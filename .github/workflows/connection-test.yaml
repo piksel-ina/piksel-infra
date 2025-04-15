@@ -1,0 +1,28 @@
+name: AWS Workflow
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write # Required for OIDC authentication
+      contents: read # Required to checkout the code
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::4058-9484-2138:role/GitHubActionsOIDCRole
+          aws-region: us-east-1 # Change to your preferred region
+
+      - name: Deploy or access AWS resources
+        run: |
+          # Your AWS CLI commands here
+          aws s3 ls
