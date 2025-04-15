@@ -20,7 +20,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::4058-9484-2138:role/GitHubActionsOIDCRole
-          aws-region: us-east-1 # Change to your preferred region
+          aws-region: ap-southeast-3
 
       - name: Deploy or access AWS resources
         run: |
