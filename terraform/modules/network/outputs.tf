@@ -65,7 +65,7 @@ output "private_route_table_ids" {
 
 output "availability_zones" {
   description = "List of availability zones used"
-  value       = distinct([
+  value = distinct([
     for subnet in merge(var.public_subnets, var.private_app_subnets, var.private_data_subnets) : subnet.availability_zone
   ])
 }

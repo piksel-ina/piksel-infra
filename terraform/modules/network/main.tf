@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">= 1.0.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 # VPC
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
@@ -86,20 +97,20 @@ resource "aws_subnet" "private_data" {
 locals {
   # If single_nat_gateway is true, only use the first AZ from azs_to_use
   nat_gateway_azs = var.single_nat_gateway && length(var.azs_to_use) > 0 ? [var.azs_to_use[0]] : var.azs_to_use
-  
+
   # Filter public subnets to only those in the AZs we're using for NAT Gateways
   public_subnets_with_nat = {
     for k, v in var.public_subnets :
     k => v if contains(local.nat_gateway_azs, v.availability_zone) && var.enable_nat_gateway
   }
-  
+
   # Map to link private subnets to their corresponding public subnet's NAT Gateway
   # This handles routing for private subnets in AZs that have NAT Gateways
   private_subnet_nat_mapping = {
     for k, v in merge(var.private_app_subnets, var.private_data_subnets) :
-    k => var.single_nat_gateway ? 
-         keys(local.public_subnets_with_nat)[0] : 
-         [for pk, pv in local.public_subnets_with_nat : pk if pv.availability_zone == v.availability_zone][0]
+    k => var.single_nat_gateway ?
+    keys(local.public_subnets_with_nat)[0] :
+    [for pk, pv in local.public_subnets_with_nat : pk if pv.availability_zone == v.availability_zone][0]
     if var.enable_nat_gateway && (var.single_nat_gateway || contains(local.nat_gateway_azs, v.availability_zone))
   }
 }
@@ -107,9 +118,9 @@ locals {
 # Elastic IPs for NAT Gateways
 resource "aws_eip" "nat" {
   for_each = local.public_subnets_with_nat
-  
+
   domain = "vpc"
-  
+
   tags = merge(
     var.common_tags,
     {
@@ -122,10 +133,10 @@ resource "aws_eip" "nat" {
 # NAT Gateways - only in specified AZs
 resource "aws_nat_gateway" "main" {
   for_each = local.public_subnets_with_nat
-  
+
   allocation_id = aws_eip.nat[each.key].id
   subnet_id     = aws_subnet.public[each.key].id
-  
+
   tags = merge(
     var.common_tags,
     {
@@ -138,7 +149,7 @@ resource "aws_nat_gateway" "main" {
 # Route tables for public subnets
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = merge(
     var.common_tags,
     {
@@ -158,7 +169,7 @@ resource "aws_route" "public_internet_gateway" {
 # Associate public subnets with public route table
 resource "aws_route_table_association" "public" {
   for_each = var.public_subnets
-  
+
   subnet_id      = aws_subnet.public[each.key].id
   route_table_id = aws_route_table.public.id
 }
@@ -166,9 +177,9 @@ resource "aws_route_table_association" "public" {
 # Route tables for private subnets
 resource "aws_route_table" "private" {
   for_each = merge(var.private_app_subnets, var.private_data_subnets)
-  
+
   vpc_id = aws_vpc.main.id
-  
+
   tags = merge(
     var.common_tags,
     {
@@ -181,7 +192,7 @@ resource "aws_route_table" "private" {
 # Routes to NAT Gateway for private subnets
 resource "aws_route" "private_nat_gateway" {
   for_each = local.private_subnet_nat_mapping
-  
+
   route_table_id         = aws_route_table.private[each.key].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.main[each.value].id
@@ -190,7 +201,7 @@ resource "aws_route" "private_nat_gateway" {
 # Associate private app subnets with private route tables
 resource "aws_route_table_association" "private_app" {
   for_each = var.private_app_subnets
-  
+
   subnet_id      = aws_subnet.private_app[each.key].id
   route_table_id = aws_route_table.private[each.key].id
 }
@@ -198,8 +209,7 @@ resource "aws_route_table_association" "private_app" {
 # Associate private data subnets with private route tables
 resource "aws_route_table_association" "private_data" {
   for_each = var.private_data_subnets
-  
+
   subnet_id      = aws_subnet.private_data[each.key].id
   route_table_id = aws_route_table.private[each.key].id
 }
-

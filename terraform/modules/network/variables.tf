@@ -51,7 +51,7 @@ variable "cluster_name" {
 variable "azs_to_use" {
   description = "List of availability zones to actually use (determines where NAT Gateways are created)"
   type        = list(string)
-  default     = [] 
+  default     = []
 }
 
 variable "enable_nat_gateway" {
@@ -65,4 +65,3 @@ variable "single_nat_gateway" {
   type        = bool
   default     = false
 }
-
