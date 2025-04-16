@@ -1,0 +1,50 @@
+name: Network-dev Apply
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "terraform/network/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform/network
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.4
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Initialize Network
+        run: terraform init -upgrade
+
+      - name: Format Check Network
+        run: terraform fmt -check
+
+      - name: Validate Network
+        run: terraform validate
+
+      - name: Plan Network Changes
+        id: plan
+        run: terraform plan -input=false
+
+      - name: Apply Network Changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+        run: terraform apply -auto-approve -input=false
