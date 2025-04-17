@@ -92,15 +92,3 @@ variable "common_tags" {
   type        = map(string)
   default     = {}
 }
-
-variable "aws_role_arn" {
-  description = "ARN of the IAM role to assume for AWS operations"
-  type        = string
-  default     = null # The actual value will come from Terraform Cloud environment variables
-}
-
-variable "aws_web_identity_token_file" {
-  description = "Path to the web identity token file for AWS role assumption"
-  type        = string
-  default     = "/tmp/token" # Default path in Terraform Cloud
-}

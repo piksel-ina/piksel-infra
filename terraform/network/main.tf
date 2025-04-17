@@ -1,14 +1,5 @@
 provider "aws" {
-  region = var.aws_region #
-
-  # Only use this block if the role ARN is provided
-  dynamic "assume_role_with_web_identity" {
-    for_each = var.aws_role_arn != null ? [1] : []
-    content {
-      role_arn                = var.aws_role_arn
-      web_identity_token_file = var.aws_web_identity_token_file
-    }
-  }
+  region = var.aws_region
 
   default_tags {
     tags = {
