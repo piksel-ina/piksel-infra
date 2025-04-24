@@ -1,0 +1,27 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML files
+      - id: end-of-file-fixer
+        name: Fix end of files
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.99.0
+    hooks:
+      - id: terraform_fmt
+        name: Format Terraform code
+      - id: terraform_validate
+        name: Validate Terraform code
+      - id: terraform_tflint
+        name: Lint Terraform code
+      - id: terraform_docs
+        # name: Generate Terraform documentation for network modules
+        # files: ^terraform/network/modules/network/.*\.tf$
+        # args:
+        #   - --hook-config=--path-to-file=README.md
+        #   - --hook-config=--add-to-existing-file=true
+        #   - --hook-config=--create-file-if-not-exist=true
