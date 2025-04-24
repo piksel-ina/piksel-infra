@@ -4,7 +4,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = ">= 5.79"
     }
   }
 
@@ -16,3 +16,9 @@ terraform {
     }
   }
 }
+
+provider "aws" {
+  region = local.region
+}
+
+data "aws_availability_zones" "available" {}
