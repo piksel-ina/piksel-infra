@@ -19,9 +19,8 @@ repos:
       - id: terraform_tflint
         name: Lint Terraform code
       - id: terraform_docs
-        # name: Generate Terraform documentation for network modules
-        # files: ^terraform/network/modules/network/.*\.tf$
-        # args:
-        #   - --hook-config=--path-to-file=README.md
-        #   - --hook-config=--add-to-existing-file=true
-        #   - --hook-config=--create-file-if-not-exist=true
+        name: "Generate Documentation: Dev-env Documentation"
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+        files: ^dev/.*\.tf$
