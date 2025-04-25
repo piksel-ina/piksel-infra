@@ -71,3 +71,22 @@ variable "s3_notebook_outputs_expiration_days" {
   type        = number
   default     = 30
 }
+
+# Cloudfront Variables
+variable "use_custom_domain" {
+  description = "Whether to use a custom domain for CloudFront"
+  type        = bool
+  default     = false
+}
+
+variable "domain_name" {
+  description = "Custom domain name for CloudFront distribution"
+  type        = string
+  default     = ""
+}
+
+variable "create_acm_certificate" {
+  description = "Whether to create an ACM certificate for the custom domain"
+  type        = bool
+  default     = false
+}

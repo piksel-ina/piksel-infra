@@ -406,7 +406,7 @@ data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
     # condition {
     #   test = "ArnNotLike"
     #   variable = "aws:PrincipalArn"
-    #   values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/YourAdminRole"]
+    #   values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:roleAdminRole"]
     # }
   }
 }
@@ -509,8 +509,29 @@ module "s3_bucket_data_dev" {
     aws_kms_key.s3_key,
     module.s3_log_bucket
   ]
-}
 
+  # Intelligent Tiering for data bucket
+  intelligent_tiering = {
+    archive_tier = {
+      name   = "${local.name}-data-archive-tier"
+      status = "Enabled"
+      filter = {
+        prefix = "path/to/data/"
+        tags = {
+          "tier" = "archive"
+        }
+      }
+      tiering = {
+        ARCHIVE_ACCESS = {
+          days = 90
+        }
+        DEEP_ARCHIVE_ACCESS = {
+          days = 180
+        }
+      }
+    }
+  }
+}
 
 ################################################################################
 # Piksel Notebooks Bucket (Dev)
@@ -600,6 +621,13 @@ module "s3_bucket_web_dev" {
       }
       bucket_key_enabled = true
     }
+    attach_policy                   = true
+    attach_policy_for_cfn           = true
+    cfn_origin_access_identity_path = null # Not needed when using OAC
+    cfn_distribution_arn            = module.cloudfront.cloudfront_distribution_arn
+
+    # Additional TLS enforcement policy
+    attach_policy_for_tls = true
   }
 
   # Block all public access (as specified for dev web bucket)
@@ -637,4 +665,121 @@ module "s3_bucket_web_dev" {
   ]
 }
 
-# ... (keep existing EKS Cluster SG and Node Group SG resources/modules if they follow) ...
+################################################################################
+# CloudFront for Web Bucket
+################################################################################
+
+# ACM Certificate (only created if custom domain is used)
+resource "aws_acm_certificate" "web_cert" {
+  count             = var.use_custom_domain && var.create_acm_certificate ? 1 : 0
+  domain_name       = var.domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = merge(local.tags, {
+    Name = "${local.name}-web-cert"
+  })
+}
+
+# Certificate validation placeholder
+resource "aws_acm_certificate_validation" "web_cert" {
+  count           = var.use_custom_domain && var.create_acm_certificate ? 1 : 0
+  certificate_arn = aws_acm_certificate.web_cert[0].arn
+}
+
+module "cloudfront" {
+  source  = "terraform-aws-modules/cloudfront/aws"
+  version = "4.1.0"
+
+  aliases = var.use_custom_domain ? [var.domain_name] : []
+
+  comment             = "${local.name} web distribution"
+  enabled             = true
+  is_ipv6_enabled     = true
+  price_class         = "PriceClass_100"
+  retain_on_delete    = false
+  wait_for_deployment = false
+  default_root_object = "index.html"
+
+  # Create Origin Access Control using the module
+  create_origin_access_control = true
+  origin_access_control = {
+    s3_oac = {
+      description      = "CloudFront access to S3"
+      origin_type      = "s3"
+      signing_behavior = "always"
+      signing_protocol = "sigv4"
+    }
+  }
+
+  # Origin configuration
+  origin = {
+    s3_bucket = {
+      domain_name           = module.s3_bucket_web_dev.s3_bucket_bucket_regional_domain_name
+      origin_access_control = "s3_oac"
+      origin_id             = "s3"
+    }
+  }
+
+  # Default cache behavior
+  default_cache_behavior = {
+    target_origin_id       = "s3"
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    cached_methods  = ["GET", "HEAD"]
+    compress        = true
+
+    # Using managed policies by name (module handles the ARNs)
+    use_forwarded_values       = false
+    cache_policy_name          = "Managed-CachingOptimized"
+    origin_request_policy_name = "Managed-CORS-S3Origin"
+  }
+
+  # Custom error responses
+  custom_error_response = [
+    {
+      error_code            = 403
+      response_code         = 200
+      response_page_path    = "/index.html"
+      error_caching_min_ttl = 10
+    },
+    {
+      error_code            = 404
+      response_code         = 200
+      response_page_path    = "/index.html"
+      error_caching_min_ttl = 10
+    }
+  ]
+
+  # Viewer certificate configuration
+  viewer_certificate = {
+    acm_certificate_arn            = var.use_custom_domain && var.create_acm_certificate ? aws_acm_certificate.web_cert[0].arn : null
+    cloudfront_default_certificate = !var.use_custom_domain
+    minimum_protocol_version       = var.use_custom_domain ? "TLSv1.2_2021" : "TLSv1"
+    ssl_support_method             = var.use_custom_domain ? "sni-only" : null
+  }
+
+  # No geo-restrictions for dev
+  geo_restriction = {
+    restriction_type = "none"
+  }
+
+  # Enable CloudFront monitoring
+  create_monitoring_subscription = true
+
+  # Web Application Firewall (optional)
+  web_acl_id = null # Set to WAF WebACL ID if needed
+
+  tags = merge(local.tags, {
+    Name    = "${local.name}-web-distribution"
+    Purpose = "web"
+  })
+
+  depends_on = [
+    aws_acm_certificate_validation.web_cert
+  ]
+}

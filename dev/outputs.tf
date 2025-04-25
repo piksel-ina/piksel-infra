@@ -86,3 +86,24 @@ output "s3_bucket_web_dev_arn" {
   description = "ARN of the S3 web bucket for the dev environment"
   value       = module.s3_bucket_web_dev.s3_bucket_arn
 }
+
+# Cloudfront Outputs
+output "custom_domain_url" {
+  description = "The custom domain URL (if configured)"
+  value       = var.use_custom_domain ? "https://${var.domain_name}" : "No custom domain configured"
+}
+
+output "cloudfront_distribution_id" {
+  description = "The ID of the CloudFront distribution"
+  value       = module.cloudfront.cloudfront_distribution_id
+}
+
+output "cloudfront_distribution_domain_name" {
+  description = "The domain name of the CloudFront distribution"
+  value       = module.cloudfront.cloudfront_distribution_domain_name
+}
+
+output "cloudfront_distribution_url" {
+  description = "The URL of the CloudFront distribution"
+  value       = "https://${module.cloudfront.cloudfront_distribution_domain_name}"
+}

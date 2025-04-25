@@ -1,13 +1,10 @@
 aws_region          = "ap-southeast-3"
-project             = "piksel"
+project             = "Piksel"
 environment         = "dev"
 vpc_cidr            = "10.0.0.0/16"
 allowed_cidr_blocks = ["0.0.0.0/0"] # Consider restricting this in production
 common_tags = {
-  Project     = "Piksel"
-  Environment = "Dev"
-  ManagedBy   = "Terraform"
-  Owner       = "DevOps-Team"
+  Owner = "DevOps-Team"
 }
 
 # Explicitly define S3 settings for dev (matches defaults)
@@ -16,3 +13,8 @@ s3_log_bucket_force_destroy         = true
 s3_log_retention_days               = 90
 s3_data_raw_transition_days         = 30
 s3_notebook_outputs_expiration_days = 30
+
+# CloudFront domain configuration for dev
+use_custom_domain      = false # Set to true when have a domain
+domain_name            = ""    # Set to domain when ready, e.g., "dev-web.office-domain.com"
+create_acm_certificate = false # Set to true when you want Terraform to create the certificate
