@@ -236,3 +236,405 @@ resource "aws_security_group_rule" "database_inbound" {
   security_group_id        = aws_security_group.database.id
   description              = "Allow PostgreSQL access from EKS nodes"
 }
+
+
+################################################################################
+# KMS Key for S3 Encryption
+################################################################################
+
+resource "aws_kms_key" "s3_key" {
+  description             = "KMS key for S3 bucket encryption in ${local.name}"
+  deletion_window_in_days = var.s3_kms_key_deletion_window_in_days
+  enable_key_rotation     = true
+  tags                    = merge(local.tags, { Name = "${local.name}-s3-kms-key" })
+
+  # Default policy allows root user full control and enables IAM policy usage
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "key-default-1",
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = "*"
+      }
+      # Add statements here later if specific services need direct KMS access
+    ]
+  })
+}
+
+resource "aws_kms_alias" "s3_key" {
+  name          = "alias/${local.name}-s3"
+  target_key_id = aws_kms_key.s3_key.key_id
+}
+
+data "aws_caller_identity" "current" {}
+data "aws_iam_policy_document" "s3_log_bucket_policy" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "arn:aws:s3:::${local.name}-logs/*" # Grant access only to the specific bucket ARN
+    ]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:s3:::${local.name}-*"] # Allow logs from buckets matching the pattern
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+
+################################################################################
+# S3 Access Logging Bucket
+################################################################################
+
+module "s3_log_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.7.0" # Pinning to the requested version
+
+  bucket = "${local.name}-logs" # e.g., piksel-dev-logs
+
+  # Use default SSE-S3 encryption for simplicity on the log bucket itself
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  # Block all public access
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  # Attach policy to allow S3 logging service to write
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_log_bucket_policy.json
+
+  # Lifecycle rule to expire logs
+  lifecycle_rule = [
+    {
+      id      = "log-expiration"
+      enabled = true
+      filter = {
+        prefix = "" # Empty prefix means apply to all objects
+      }
+      expiration = {
+        days = var.s3_log_retention_days
+      }
+    }
+  ]
+
+  # Enable versioning for log bucket recommended practice
+  versioning = {
+    enabled = true
+  }
+
+  # Allow force destroy only in non-prod
+  force_destroy = var.s3_log_bucket_force_destroy
+
+  tags = merge(local.tags, {
+    Purpose = "s3-access-logs"
+    Name    = "${local.name}-logs"
+  })
+}
+
+################################################################################
+# S3 Bucket Policies (TLS and VPC Endpoint Enforcement)
+################################################################################
+
+data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
+  # Policy for buckets requiring both TLS and VPC Endpoint access
+  statement {
+    sid    = "AllowSSLRequestsOnly"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::${local.name}-data/*",      # Apply to objects within the data bucket
+      "arn:aws:s3:::${local.name}-data",        # Apply to the bucket itself
+      "arn:aws:s3:::${local.name}-notebooks/*", # Apply to objects within the notebooks bucket
+      "arn:aws:s3:::${local.name}-notebooks",   # Apply to the bucket itself
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid    = "DenyAccessOutsideVPCE"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::${local.name}-data/*",
+      "arn:aws:s3:::${local.name}-data",
+      "arn:aws:s3:::${local.name}-notebooks/*",
+      "arn:aws:s3:::${local.name}-notebooks",
+    ]
+    condition {
+      test     = "StringNotEqualsIfExists" # Use IfExists because global services might not have VPC context
+      variable = "aws:sourceVpce"
+      values   = [module.vpc_endpoints.endpoints["s3"].id] # Reference the created S3 VPC Endpoint ID
+    }
+    # Add exceptions here if needed (e.g., specific roles/users needing console access)
+    # condition {
+    #   test = "ArnNotLike"
+    #   variable = "aws:PrincipalArn"
+    #   values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/YourAdminRole"]
+    # }
+  }
+}
+
+data "aws_iam_policy_document" "s3_tls_only_enforcement" {
+  # Policy for buckets requiring only TLS (like the dev web bucket)
+  statement {
+    sid    = "AllowSSLRequestsOnly"
+    effect = "Deny"
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+    actions = ["s3:*"]
+    resources = [
+      "arn:aws:s3:::${local.name}-web/*", # Apply to objects within the web bucket
+      "arn:aws:s3:::${local.name}-web",   # Apply to the bucket itself
+    ]
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+}
+
+################################################################################
+# Piksel Data Bucket (Dev)
+################################################################################
+
+module "s3_bucket_data_dev" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.7.0"
+
+  bucket = "${local.name}-data" # e.g., piksel-dev-data
+
+  # Encryption using the dedicated KMS key
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3_key.arn
+      }
+      bucket_key_enabled = true # Enable S3 Bucket Key for cost savings
+    }
+  }
+
+  # Block all public access
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  # Enable versioning
+  versioning = {
+    enabled = true
+  }
+
+  # Configure access logging
+  logging = {
+    target_bucket = module.s3_log_bucket.s3_bucket_id
+    target_prefix = "s3/${local.name}-data/"
+  }
+
+  # Lifecycle rules (Transition raw data)
+  lifecycle_rule = [
+    {
+      id      = "raw-transition-to-ia"
+      enabled = true
+      filter = {
+        prefix = "raw/" # Apply only to objects under the raw/ prefix
+      }
+      transitions = [
+        {
+          days          = var.s3_data_raw_transition_days
+          storage_class = "STANDARD_IA"
+        },
+      ]
+    },
+    # Add more rules here for /processed, /tiles if defined later
+    # {
+    #   id = "processed-expiration",
+    #   enabled = true,
+    #   prefix = "processed/",
+    #   expiration = { days = 180 }
+    # }
+  ]
+
+  # Attach policy for TLS and VPCe enforcement
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_tls_vpce_enforcement.json
+
+  tags = merge(local.tags, {
+    Purpose = "data"
+    Name    = "${local.name}-data"
+  })
+
+  # Ensure KMS key and log bucket exist first
+  depends_on = [
+    aws_kms_key.s3_key,
+    module.s3_log_bucket
+  ]
+}
+
+
+################################################################################
+# Piksel Notebooks Bucket (Dev)
+################################################################################
+
+module "s3_bucket_notebooks_dev" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.7.0"
+
+  bucket = "${local.name}-notebooks" # e.g., piksel-dev-notebooks
+
+  # Encryption using the dedicated KMS key
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3_key.arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  # Block all public access
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  # Enable versioning
+  versioning = {
+    enabled = true
+  }
+
+  # Configure access logging
+  logging = {
+    target_bucket = module.s3_log_bucket.s3_bucket_id
+    target_prefix = "s3/${local.name}-notebooks/"
+  }
+
+  # Lifecycle rules (Expire outputs)
+  lifecycle_rule = [
+    {
+      id      = "outputs-expiration"
+      enabled = true
+      filter = {
+        prefix = "outputs/" # Apply only to objects under the outputs/ prefix
+      }
+      expiration = {
+        days = var.s3_notebook_outputs_expiration_days
+      }
+    }
+  ]
+
+  # Attach policy for TLS and VPCe enforcement
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_tls_vpce_enforcement.json
+
+  tags = merge(local.tags, {
+    Purpose = "notebooks"
+    Name    = "${local.name}-notebooks"
+  })
+
+  # Ensure KMS key and log bucket exist first
+  depends_on = [
+    aws_kms_key.s3_key,
+    module.s3_log_bucket
+  ]
+}
+
+
+################################################################################
+# Piksel Web Bucket (Dev)
+################################################################################
+
+module "s3_bucket_web_dev" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.7.0"
+
+  bucket = "${local.name}-web" # e.g., piksel-dev-web
+
+  # Encryption using the dedicated KMS key
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = aws_kms_key.s3_key.arn
+      }
+      bucket_key_enabled = true
+    }
+  }
+
+  # Block all public access (as specified for dev web bucket)
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  # Disable versioning for web assets
+  versioning = {
+    enabled = false
+  }
+
+  # Configure access logging
+  logging = {
+    target_bucket = module.s3_log_bucket.s3_bucket_id
+    target_prefix = "s3/${local.name}-web/"
+  }
+
+  # No lifecycle rules specified for dev web bucket
+
+  # Attach policy for TLS enforcement only
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_tls_only_enforcement.json
+
+  tags = merge(local.tags, {
+    Purpose = "web"
+    Name    = "${local.name}-web"
+  })
+
+  # Ensure KMS key and log bucket exist first
+  depends_on = [
+    aws_kms_key.s3_key,
+    module.s3_log_bucket
+  ]
+}
+
+# ... (keep existing EKS Cluster SG and Node Group SG resources/modules if they follow) ...

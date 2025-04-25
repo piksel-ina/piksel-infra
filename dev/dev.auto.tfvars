@@ -9,3 +9,10 @@ common_tags = {
   ManagedBy   = "Terraform"
   Owner       = "DevOps-Team"
 }
+
+# Explicitly define S3 settings for dev (matches defaults)
+s3_kms_key_deletion_window_in_days  = 7
+s3_log_bucket_force_destroy         = true
+s3_log_retention_days               = 90
+s3_data_raw_transition_days         = 30
+s3_notebook_outputs_expiration_days = 30

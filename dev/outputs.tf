@@ -42,3 +42,47 @@ output "security_group_ids" {
 }
 
 ################################################################################
+
+# KMS Outputs
+output "s3_kms_key_arn" {
+  description = "ARN of the KMS key used for S3 encryption"
+  value       = aws_kms_key.s3_key.arn
+}
+
+################################################################################
+
+# S3 Outputs
+output "s3_log_bucket_id" {
+  description = "ID (name) of the S3 bucket used for access logging"
+  value       = module.s3_log_bucket.s3_bucket_id
+}
+
+output "s3_bucket_data_dev_id" {
+  description = "ID (name) of the S3 data bucket for the dev environment"
+  value       = module.s3_bucket_data_dev.s3_bucket_id
+}
+
+output "s3_bucket_data_dev_arn" {
+  description = "ARN of the S3 data bucket for the dev environment"
+  value       = module.s3_bucket_data_dev.s3_bucket_arn
+}
+
+output "s3_bucket_notebooks_dev_id" {
+  description = "ID (name) of the S3 notebooks bucket for the dev environment"
+  value       = module.s3_bucket_notebooks_dev.s3_bucket_id
+}
+
+output "s3_bucket_notebooks_dev_arn" {
+  description = "ARN of the S3 notebooks bucket for the dev environment"
+  value       = module.s3_bucket_notebooks_dev.s3_bucket_arn
+}
+
+output "s3_bucket_web_dev_id" {
+  description = "ID (name) of the S3 web bucket for the dev environment"
+  value       = module.s3_bucket_web_dev.s3_bucket_id
+}
+
+output "s3_bucket_web_dev_arn" {
+  description = "ARN of the S3 web bucket for the dev environment"
+  value       = module.s3_bucket_web_dev.s3_bucket_arn
+}

@@ -40,3 +40,34 @@ variable "allowed_cidr_blocks" {
   description = "List of CIDR blocks allowed to access the ALB"
   type        = list(string)
 }
+
+# S3 Specific Variables
+variable "s3_kms_key_deletion_window_in_days" {
+  description = "Number of days to retain the S3 KMS key after deletion."
+  type        = number
+  default     = 7 # Use 7 for dev/staging, 30 for prod
+}
+
+variable "s3_log_bucket_force_destroy" {
+  description = "Force destroy the S3 log bucket (useful for dev/testing, disable in prod)."
+  type        = bool
+  default     = true # Set to false for staging/prod
+}
+
+variable "s3_log_retention_days" {
+  description = "Number of days to retain S3 access logs before deleting."
+  type        = number
+  default     = 90
+}
+
+variable "s3_data_raw_transition_days" {
+  description = "Number of days before transitioning raw data to IA."
+  type        = number
+  default     = 30
+}
+
+variable "s3_notebook_outputs_expiration_days" {
+  description = "Number of days before expiring notebook outputs."
+  type        = number
+  default     = 30
+}
