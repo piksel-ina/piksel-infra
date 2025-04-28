@@ -60,11 +60,11 @@ variable "s3_log_retention_days" {
   default     = 90
 }
 
-variable "s3_data_raw_transition_days" {
-  description = "Number of days before transitioning raw data to IA."
-  type        = number
-  default     = 30
-}
+# variable "s3_data_raw_transition_days" {
+#   description = "Number of days before transitioning raw data to IA."
+#   type        = number
+#   default     = 30
+# }
 
 variable "s3_notebook_outputs_expiration_days" {
   description = "Number of days before expiring notebook outputs."

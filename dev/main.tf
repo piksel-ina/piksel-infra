@@ -360,8 +360,8 @@ module "s3_log_bucket" {
 # S3 Bucket Policies (TLS and VPC Endpoint Enforcement)
 ################################################################################
 
-data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
-  # Policy for buckets requiring both TLS and VPC Endpoint access
+# For data bucket
+data "aws_iam_policy_document" "data_bucket_policy" {
   statement {
     sid    = "AllowSSLRequestsOnly"
     effect = "Deny"
@@ -371,10 +371,8 @@ data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
     }
     actions = ["s3:*"]
     resources = [
-      "arn:aws:s3:::${local.name}-data/*",      # Apply to objects within the data bucket
-      "arn:aws:s3:::${local.name}-data",        # Apply to the bucket itself
-      "arn:aws:s3:::${local.name}-notebooks/*", # Apply to objects within the notebooks bucket
-      "arn:aws:s3:::${local.name}-notebooks",   # Apply to the bucket itself
+      "arn:aws:s3:::${local.name}-data/*",
+      "arn:aws:s3:::${local.name}-data"
     ]
     condition {
       test     = "Bool"
@@ -382,9 +380,12 @@ data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
       values   = ["false"]
     }
   }
+}
 
+# For notebooks bucket
+data "aws_iam_policy_document" "notebooks_bucket_policy" {
   statement {
-    sid    = "DenyAccessOutsideVPCE"
+    sid    = "AllowSSLRequestsOnly"
     effect = "Deny"
     principals {
       type        = "*"
@@ -392,27 +393,19 @@ data "aws_iam_policy_document" "s3_tls_vpce_enforcement" {
     }
     actions = ["s3:*"]
     resources = [
-      "arn:aws:s3:::${local.name}-data/*",
-      "arn:aws:s3:::${local.name}-data",
       "arn:aws:s3:::${local.name}-notebooks/*",
-      "arn:aws:s3:::${local.name}-notebooks",
+      "arn:aws:s3:::${local.name}-notebooks"
     ]
     condition {
-      test     = "StringNotEqualsIfExists" # Use IfExists because global services might not have VPC context
-      variable = "aws:sourceVpce"
-      values   = [module.vpc_endpoints.endpoints["s3"].id] # Reference the created S3 VPC Endpoint ID
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
     }
-    # Add exceptions here if needed (e.g., specific roles/users needing console access)
-    # condition {
-    #   test = "ArnNotLike"
-    #   variable = "aws:PrincipalArn"
-    #   values = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:roleAdminRole"]
-    # }
   }
 }
 
 data "aws_iam_policy_document" "s3_tls_only_enforcement" {
-  # Policy for buckets requiring only TLS (like the dev web bucket)
+  # Policy for buckets requiring TLS
   statement {
     sid    = "AllowSSLRequestsOnly"
     effect = "Deny"
@@ -479,10 +472,18 @@ module "s3_bucket_data_dev" {
       filter = {
         prefix = "raw/" # Apply only to objects under the raw/ prefix
       }
-      transitions = [
+      transition = [
         {
-          days          = var.s3_data_raw_transition_days
+          days          = 30
           storage_class = "STANDARD_IA"
+        },
+        {
+          days          = 60
+          storage_class = "ONEZONE_IA"
+        },
+        {
+          days          = 90
+          storage_class = "GLACIER"
         },
       ]
     },
@@ -494,10 +495,9 @@ module "s3_bucket_data_dev" {
     #   expiration = { days = 180 }
     # }
   ]
-
-  # Attach policy for TLS and VPCe enforcement
+  # Use a simple TLS-only policy for now
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_tls_vpce_enforcement.json
+  policy        = data.aws_iam_policy_document.data_bucket_policy.json
 
   tags = merge(local.tags, {
     Purpose = "data"
@@ -510,27 +510,7 @@ module "s3_bucket_data_dev" {
     module.s3_log_bucket
   ]
 
-  # Intelligent Tiering for data bucket
-  intelligent_tiering = {
-    archive_tier = {
-      name   = "${local.name}-data-archive-tier"
-      status = "Enabled"
-      filter = {
-        prefix = "path/to/data/"
-        tags = {
-          "tier" = "archive"
-        }
-      }
-      tiering = {
-        ARCHIVE_ACCESS = {
-          days = 90
-        }
-        DEEP_ARCHIVE_ACCESS = {
-          days = 180
-        }
-      }
-    }
-  }
+  # # Intelligent Tiering for data bucket
 }
 
 ################################################################################
@@ -585,9 +565,9 @@ module "s3_bucket_notebooks_dev" {
     }
   ]
 
-  # Attach policy for TLS and VPCe enforcement
+  # Use a simple TLS-only policy for now
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_tls_vpce_enforcement.json
+  policy        = data.aws_iam_policy_document.notebooks_bucket_policy.json
 
   tags = merge(local.tags, {
     Purpose = "notebooks"
