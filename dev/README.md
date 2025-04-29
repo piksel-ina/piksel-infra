@@ -52,7 +52,11 @@ This Terraform configuration is organized into the following files:
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_alb_sg"></a> [alb\_sg](#module\_alb\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
 | <a name="module_cloudfront"></a> [cloudfront](#module\_cloudfront) | terraform-aws-modules/cloudfront/aws | 4.1.0 |
+| <a name="module_eks_control_plane_sg"></a> [eks\_control\_plane\_sg](#module\_eks\_control\_plane\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
+| <a name="module_eks_nodes_sg"></a> [eks\_nodes\_sg](#module\_eks\_nodes\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
+| <a name="module_rds_sg"></a> [rds\_sg](#module\_rds\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
 | <a name="module_s3_bucket_data_dev"></a> [s3\_bucket\_data\_dev](#module\_s3\_bucket\_data\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_s3_bucket_notebooks_dev"></a> [s3\_bucket\_notebooks\_dev](#module\_s3\_bucket\_notebooks\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_s3_bucket_web_dev"></a> [s3\_bucket\_web\_dev](#module\_s3\_bucket\_web\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
@@ -68,19 +72,6 @@ This Terraform configuration is organized into the following files:
 | [aws_acm_certificate_validation.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate_validation) | resource |
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
-| [aws_security_group.alb](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group) | resource |
-| [aws_security_group.database](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group) | resource |
-| [aws_security_group.eks_cluster](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group) | resource |
-| [aws_security_group.node_group](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group) | resource |
-| [aws_security_group_rule.alb_http_inbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.alb_https_inbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.alb_outbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.cluster_inbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.cluster_outbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.database_inbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.nodes_cluster_inbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.nodes_internal](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
-| [aws_security_group_rule.nodes_outbound](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/security_group_rule) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.data_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |

@@ -34,10 +34,11 @@ output "vpc_endpoints" {
 output "security_group_ids" {
   description = "Security group IDs for different components"
   value = {
-    eks_cluster = aws_security_group.eks_cluster.id
-    node_group  = aws_security_group.node_group.id
-    alb         = aws_security_group.alb.id
-    database    = aws_security_group.database.id
+    # Updated to use module outputs
+    eks_cluster = module.eks_control_plane_sg.security_group_id # Assuming module name from previous refactor
+    node_group  = module.eks_nodes_sg.security_group_id         # Assuming module name from previous refactor
+    alb         = module.alb_sg.security_group_id               # Assuming module name from previous refactor
+    database    = module.rds_sg.security_group_id               # Assuming module name from previous refactor
   }
 }
 

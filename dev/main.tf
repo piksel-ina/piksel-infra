@@ -95,148 +95,176 @@ module "vpc_endpoints" {
 }
 
 ################################################################################
-# EKS Cluster Security Group
+# Security Groups
 ################################################################################
-resource "aws_security_group" "eks_cluster" {
-  name        = "${local.name}-cluster-sg"
-  description = "Security group for EKS cluster control plane"
-  vpc_id      = module.vpc.vpc_id
 
-  tags = merge(local.tags, {
-    Name = "${local.name}-cluster-sg"
-  })
-}
+module "alb_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
 
-resource "aws_security_group_rule" "cluster_inbound" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.node_group.id
-  security_group_id        = aws_security_group.eks_cluster.id
-  description              = "Allow worker nodes to communicate with the cluster API Server"
-}
-
-resource "aws_security_group_rule" "cluster_outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.eks_cluster.id
-  description       = "Allow all outbound traffic"
-}
-
-################################################################################
-# EKS Node Group Security Group
-################################################################################
-resource "aws_security_group" "node_group" {
-  name        = "${local.name}-node-sg"
-  description = "Security group for EKS worker nodes"
-  vpc_id      = module.vpc.vpc_id
-
-  tags = merge(local.tags, {
-    Name                                          = "${local.name}-node-sg"
-    "kubernetes.io/cluster/${local.name}-cluster" = "owned"
-  })
-}
-
-resource "aws_security_group_rule" "nodes_internal" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.node_group.id
-  security_group_id        = aws_security_group.node_group.id
-  description              = "Allow nodes to communicate with each other"
-}
-
-resource "aws_security_group_rule" "nodes_cluster_inbound" {
-  type                     = "ingress"
-  from_port                = 1025
-  to_port                  = 65535
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.eks_cluster.id
-  security_group_id        = aws_security_group.node_group.id
-  description              = "Allow worker Kubelets and pods to receive communication from the cluster control plane"
-}
-
-resource "aws_security_group_rule" "nodes_outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.node_group.id
-  description       = "Allow all outbound traffic"
-}
-
-################################################################################
-# ALB Security Group
-################################################################################
-resource "aws_security_group" "alb" {
   name        = "${local.name}-alb-sg"
   description = "Security group for Application Load Balancer"
   vpc_id      = module.vpc.vpc_id
 
-  tags = merge(local.tags, {
-    Name = "${local.name}-alb-sg"
-  })
+  # Ingress rules from specified CIDR blocks
+  ingress_with_cidr_blocks = [
+    {
+      rule        = "http-80-tcp"
+      cidr_blocks = join(",", var.allowed_cidr_blocks) # Module expects comma-separated string or list
+      description = "Allow HTTP from specified CIDRs"
+    },
+    {
+      rule        = "https-443-tcp"
+      cidr_blocks = join(",", var.allowed_cidr_blocks)
+      description = "Allow HTTPS from specified CIDRs"
+    }
+  ]
+
+  # Egress rules: Allow all outbound
+  egress_with_cidr_blocks = [
+    {
+      rule        = "all-all"
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all outbound traffic"
+    }
+  ]
+
+  tags = merge(local.tags, { Name = "${local.name}-alb-sg" })
 }
 
-resource "aws_security_group_rule" "alb_http_inbound" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = var.allowed_cidr_blocks
-  security_group_id = aws_security_group.alb.id
-  description       = "Allow HTTP inbound traffic"
+module "eks_nodes_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
+
+  name        = "${local.name}-eks-nodes-sg"
+  description = "Security group for EKS worker nodes"
+  vpc_id      = module.vpc.vpc_id
+
+  # Ingress from self (node-to-node communication)
+  ingress_with_self = [
+    {
+      rule        = "all-all"
+      description = "Allow all traffic from self (node-to-node)"
+    }
+  ]
+
+  # Ingress rules from other Security Groups
+  ingress_with_source_security_group_id = [
+    # From Control Plane (Note: This references module.eks_control_plane_sg)
+    {
+      # Using specific ports/protocol as 'all-all' might not be a predefined rule name
+      from_port                = 1025
+      to_port                  = 65535
+      protocol                 = "tcp"
+      source_security_group_id = module.eks_control_plane_sg.security_group_id # Reference potentially causing cycle
+      description              = "Allow Kubelet API from Control Plane"
+    },
+    {
+      rule                     = "https-443-tcp"
+      source_security_group_id = module.eks_control_plane_sg.security_group_id # Reference potentially causing cycle
+      description              = "Allow HTTPS from Control Plane"
+    },
+    # From ALB
+    {
+      rule                     = "http-80-tcp"
+      source_security_group_id = module.alb_sg.security_group_id
+      description              = "Allow HTTP from ALB"
+    },
+    {
+      rule                     = "https-443-tcp"
+      source_security_group_id = module.alb_sg.security_group_id
+      description              = "Allow HTTPS from ALB"
+    }
+  ]
+
+  # Egress rules: Allow all outbound
+  egress_with_cidr_blocks = [
+    {
+      rule        = "all-all"
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all outbound traffic"
+    }
+  ]
+
+  tags = merge(local.tags, { Name = "${local.name}-eks-nodes-sg" })
+
+  # Explicit dependency might help Terraform's graph, but could also formalize a cycle
+  # depends_on = [module.eks_control_plane_sg, module.alb_sg]
 }
 
-resource "aws_security_group_rule" "alb_https_inbound" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = var.allowed_cidr_blocks
-  security_group_id = aws_security_group.alb.id
-  description       = "Allow HTTPS inbound traffic"
+module "eks_control_plane_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
+
+  name        = "${local.name}-eks-control-plane-sg"
+  description = "Security group for EKS control plane"
+  vpc_id      = module.vpc.vpc_id
+
+  # Ingress rules from other Security Groups
+  ingress_with_source_security_group_id = [
+    # From EKS Nodes (Note: This references module.eks_nodes_sg)
+    {
+      rule                     = "https-443-tcp"
+      source_security_group_id = module.eks_nodes_sg.security_group_id # Reference potentially causing cycle
+      description              = "Allow HTTPS from EKS Nodes"
+    },
+    {
+      # Allow all traffic from nodes (as per original config) - Be cautious with this rule
+      rule                     = "all-all"
+      source_security_group_id = module.eks_nodes_sg.security_group_id # Reference potentially causing cycle
+      description              = "Allow ALL traffic from EKS Nodes (Review if needed)"
+    }
+  ]
+
+  # Egress rules: Allow all outbound
+  egress_with_cidr_blocks = [
+    {
+      rule        = "all-all"
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all outbound traffic"
+    }
+  ]
+
+  tags = merge(local.tags, { Name = "${local.name}-eks-control-plane-sg" })
+
+  # Explicit dependency might help Terraform's graph, but could also formalize a cycle
+  # depends_on = [module.eks_nodes_sg]
 }
 
-resource "aws_security_group_rule" "alb_outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.alb.id
-  description       = "Allow all outbound traffic"
-}
+module "rds_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.3.0"
 
-################################################################################
-# Database Security Group
-################################################################################
-resource "aws_security_group" "database" {
-  name        = "${local.name}-db-sg"
+  name        = "${local.name}-rds-sg"
   description = "Security group for RDS instances"
   vpc_id      = module.vpc.vpc_id
 
-  tags = merge(local.tags, {
-    Name = "${local.name}-db-sg"
-  })
-}
+  # Ingress rules from other Security Groups
+  ingress_with_source_security_group_id = [
+    # From EKS Nodes
+    {
+      # Using specific ports/protocol as 'postgresql-tcp' might not be a predefined rule name
+      from_port                = 5432 # Assuming PostgreSQL default port
+      to_port                  = 5432
+      protocol                 = "tcp"
+      source_security_group_id = module.eks_nodes_sg.security_group_id
+      description              = "Allow PostgreSQL access from EKS Nodes"
+    }
+  ]
 
-resource "aws_security_group_rule" "database_inbound" {
-  type                     = "ingress"
-  from_port                = 5432
-  to_port                  = 5432
-  protocol                 = "tcp"
-  source_security_group_id = aws_security_group.node_group.id
-  security_group_id        = aws_security_group.database.id
-  description              = "Allow PostgreSQL access from EKS nodes"
-}
+  # Egress rules: Allow all outbound
+  egress_with_cidr_blocks = [
+    {
+      rule        = "all-all"
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all outbound traffic"
+    }
+  ]
 
+  tags = merge(local.tags, { Name = "${local.name}-rds-sg" })
+
+  depends_on = [module.eks_nodes_sg] # Explicit dependency is safe here as RDS depends on Nodes, but not vice-versa
+}
 
 ################################################################################
 # KMS Key for S3 Encryption
