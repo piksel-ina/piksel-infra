@@ -7,6 +7,12 @@ on:
       - "**/*.tf" # Only run if Terraform files change
       - "**/*.tfvars" # Or Terraform variable files change
       - ".github/workflows/tf-validate-lint.yml" # Or this workflow file changes
+  push:
+    branches: [main]
+    paths:
+      - "**/*.tf"
+      - "**/*.tfvars"
+      - ".github/workflows/tf-validate-lint.yml"
 
 jobs:
   validate:
