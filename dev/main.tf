@@ -792,16 +792,9 @@ module "cloudfront" {
   ]
 }
 
-
-
 ################################################################################
 # RDS - ODC Index Database Resources
 ################################################################################
-################################################################################
-# RDS - ODC Index Database Resources
-################################################################################
-
-# --- ODC RDS Instance using the Module ---
 
 module "odc_rds" {
   source  = "terraform-aws-modules/rds/aws"
@@ -867,6 +860,6 @@ module "odc_rds" {
 
   tags = merge(local.tags, { Purpose = "odc-index" })
 
-  # Ensure SG is created before RDS tries to use it (though Terraform usually handles this)
+  # Ensure SG is created before RDS tries to use it
   depends_on = [module.rds_sg]
 }
