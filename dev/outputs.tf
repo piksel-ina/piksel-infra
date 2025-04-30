@@ -108,3 +108,43 @@ output "cloudfront_distribution_url" {
   description = "The URL of the CloudFront distribution"
   value       = "https://${module.cloudfront.cloudfront_distribution_domain_name}"
 }
+
+
+# ------------------------------------------------------------------------------
+# RDS - ODC Index Database Outputs
+# ------------------------------------------------------------------------------
+output "odc_rds_instance_id" {
+  description = "The ID of the ODC index RDS instance."
+  value       = module.odc_rds.db_instance_identifier
+}
+
+output "odc_rds_instance_arn" {
+  description = "The ARN of the ODC index RDS instance."
+  value       = module.odc_rds.db_instance_arn
+}
+
+output "odc_rds_instance_endpoint" {
+  description = "The connection endpoint for the ODC index RDS instance."
+  value       = module.odc_rds.db_instance_endpoint
+}
+
+output "odc_rds_instance_port" {
+  description = "The port the ODC index RDS instance is listening on."
+  value       = module.odc_rds.db_instance_port
+}
+
+output "odc_rds_instance_address" {
+  description = "The address of the ODC index RDS instance."
+  value       = module.odc_rds.db_instance_address
+}
+
+output "odc_rds_master_user_secret_arn" {
+  description = "ARN of the Secrets Manager secret storing the master credentials for the ODC index RDS."
+  value       = try(module.odc_rds.db_instance_master_user_secret[0].secret_arn, null) # Access secret ARN safely
+  sensitive   = true
+}
+
+output "odc_rds_security_group_id" {
+  description = "The ID of the security group attached to the ODC index RDS instance."
+  value       = module.rds_sg.security_group_id
+}

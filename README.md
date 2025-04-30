@@ -136,5 +136,6 @@ The infrastructure design choices are documented in the central `piksel-document
 
 - **[Network Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/network.md)**
 - **[S3 / Object Storage Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)**
+- **[RDS / Database Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)**
 
-Please refer to these documents for the rationale behind the network layout, S3 bucket configurations, security postures, and other architectural decisions implemented in this repository.
+Please refer to these documents for the rationale behind the architectural decisions implemented in this repository.
