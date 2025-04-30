@@ -791,3 +791,82 @@ module "cloudfront" {
     aws_acm_certificate_validation.web_cert
   ]
 }
+
+
+
+################################################################################
+# RDS - ODC Index Database Resources
+################################################################################
+################################################################################
+# RDS - ODC Index Database Resources
+################################################################################
+
+# --- ODC RDS Instance using the Module ---
+
+module "odc_rds" {
+  source  = "terraform-aws-modules/rds/aws"
+  version = "6.12.0"
+
+  identifier = "${local.name}-odc-index-rds" # Matches blueprint naming convention
+
+  engine               = "postgres"
+  engine_version       = var.odc_db_engine_version
+  family               = "postgres17" # Parameter group family must match major engine version
+  major_engine_version = "17"         # Option group major engine version must match
+
+  instance_class        = var.odc_db_instance_class
+  allocated_storage     = var.odc_db_allocated_storage
+  max_allocated_storage = var.odc_db_max_allocated_storage
+  storage_type          = "gp3" # As per blueprint
+  storage_encrypted     = true  # Enable encryption at rest (Blueprint requirement)
+  kms_key_id            = null  # Use default aws/rds KMS key (Blueprint requirement)
+
+  db_name                       = var.odc_db_name
+  username                      = var.odc_db_master_username
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = null
+
+  port                   = 5432
+  multi_az               = var.odc_db_multi_az
+  db_subnet_group_name   = module.vpc.database_subnet_group_name
+  vpc_security_group_ids = [module.rds_sg.security_group_id]
+
+  # Parameter Group to enforce SSL
+  parameter_group_name = "${local.name}-odc-rds-params-pg17"
+  parameters = [
+    {
+      name         = "rds.force_ssl"
+      value        = "1"
+      apply_method = "pending-reboot"
+    }
+  ]
+
+  # Option Group (Required for extensions like PostGIS)
+  option_group_name = "${local.name}-odc-rds-options-og17"
+  options = [
+    {
+      option_name = "POSTGIS"
+    }
+  ]
+
+  # Backup and Maintenance
+  backup_retention_period = var.odc_db_backup_retention_period
+  skip_final_snapshot     = var.odc_db_skip_final_snapshot
+  deletion_protection     = var.odc_db_deletion_protection
+  apply_immediately       = true
+
+  # Monitoring and Logging
+  create_monitoring_role          = true
+  monitoring_interval             = 60
+  performance_insights_enabled    = true
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  # Security
+  iam_database_authentication_enabled = true
+  publicly_accessible                 = false
+
+  tags = merge(local.tags, { Purpose = "odc-index" })
+
+  # Ensure SG is created before RDS tries to use it (though Terraform usually handles this)
+  depends_on = [module.rds_sg]
+}

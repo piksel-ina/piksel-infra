@@ -17,8 +17,8 @@ variable "environment" {
   description = "Environment name"
   type        = string
   validation {
-    condition     = contains(["dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be dev, staging, or prod."
+    condition     = contains(["test", "dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be test, dev, staging, or prod."
   }
 }
 
@@ -89,4 +89,67 @@ variable "create_acm_certificate" {
   description = "Whether to create an ACM certificate for the custom domain"
   type        = bool
   default     = false
+}
+
+# ------------------------------------------------------------------------------
+# RDS - ODC Index Database Variables
+# ------------------------------------------------------------------------------
+variable "odc_db_instance_class" {
+  description = "Instance class for the ODC index RDS database."
+  type        = string
+  default     = "db.t3.large" # Default based on blueprint v1.1
+}
+
+variable "odc_db_allocated_storage" {
+  description = "Initial allocated storage in GB for the ODC index RDS database."
+  type        = number
+  default     = 20 # Default based on blueprint v1.1
+}
+
+variable "odc_db_max_allocated_storage" {
+  description = "Maximum storage size in GB for autoscaling the ODC index RDS database."
+  type        = number
+  default     = 100 # Example limit, adjust as needed
+}
+
+variable "odc_db_engine_version" {
+  description = "PostgreSQL engine version for the ODC index RDS database."
+  type        = string
+  default     = "17.2-R2" # Default based on blueprint v1.1
+}
+
+variable "odc_db_backup_retention_period" {
+  description = "Backup retention period in days for the ODC index RDS database."
+  type        = number
+  default     = 7 # Default based on blueprint v1.1 for dev
+}
+
+variable "odc_db_multi_az" {
+  description = "Specifies if the ODC index RDS instance is multi-AZ."
+  type        = bool
+  default     = true # Default based on blueprint v1.1
+}
+
+variable "odc_db_deletion_protection" {
+  description = "If the ODC index DB instance should have deletion protection enabled."
+  type        = bool
+  default     = false # Typically false for dev, true for prod
+}
+
+variable "odc_db_skip_final_snapshot" {
+  description = "Determines whether a final DB snapshot is created before the ODC index DB instance is deleted."
+  type        = bool
+  default     = true # Typically true for dev, false for prod
+}
+
+variable "odc_db_name" {
+  description = "The name of the database to create in the ODC index RDS instance."
+  type        = string
+  default     = "odc_index_db" # Example name
+}
+
+variable "odc_db_master_username" {
+  description = "Master username for the ODC index RDS instance."
+  type        = string
+  default     = "odc_master" # Example username, DO NOT USE 'user', 'admin', 'postgres' etc.
 }
