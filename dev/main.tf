@@ -455,10 +455,10 @@ data "aws_iam_policy_document" "s3_tls_only_enforcement" {
 }
 
 ################################################################################
-# Piksel Data Bucket (Dev)
+# Piksel Data Bucket
 ################################################################################
 
-module "s3_bucket_data_dev" {
+module "s3_bucket_data" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -553,10 +553,10 @@ module "s3_bucket_data_dev" {
 }
 
 ################################################################################
-# Piksel Notebooks Bucket (Dev)
+# Piksel Notebooks Bucket
 ################################################################################
 
-module "s3_bucket_notebooks_dev" {
+module "s3_bucket_notebooks" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -633,10 +633,10 @@ module "s3_bucket_notebooks_dev" {
 
 
 ################################################################################
-# Piksel Web Bucket (Dev)
+# Piksel Web Bucket
 ################################################################################
 
-module "s3_bucket_web_dev" {
+module "s3_bucket_web" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -748,7 +748,7 @@ module "cloudfront" {
   # Origin configuration
   origin = {
     s3_bucket = {
-      domain_name           = module.s3_bucket_web_dev.s3_bucket_bucket_regional_domain_name
+      domain_name           = module.s3_bucket_web.s3_bucket_bucket_regional_domain_name
       origin_access_control = "s3_oac"
       origin_id             = "s3"
     }
