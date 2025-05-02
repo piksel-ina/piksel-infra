@@ -26,14 +26,15 @@ piksel-infra/
 │ ├── outputs.tf                # Outputs for dev
 │ ├── providers.tf              # Provider configuration
 │ └── dev.auto.tfvars           # **Environment-specific values (DO NOT commit secrets)**
+├── shared/                     # Shared Environment Configuration (similar structure)
 ├── staging/                    # Staging Environment Configuration (similar structure)
 └── prod/                       # Production Environment Configuration (similar structure)
 
 ```
 <!-- prettier-ignore-end -->
 
-- Each environment (`dev`, `staging`, `prod`) has its own directory containing Terraform configuration (`.tf` files) and variable definitions (`.tfvars`).
-- Shared configurations or complex resources might eventually be abstracted into local modules if needed, but the primary approach leverages modules directly from the Terraform Registry within each environment's `main.tf`.
+- Each environment (`dev`, `staging`, `prod`, 'shared') has its own directory containing Terraform configuration (`.tf` files) and variable definitions (`.tfvars`).
+- Configurations or complex resources might eventually be abstracted into local modules if needed, but the primary approach leverages modules directly from the Terraform Registry within each environment's `main.tf`.
 - Terraform state is managed remotely using **Terraform Cloud**.
 
 ## Workflow: GitOps with Terraform Cloud
@@ -137,5 +138,8 @@ The infrastructure design choices are documented in the central `piksel-document
 - **[Network Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/network.md)**
 - **[S3 / Object Storage Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)**
 - **[RDS / Database Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)**
+- **[ECR / Container Registry Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/container-registry.md)**
+- **[DNS Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/dns.md)**
+- **[IAM Strategy](https://github.com/piksel-ina/piksel-document/blob/main/architecture/iam-strategy.md)**
 
 Please refer to these documents for the rationale behind the architectural decisions implemented in this repository.
