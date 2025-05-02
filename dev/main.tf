@@ -515,6 +515,17 @@ module "s3_bucket_data_dev" {
         },
       ]
     },
+    {
+      id      = "expire-noncurrent-versions"
+      enabled = true
+      # Apply to all objects in the bucket (empty prefix)
+      filter = {
+        prefix = ""
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = var.s3_noncurrent_version_retention_days
+      }
+    }
     # Add more rules here for /processed, /tiles if defined later
     # {
     #   id = "processed-expiration",
@@ -589,6 +600,17 @@ module "s3_bucket_notebooks_dev" {
       }
       expiration = {
         days = var.s3_notebook_outputs_expiration_days
+      }
+    },
+    {
+      id      = "expire-noncurrent-versions"
+      enabled = true
+      # Apply to all objects in the bucket (empty prefix)
+      filter = {
+        prefix = ""
+      }
+      noncurrent_version_expiration = {
+        noncurrent_days = var.s3_noncurrent_version_retention_days
       }
     }
   ]

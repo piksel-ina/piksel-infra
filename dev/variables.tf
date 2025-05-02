@@ -72,6 +72,12 @@ variable "s3_notebook_outputs_expiration_days" {
   default     = 30
 }
 
+variable "s3_noncurrent_version_retention_days" {
+  description = "Number of days to keep noncurrent S3 object versions before expiration."
+  type        = number
+  default     = 7
+}
+
 # Cloudfront Variables
 variable "use_custom_domain" {
   description = "Whether to use a custom domain for CloudFront"
