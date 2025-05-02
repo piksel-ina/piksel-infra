@@ -1030,3 +1030,21 @@ resource "aws_cloudwatch_metric_alarm" "s3_5xx_errors" {
   # Explicit dependency to ensure metric config exists before alarm tries to use it
   depends_on = [aws_s3_bucket_metric.critical_bucket_metrics]
 }
+
+
+################################################################################
+# IAM Access Analyzer
+################################################################################
+
+# Creates an analyzer scoped to this specific AWS account/environment.
+resource "aws_accessanalyzer_analyzer" "this" {
+  analyzer_name = "${local.name}-analyzer"
+
+  # Analyze resources only within this account
+  type = "ACCOUNT"
+
+  # Apply standard tags from locals.tags and add a specific Name tag
+  tags = merge(local.tags, {
+    Name = "${local.name}-analyzer"
+  })
+}

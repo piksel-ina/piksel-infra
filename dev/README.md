@@ -154,6 +154,7 @@ To ensure operational health and proactively identify potential issues, baseline
 
 | Name | Type |
 |------|------|
+| [aws_accessanalyzer_analyzer.this](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/accessanalyzer_analyzer) | resource |
 | [aws_acm_certificate.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudwatch_metric_alarm.rds_cpu_high](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
