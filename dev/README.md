@@ -54,7 +54,6 @@ This Terraform configuration is organized into the following files:
   - [🔗 S3 Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md#design-vs-implementation)
 
-
 ### Relational Database Service (RDS)
 
 - **Modular Instances:** Utilizes the `terraform-aws-modules/rds/aws` module for consistent and maintainable deployment of RDS instances across environments.
@@ -76,7 +75,6 @@ This Terraform configuration is organized into the following files:
 - **Related Documents**:
   - [🔗 RDS Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md#9-design-vs-implementation-odc-index-database---dev-environment)
-
 
 ## Backup and Recovery Strategy
 
@@ -100,6 +98,24 @@ This section briefly outlines the backup and recovery mechanisms implemented for
   - **Deletion Protection:** Configurable via `var.odc_db_deletion_protection` (recommended: `true`) to prevent accidental instance deletion.
 - **High Availability:** Multi-AZ deployments (controlled by `var.odc_db_multi_az`) provide high availability via a standby replica but are distinct from backups.
 - **Compliance:** All RDS backups (automated snapshots, logs) are stored within the same AWS region as the instance.
+
+## Monitoring and Alerting
+
+To ensure operational health and proactively identify potential issues, baseline monitoring and alerting have been configured using AWS CloudWatch.
+
+### Overview
+
+- **Mechanism:** CloudWatch Alarms monitor key metrics for critical services.
+- **Notifications:** Alerts are triggered when predefined thresholds are breached and sent to a central SNS topic (`monitoring_alerts`) for notification (e.g., via email subscription, Slack integration - configuration depends on SNS subscription setup).
+
+### Monitored Services
+
+- **Relational Database Service (RDS):**
+  - **CPU Utilization:** Alerts on sustained high CPU usage, indicating potential performance bottlenecks or the need for instance scaling.
+  - **Freeable Memory:** Alerts when available memory is critically low, which can impact database performance.
+  - **Free Storage Space:** Alerts when disk space is running low, preventing potential write failures or service interruptions.
+- **Object Storage (S3):**
+  - **5xx Server Errors:** Alerts if AWS encounters internal server errors when processing requests for the critical buckets (`data`, `notebooks`, `web`). This indicates potential platform-level issues affecting bucket availability or accessibility. S3 Request Metrics are enabled on these buckets to provide the necessary `5xxErrors` metric.
 
 ---
 
@@ -127,9 +143,9 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="module_eks_nodes_sg"></a> [eks\_nodes\_sg](#module\_eks\_nodes\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
 | <a name="module_odc_rds"></a> [odc\_rds](#module\_odc\_rds) | terraform-aws-modules/rds/aws | 6.12.0 |
 | <a name="module_rds_sg"></a> [rds\_sg](#module\_rds\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
-| <a name="module_s3_bucket_data_dev"></a> [s3\_bucket\_data\_dev](#module\_s3\_bucket\_data\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
-| <a name="module_s3_bucket_notebooks_dev"></a> [s3\_bucket\_notebooks\_dev](#module\_s3\_bucket\_notebooks\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
-| <a name="module_s3_bucket_web_dev"></a> [s3\_bucket\_web\_dev](#module\_s3\_bucket\_web\_dev) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
+| <a name="module_s3_bucket_data"></a> [s3\_bucket\_data](#module\_s3\_bucket\_data) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
+| <a name="module_s3_bucket_notebooks"></a> [s3\_bucket\_notebooks](#module\_s3\_bucket\_notebooks) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
+| <a name="module_s3_bucket_web"></a> [s3\_bucket\_web](#module\_s3\_bucket\_web) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_s3_log_bucket"></a> [s3\_log\_bucket](#module\_s3\_log\_bucket) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.21.0 |
 | <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.21.0 |
@@ -140,8 +156,15 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 |------|------|
 | [aws_acm_certificate.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate_validation) | resource |
+| [aws_cloudwatch_metric_alarm.rds_cpu_high](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.rds_low_memory](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.rds_low_storage](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.s3_5xx_errors](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
+| [aws_s3_bucket_metric.critical_bucket_metrics](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/s3_bucket_metric) | resource |
+| [aws_sns_topic.monitoring_alerts](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.email_alert_subscriptions](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic_subscription) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.data_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |
@@ -159,6 +182,7 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="input_create_acm_certificate"></a> [create\_acm\_certificate](#input\_create\_acm\_certificate) | Whether to create an ACM certificate for the custom domain | `bool` | `false` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name for CloudFront distribution | `string` | `""` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | n/a | yes |
+| <a name="input_monitoring_alert_emails"></a> [monitoring\_alert\_emails](#input\_monitoring\_alert\_emails) | A map of user names to email addresses for receiving monitoring alerts. | `map(string)` | `{}` | no |
 | <a name="input_odc_db_allocated_storage"></a> [odc\_db\_allocated\_storage](#input\_odc\_db\_allocated\_storage) | Initial allocated storage in GB for the ODC index RDS database. | `number` | `20` | no |
 | <a name="input_odc_db_backup_retention_period"></a> [odc\_db\_backup\_retention\_period](#input\_odc\_db\_backup\_retention\_period) | Backup retention period in days for the ODC index RDS database. | `number` | `7` | no |
 | <a name="input_odc_db_deletion_protection"></a> [odc\_db\_deletion\_protection](#input\_odc\_db\_deletion\_protection) | If the ODC index DB instance should have deletion protection enabled. | `bool` | `false` | no |
@@ -170,6 +194,9 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="input_odc_db_name"></a> [odc\_db\_name](#input\_odc\_db\_name) | The name of the database to create in the ODC index RDS instance. | `string` | `"odc_index_db"` | no |
 | <a name="input_odc_db_skip_final_snapshot"></a> [odc\_db\_skip\_final\_snapshot](#input\_odc\_db\_skip\_final\_snapshot) | Determines whether a final DB snapshot is created before the ODC index DB instance is deleted. | `bool` | `true` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | `"piksel"` | no |
+| <a name="input_rds_cpu_threshold"></a> [rds\_cpu\_threshold](#input\_rds\_cpu\_threshold) | CPU Utilization percentage threshold for RDS alarm. | `number` | `80` | no |
+| <a name="input_rds_low_memory_threshold_mb"></a> [rds\_low\_memory\_threshold\_mb](#input\_rds\_low\_memory\_threshold\_mb) | Freeable memory threshold in MB for RDS alarm. | `number` | `500` | no |
+| <a name="input_rds_low_storage_threshold_gb"></a> [rds\_low\_storage\_threshold\_gb](#input\_rds\_low\_storage\_threshold\_gb) | Free storage space threshold in GB for RDS alarm. | `number` | `10` | no |
 | <a name="input_s3_kms_key_deletion_window_in_days"></a> [s3\_kms\_key\_deletion\_window\_in\_days](#input\_s3\_kms\_key\_deletion\_window\_in\_days) | Number of days to retain the S3 KMS key after deletion. | `number` | `7` | no |
 | <a name="input_s3_log_bucket_force_destroy"></a> [s3\_log\_bucket\_force\_destroy](#input\_s3\_log\_bucket\_force\_destroy) | Force destroy the S3 log bucket (useful for dev/testing, disable in prod). | `bool` | `true` | no |
 | <a name="input_s3_log_retention_days"></a> [s3\_log\_retention\_days](#input\_s3\_log\_retention\_days) | Number of days to retain S3 access logs before deleting. | `number` | `90` | no |
@@ -196,12 +223,12 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="output_odc_rds_security_group_id"></a> [odc\_rds\_security\_group\_id](#output\_odc\_rds\_security\_group\_id) | The ID of the security group attached to the ODC index RDS instance. |
 | <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | List of IDs of private subnets |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets |
-| <a name="output_s3_bucket_data_dev_arn"></a> [s3\_bucket\_data\_dev\_arn](#output\_s3\_bucket\_data\_dev\_arn) | ARN of the S3 data bucket for the dev environment |
-| <a name="output_s3_bucket_data_dev_id"></a> [s3\_bucket\_data\_dev\_id](#output\_s3\_bucket\_data\_dev\_id) | ID (name) of the S3 data bucket for the dev environment |
-| <a name="output_s3_bucket_notebooks_dev_arn"></a> [s3\_bucket\_notebooks\_dev\_arn](#output\_s3\_bucket\_notebooks\_dev\_arn) | ARN of the S3 notebooks bucket for the dev environment |
-| <a name="output_s3_bucket_notebooks_dev_id"></a> [s3\_bucket\_notebooks\_dev\_id](#output\_s3\_bucket\_notebooks\_dev\_id) | ID (name) of the S3 notebooks bucket for the dev environment |
-| <a name="output_s3_bucket_web_dev_arn"></a> [s3\_bucket\_web\_dev\_arn](#output\_s3\_bucket\_web\_dev\_arn) | ARN of the S3 web bucket for the dev environment |
-| <a name="output_s3_bucket_web_dev_id"></a> [s3\_bucket\_web\_dev\_id](#output\_s3\_bucket\_web\_dev\_id) | ID (name) of the S3 web bucket for the dev environment |
+| <a name="output_s3_bucket_data_arn"></a> [s3\_bucket\_data\_arn](#output\_s3\_bucket\_data\_arn) | ARN of the S3 data bucket |
+| <a name="output_s3_bucket_data_id"></a> [s3\_bucket\_data\_id](#output\_s3\_bucket\_data\_id) | ID (name) of the S3 data bucket |
+| <a name="output_s3_bucket_notebooks_arn"></a> [s3\_bucket\_notebooks\_arn](#output\_s3\_bucket\_notebooks\_arn) | ARN of the S3 notebooks bucket |
+| <a name="output_s3_bucket_notebooks_id"></a> [s3\_bucket\_notebooks\_id](#output\_s3\_bucket\_notebooks\_id) | ID (name) of the S3 notebooks bucket |
+| <a name="output_s3_bucket_web_arn"></a> [s3\_bucket\_web\_arn](#output\_s3\_bucket\_web\_arn) | ARN of the S3 web bucket |
+| <a name="output_s3_bucket_web_id"></a> [s3\_bucket\_web\_id](#output\_s3\_bucket\_web\_id) | ID (name) of the S3 web bucket |
 | <a name="output_s3_kms_key_arn"></a> [s3\_kms\_key\_arn](#output\_s3\_kms\_key\_arn) | ARN of the KMS key used for S3 encryption |
 | <a name="output_s3_log_bucket_id"></a> [s3\_log\_bucket\_id](#output\_s3\_log\_bucket\_id) | ID (name) of the S3 bucket used for access logging |
 | <a name="output_security_group_ids"></a> [security\_group\_ids](#output\_security\_group\_ids) | Security group IDs for different components |

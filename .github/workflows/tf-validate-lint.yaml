@@ -59,6 +59,16 @@ jobs:
         # Use --format compact for cleaner output in logs
         continue-on-error: false # Fail the workflow on linting errors
 
+      # Verify the dev environment configuration file (dev/dev.auto.tfvars)
+      # contains the mandatory 'project' and 'environment' values.
+      # This is crucial for maintaining the expected infrastructure naming
+      - name: Verify dev.auto.tfvars content
+        run: |
+          echo "Checking dev/dev.auto.tfvars for specific required values..."
+          grep -F 'project             = "piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          grep -F 'environment         = "dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          echo "Required values in dev/dev.auto.tfvars verified."
+
       # --- Validation per Environment ---
       # Note: These steps assume the directory structure exists.
       # If staging/prod directories don't exist yet, these specific steps might fail

@@ -159,3 +159,30 @@ variable "odc_db_master_username" {
   type        = string
   default     = "odc_master" # Example username, DO NOT USE 'user', 'admin', 'postgres' etc.
 }
+
+
+# Monitoring Variables
+variable "monitoring_alert_emails" {
+  description = "A map of user names to email addresses for receiving monitoring alerts."
+  type        = map(string)
+  default     = {} # Default to empty map, actual values should come from .tfvars
+}
+
+# Variables for thresholds
+variable "rds_cpu_threshold" {
+  description = "CPU Utilization percentage threshold for RDS alarm."
+  type        = number
+  default     = 80
+}
+
+variable "rds_low_storage_threshold_gb" {
+  description = "Free storage space threshold in GB for RDS alarm."
+  type        = number
+  default     = 10 # Adjust based on your allocated_storage
+}
+
+variable "rds_low_memory_threshold_mb" {
+  description = "Freeable memory threshold in MB for RDS alarm."
+  type        = number
+  default     = 500 # Adjust based on your instance_class memory
+}

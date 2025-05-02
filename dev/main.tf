@@ -455,10 +455,10 @@ data "aws_iam_policy_document" "s3_tls_only_enforcement" {
 }
 
 ################################################################################
-# Piksel Data Bucket (Dev)
+# Piksel Data Bucket
 ################################################################################
 
-module "s3_bucket_data_dev" {
+module "s3_bucket_data" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -553,10 +553,10 @@ module "s3_bucket_data_dev" {
 }
 
 ################################################################################
-# Piksel Notebooks Bucket (Dev)
+# Piksel Notebooks Bucket
 ################################################################################
 
-module "s3_bucket_notebooks_dev" {
+module "s3_bucket_notebooks" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -633,10 +633,10 @@ module "s3_bucket_notebooks_dev" {
 
 
 ################################################################################
-# Piksel Web Bucket (Dev)
+# Piksel Web Bucket
 ################################################################################
 
-module "s3_bucket_web_dev" {
+module "s3_bucket_web" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.7.0"
 
@@ -748,7 +748,7 @@ module "cloudfront" {
   # Origin configuration
   origin = {
     s3_bucket = {
-      domain_name           = module.s3_bucket_web_dev.s3_bucket_bucket_regional_domain_name
+      domain_name           = module.s3_bucket_web.s3_bucket_bucket_regional_domain_name
       origin_access_control = "s3_oac"
       origin_id             = "s3"
     }
@@ -822,7 +822,7 @@ module "odc_rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.12.0"
 
-  identifier = "${local.name}-odc-index-rds" # Matches blueprint naming convention
+  identifier = "${local.name}-odc-index-rds"
 
   engine               = "postgres"
   engine_version       = var.odc_db_engine_version
@@ -832,9 +832,9 @@ module "odc_rds" {
   instance_class        = var.odc_db_instance_class
   allocated_storage     = var.odc_db_allocated_storage
   max_allocated_storage = var.odc_db_max_allocated_storage
-  storage_type          = "gp3" # As per blueprint
-  storage_encrypted     = true  # Enable encryption at rest (Blueprint requirement)
-  kms_key_id            = null  # Use default aws/rds KMS key (Blueprint requirement)
+  storage_type          = "gp3"
+  storage_encrypted     = true # Enable encryption at rest
+  kms_key_id            = null # Use default aws/rds KMS key
 
   db_name                       = var.odc_db_name
   username                      = var.odc_db_master_username
@@ -884,4 +884,149 @@ module "odc_rds" {
 
   # Ensure SG is created before RDS tries to use it
   depends_on = [module.rds_sg]
+}
+
+
+################################################################################
+# SNS Notifications for Monitoring Alerts
+################################################################################
+
+resource "aws_sns_topic" "monitoring_alerts" {
+  name = "${local.name}-monitoring-alerts" # Using local.name assumed from your example
+
+  tags = merge(local.tags, { # Assuming local.tags exists
+    Purpose = "MonitoringAlerts"
+  })
+}
+
+resource "aws_sns_topic_subscription" "email_alert_subscriptions" {
+  # Create one subscription for each email in the map
+  for_each = var.monitoring_alert_emails
+
+  topic_arn = aws_sns_topic.monitoring_alerts.arn
+  protocol  = "email"
+  endpoint  = each.value # The email address from the map
+}
+
+# IMPORTANT: After applying this configuration, each email address listed
+# in var.monitoring_alert_emails will receive a confirmation email from AWS.
+# Users MUST click the link in that email to activate the subscription.
+
+################################################################################
+# RDS Performance Alarms
+################################################################################
+resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
+  alarm_name          = "${module.odc_rds.db_instance_identifier}-cpu-utilization-high"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 2 # Breached for 2 consecutive periods (e.g., 10 mins if period is 300s)
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/RDS"
+  period              = 300 # Check every 5 minutes
+  statistic           = "Average"
+  threshold           = var.rds_cpu_threshold # Use variable
+
+  dimensions = {
+    DBInstanceIdentifier = module.odc_rds.db_instance_identifier # Get ID from module output
+  }
+
+  alarm_description = "Alarm when RDS CPU utilization exceeds ${var.rds_cpu_threshold}%"
+  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn] # Send alert to SNS
+  ok_actions        = [aws_sns_topic.monitoring_alerts.arn] # Notify when OK
+
+  tags = merge(local.tags, { Purpose = "MonitoringAlarm-RDS-CPU" })
+}
+
+# 2b. RDS Free Storage Space Alarm
+resource "aws_cloudwatch_metric_alarm" "rds_low_storage" {
+  alarm_name          = "${module.odc_rds.db_instance_identifier}-low-free-storage"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 1 # Alert immediately on first breach
+  metric_name         = "FreeStorageSpace"
+  namespace           = "AWS/RDS"
+  period              = 300       # Check every 5 minutes
+  statistic           = "Minimum" # Check the lowest value in the period
+  # Convert GB threshold to Bytes for the alarm
+  threshold = var.rds_low_storage_threshold_gb * 1024 * 1024 * 1024
+
+  dimensions = {
+    DBInstanceIdentifier = module.odc_rds.db_instance_identifier
+  }
+
+  alarm_description = "Alarm when RDS free storage space drops below ${var.rds_low_storage_threshold_gb} GB"
+  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
+  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+
+  tags = merge(local.tags, { Purpose = "MonitoringAlarm-RDS-Storage" })
+}
+
+# 2c. RDS Freeable Memory Alarm
+resource "aws_cloudwatch_metric_alarm" "rds_low_memory" {
+  alarm_name          = "${module.odc_rds.db_instance_identifier}-low-freeable-memory"
+  comparison_operator = "LessThanOrEqualToThreshold"
+  evaluation_periods  = 2 # Low for 2 consecutive periods (e.g., 10 mins)
+  metric_name         = "FreeableMemory"
+  namespace           = "AWS/RDS"
+  period              = 300 # Check every 5 minutes
+  statistic           = "Minimum"
+  # Convert MB threshold to Bytes for the alarm
+  threshold = var.rds_low_memory_threshold_mb * 1024 * 1024
+
+  dimensions = {
+    DBInstanceIdentifier = module.odc_rds.db_instance_identifier
+  }
+
+  alarm_description = "Alarm when RDS freeable memory drops below ${var.rds_low_memory_threshold_mb} MB"
+  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn]
+  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+
+  tags = merge(local.tags, { Purpose = "MonitoringAlarm-RDS-Memory" })
+}
+
+################################################################################
+# S3 Bucket 5xx Error Alarms
+################################################################################
+# Define the list of critical bucket names/references to monitor
+locals {
+  critical_s3_bucket_refs = {
+    "data"      = module.s3_bucket_data.s3_bucket_id
+    "notebooks" = module.s3_bucket_notebooks.s3_bucket_id
+    "web"       = module.s3_bucket_web.s3_bucket_id
+  }
+}
+
+#  Enable S3 Request Metrics for Critical Buckets
+resource "aws_s3_bucket_metric" "critical_bucket_metrics" {
+  for_each = local.critical_s3_bucket_refs
+
+  bucket = each.value
+  name   = "EntireBucket" # This is the FilterId the alarm will use
+  # No filter {} block means it applies to the entire bucket
+}
+
+# Create 5xx Error Alarms for Critical Buckets
+resource "aws_cloudwatch_metric_alarm" "s3_5xx_errors" {
+  for_each = local.critical_s3_bucket_refs
+
+  alarm_name          = "s3-${each.key}-bucket-5xx-errors" # e.g., s3-data-bucket-5xx-errors
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1 # Alert on first occurrence
+  metric_name         = "5xxErrors"
+  namespace           = "AWS/S3"
+  period              = 300   # Check every 5 minutes
+  statistic           = "Sum" # Total count of 5xx errors in the period
+  threshold           = 0     # Alert if ANY 5xx errors occur
+
+  dimensions = {
+    BucketName = each.value
+    FilterId   = aws_s3_bucket_metric.critical_bucket_metrics[each.key].name # Reference the FilterId created above
+  }
+
+  alarm_description = "Alarm when S3 bucket ${each.value} experiences 5xx server errors."
+  alarm_actions     = [aws_sns_topic.monitoring_alerts.arn] # Reference the SNS topic defined earlier
+  ok_actions        = [aws_sns_topic.monitoring_alerts.arn]
+
+  tags = merge(local.tags, { Purpose = "MonitoringAlarm-S3-5xx-${each.key}" })
+
+  # Explicit dependency to ensure metric config exists before alarm tries to use it
+  depends_on = [aws_s3_bucket_metric.critical_bucket_metrics]
 }

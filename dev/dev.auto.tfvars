@@ -32,3 +32,16 @@ odc_db_deletion_protection     = false              # Dev setting
 odc_db_skip_final_snapshot     = true               # Dev setting
 odc_db_name                    = "odc_index_dev_db" # Environment-specific DB name
 odc_db_master_username         = "odc_master_dev"   # Environment-specific username
+
+# Map of user names to email addresses for monitoring alerts
+# Add all necessary recipients here.
+monitoring_alert_emails = {
+  "Taufik" = "muhammad.taufik@big.go.id"
+  # "AnotherUser" = "another.user@example.com"
+  # Add more key-value pairs as needed
+}
+
+# RDS monitoring thresholds
+# rds_cpu_threshold = 80
+# rds_low_storage_threshold_gb = 10
+# rds_low_memory_threshold_mb = 500

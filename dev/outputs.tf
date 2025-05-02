@@ -58,34 +58,34 @@ output "s3_log_bucket_id" {
   value       = module.s3_log_bucket.s3_bucket_id
 }
 
-output "s3_bucket_data_dev_id" {
-  description = "ID (name) of the S3 data bucket for the dev environment"
-  value       = module.s3_bucket_data_dev.s3_bucket_id
+output "s3_bucket_data_id" {
+  description = "ID (name) of the S3 data bucket"
+  value       = module.s3_bucket_data.s3_bucket_id
 }
 
-output "s3_bucket_data_dev_arn" {
-  description = "ARN of the S3 data bucket for the dev environment"
-  value       = module.s3_bucket_data_dev.s3_bucket_arn
+output "s3_bucket_data_arn" {
+  description = "ARN of the S3 data bucket"
+  value       = module.s3_bucket_data.s3_bucket_arn
 }
 
-output "s3_bucket_notebooks_dev_id" {
-  description = "ID (name) of the S3 notebooks bucket for the dev environment"
-  value       = module.s3_bucket_notebooks_dev.s3_bucket_id
+output "s3_bucket_notebooks_id" {
+  description = "ID (name) of the S3 notebooks bucket"
+  value       = module.s3_bucket_notebooks.s3_bucket_id
 }
 
-output "s3_bucket_notebooks_dev_arn" {
-  description = "ARN of the S3 notebooks bucket for the dev environment"
-  value       = module.s3_bucket_notebooks_dev.s3_bucket_arn
+output "s3_bucket_notebooks_arn" {
+  description = "ARN of the S3 notebooks bucket"
+  value       = module.s3_bucket_notebooks.s3_bucket_arn
 }
 
-output "s3_bucket_web_dev_id" {
-  description = "ID (name) of the S3 web bucket for the dev environment"
-  value       = module.s3_bucket_web_dev.s3_bucket_id
+output "s3_bucket_web_id" {
+  description = "ID (name) of the S3 web bucket"
+  value       = module.s3_bucket_web.s3_bucket_id
 }
 
-output "s3_bucket_web_dev_arn" {
-  description = "ARN of the S3 web bucket for the dev environment"
-  value       = module.s3_bucket_web_dev.s3_bucket_arn
+output "s3_bucket_web_arn" {
+  description = "ARN of the S3 web bucket"
+  value       = module.s3_bucket_web.s3_bucket_arn
 }
 
 # Cloudfront Outputs
