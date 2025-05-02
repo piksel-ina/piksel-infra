@@ -140,8 +140,15 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 |------|------|
 | [aws_acm_certificate.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.web_cert](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/acm_certificate_validation) | resource |
+| [aws_cloudwatch_metric_alarm.rds_cpu_high](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.rds_low_memory](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.rds_low_storage](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_cloudwatch_metric_alarm.s3_5xx_errors](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
+| [aws_s3_bucket_metric.critical_bucket_metrics](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/s3_bucket_metric) | resource |
+| [aws_sns_topic.monitoring_alerts](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic) | resource |
+| [aws_sns_topic_subscription.email_alert_subscriptions](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic_subscription) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
 | [aws_iam_policy_document.data_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |
@@ -159,6 +166,7 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="input_create_acm_certificate"></a> [create\_acm\_certificate](#input\_create\_acm\_certificate) | Whether to create an ACM certificate for the custom domain | `bool` | `false` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name for CloudFront distribution | `string` | `""` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name | `string` | n/a | yes |
+| <a name="input_monitoring_alert_emails"></a> [monitoring\_alert\_emails](#input\_monitoring\_alert\_emails) | A map of user names to email addresses for receiving monitoring alerts. | `map(string)` | `{}` | no |
 | <a name="input_odc_db_allocated_storage"></a> [odc\_db\_allocated\_storage](#input\_odc\_db\_allocated\_storage) | Initial allocated storage in GB for the ODC index RDS database. | `number` | `20` | no |
 | <a name="input_odc_db_backup_retention_period"></a> [odc\_db\_backup\_retention\_period](#input\_odc\_db\_backup\_retention\_period) | Backup retention period in days for the ODC index RDS database. | `number` | `7` | no |
 | <a name="input_odc_db_deletion_protection"></a> [odc\_db\_deletion\_protection](#input\_odc\_db\_deletion\_protection) | If the ODC index DB instance should have deletion protection enabled. | `bool` | `false` | no |
@@ -170,6 +178,9 @@ This section briefly outlines the backup and recovery mechanisms implemented for
 | <a name="input_odc_db_name"></a> [odc\_db\_name](#input\_odc\_db\_name) | The name of the database to create in the ODC index RDS instance. | `string` | `"odc_index_db"` | no |
 | <a name="input_odc_db_skip_final_snapshot"></a> [odc\_db\_skip\_final\_snapshot](#input\_odc\_db\_skip\_final\_snapshot) | Determines whether a final DB snapshot is created before the ODC index DB instance is deleted. | `bool` | `true` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | `"piksel"` | no |
+| <a name="input_rds_cpu_threshold"></a> [rds\_cpu\_threshold](#input\_rds\_cpu\_threshold) | CPU Utilization percentage threshold for RDS alarm. | `number` | `80` | no |
+| <a name="input_rds_low_memory_threshold_mb"></a> [rds\_low\_memory\_threshold\_mb](#input\_rds\_low\_memory\_threshold\_mb) | Freeable memory threshold in MB for RDS alarm. | `number` | `500` | no |
+| <a name="input_rds_low_storage_threshold_gb"></a> [rds\_low\_storage\_threshold\_gb](#input\_rds\_low\_storage\_threshold\_gb) | Free storage space threshold in GB for RDS alarm. | `number` | `10` | no |
 | <a name="input_s3_kms_key_deletion_window_in_days"></a> [s3\_kms\_key\_deletion\_window\_in\_days](#input\_s3\_kms\_key\_deletion\_window\_in\_days) | Number of days to retain the S3 KMS key after deletion. | `number` | `7` | no |
 | <a name="input_s3_log_bucket_force_destroy"></a> [s3\_log\_bucket\_force\_destroy](#input\_s3\_log\_bucket\_force\_destroy) | Force destroy the S3 log bucket (useful for dev/testing, disable in prod). | `bool` | `true` | no |
 | <a name="input_s3_log_retention_days"></a> [s3\_log\_retention\_days](#input\_s3\_log\_retention\_days) | Number of days to retain S3 access logs before deleting. | `number` | `90` | no |
