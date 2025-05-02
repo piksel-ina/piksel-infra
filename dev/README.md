@@ -149,6 +149,7 @@ This Terraform configuration is organized into the following files:
 | <a name="input_s3_kms_key_deletion_window_in_days"></a> [s3\_kms\_key\_deletion\_window\_in\_days](#input\_s3\_kms\_key\_deletion\_window\_in\_days) | Number of days to retain the S3 KMS key after deletion. | `number` | `7` | no |
 | <a name="input_s3_log_bucket_force_destroy"></a> [s3\_log\_bucket\_force\_destroy](#input\_s3\_log\_bucket\_force\_destroy) | Force destroy the S3 log bucket (useful for dev/testing, disable in prod). | `bool` | `true` | no |
 | <a name="input_s3_log_retention_days"></a> [s3\_log\_retention\_days](#input\_s3\_log\_retention\_days) | Number of days to retain S3 access logs before deleting. | `number` | `90` | no |
+| <a name="input_s3_noncurrent_version_retention_days"></a> [s3\_noncurrent\_version\_retention\_days](#input\_s3\_noncurrent\_version\_retention\_days) | Number of days to keep noncurrent S3 object versions before expiration. | `number` | `7` | no |
 | <a name="input_s3_notebook_outputs_expiration_days"></a> [s3\_notebook\_outputs\_expiration\_days](#input\_s3\_notebook\_outputs\_expiration\_days) | Number of days before expiring notebook outputs. | `number` | `30` | no |
 | <a name="input_use_custom_domain"></a> [use\_custom\_domain](#input\_use\_custom\_domain) | Whether to use a custom domain for CloudFront | `bool` | `false` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the VPC | `string` | `"10.0.0.0/16"` | no |

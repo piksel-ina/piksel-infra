@@ -1,6 +1,6 @@
 aws_region          = "ap-southeast-3"
 project             = "piksel"
-environment         = "dev"
+environment         = "test"
 vpc_cidr            = "10.0.0.0/16"
 allowed_cidr_blocks = ["0.0.0.0/0"] # Consider restricting this in production
 common_tags = {
@@ -12,7 +12,8 @@ s3_kms_key_deletion_window_in_days = 7
 s3_log_bucket_force_destroy        = true
 s3_log_retention_days              = 90
 # s3_data_raw_transition_days         = 30
-s3_notebook_outputs_expiration_days = 30
+s3_notebook_outputs_expiration_days  = 30
+s3_noncurrent_version_retention_days = 7
 
 # CloudFront domain configuration for dev
 use_custom_domain      = false # Set to true when have a domain
@@ -21,7 +22,7 @@ create_acm_certificate = false # Set to true when you want Terraform to create t
 
 
 # RDS - ODC Index Database Specifics for Dev
-odc_db_instance_class          = "db.t3.large"
+odc_db_instance_class          = "db.t3.small"
 odc_db_allocated_storage       = 20
 odc_db_max_allocated_storage   = 100 # Example limit for dev
 odc_db_engine_version          = "17.2"
