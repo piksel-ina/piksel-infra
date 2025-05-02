@@ -54,6 +54,7 @@ This Terraform configuration is organized into the following files:
   - [🔗 S3 Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md#design-vs-implementation)
 
+
 ### Relational Database Service (RDS)
 
 - **Modular Instances:** Utilizes the `terraform-aws-modules/rds/aws` module for consistent and maintainable deployment of RDS instances across environments.
@@ -75,6 +76,7 @@ This Terraform configuration is organized into the following files:
 - **Related Documents**:
   - [🔗 RDS Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md#9-design-vs-implementation-odc-index-database---dev-environment)
+
 
 ## Backup and Recovery Strategy
 
