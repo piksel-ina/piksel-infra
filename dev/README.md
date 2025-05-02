@@ -54,7 +54,6 @@ This Terraform configuration is organized into the following files:
   - [🔗 S3 Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md#design-vs-implementation)
 
-
 ### Relational Database Service (RDS)
 
 - **Modular Instances:** Utilizes the `terraform-aws-modules/rds/aws` module for consistent and maintainable deployment of RDS instances across environments.
@@ -76,7 +75,6 @@ This Terraform configuration is organized into the following files:
 - **Related Documents**:
   - [🔗 RDS Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md#9-design-vs-implementation-odc-index-database---dev-environment)
-
 
 ## Backup and Recovery Strategy
 
@@ -100,6 +98,24 @@ This section briefly outlines the backup and recovery mechanisms implemented for
   - **Deletion Protection:** Configurable via `var.odc_db_deletion_protection` (recommended: `true`) to prevent accidental instance deletion.
 - **High Availability:** Multi-AZ deployments (controlled by `var.odc_db_multi_az`) provide high availability via a standby replica but are distinct from backups.
 - **Compliance:** All RDS backups (automated snapshots, logs) are stored within the same AWS region as the instance.
+
+## Monitoring and Alerting
+
+To ensure operational health and proactively identify potential issues, baseline monitoring and alerting have been configured using AWS CloudWatch.
+
+### Overview
+
+- **Mechanism:** CloudWatch Alarms monitor key metrics for critical services.
+- **Notifications:** Alerts are triggered when predefined thresholds are breached and sent to a central SNS topic (`monitoring_alerts`) for notification (e.g., via email subscription, Slack integration - configuration depends on SNS subscription setup).
+
+### Monitored Services
+
+- **Relational Database Service (RDS):**
+  - **CPU Utilization:** Alerts on sustained high CPU usage, indicating potential performance bottlenecks or the need for instance scaling.
+  - **Freeable Memory:** Alerts when available memory is critically low, which can impact database performance.
+  - **Free Storage Space:** Alerts when disk space is running low, preventing potential write failures or service interruptions.
+- **Object Storage (S3):**
+  - **5xx Server Errors:** Alerts if AWS encounters internal server errors when processing requests for the critical buckets (`data`, `notebooks`, `web`). This indicates potential platform-level issues affecting bucket availability or accessibility. S3 Request Metrics are enabled on these buckets to provide the necessary `5xxErrors` metric.
 
 ---
 
