@@ -54,7 +54,6 @@ This Terraform configuration is organized into the following files:
   - [🔗 S3 Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/object-storage.md#design-vs-implementation)
 
-
 ### Relational Database Service (RDS)
 
 - **Modular Instances:** Utilizes the `terraform-aws-modules/rds/aws` module for consistent and maintainable deployment of RDS instances across environments.
@@ -76,6 +75,29 @@ This Terraform configuration is organized into the following files:
 - **Related Documents**:
   - [🔗 RDS Infrastructure Blueprint](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md)
   - [🔗 Design vs Implementation](https://github.com/piksel-ina/piksel-document/blob/main/architecture/database.md#9-design-vs-implementation-odc-index-database---dev-environment)
+
+## Backup and Recovery Strategy
+
+This section briefly outlines the backup and recovery mechanisms implemented for key stateful services.
+
+### Object Storage (S3)
+
+- **Mechanism:** Primarily relies on **S3 Versioning** enabled on the `data` and `notebooks` buckets.
+- **Protection:** Protects against accidental object deletion or overwrites within the bucket.
+- **Recovery:** Allows restoration of previous object versions. Noncurrent versions are automatically deleted after `var.s3_noncurrent_version_retention_days`.
+- **Web Bucket:** The `web` bucket does not have versioning enabled. Its content represents static website assets deployed via CI/CD. Recovery relies on redeployment through the CI/CD pipeline, with the source code versioned in Git.
+- **Limitations:** Versioning occurs _within the same bucket and region_. It does not protect against accidental bucket deletion or regional failures. Cross-region replication is not used due to data residency requirements.
+
+### Relational Database Service (RDS)
+
+- **Mechanism:** Leverages **AWS automated backups**, including daily snapshots and transaction logs.
+- **Protection:** Protects against data loss due to instance failure, data corruption, or accidental modification.
+- **Recovery:** Supports **Point-in-Time Recovery (PITR)** up to any second within the `var.odc_db_backup_retention_period` (max 35 days) and restoration from specific snapshots.
+- **Additional Safety:**
+  - **Final Snapshot:** Configurable via `var.odc_db_skip_final_snapshot` (recommended: `false`) to retain a backup upon instance deletion.
+  - **Deletion Protection:** Configurable via `var.odc_db_deletion_protection` (recommended: `true`) to prevent accidental instance deletion.
+- **High Availability:** Multi-AZ deployments (controlled by `var.odc_db_multi_az`) provide high availability via a standby replica but are distinct from backups.
+- **Compliance:** All RDS backups (automated snapshots, logs) are stored within the same AWS region as the instance.
 
 ---
 
