@@ -69,6 +69,13 @@ jobs:
           grep -F 'environment         = "dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
           echo "Required values in dev/dev.auto.tfvars verified."
 
+      - name: Verify shared.auto.tfvars content
+        run: |
+          echo "Checking shared/shared.auto.tfvars for specific required values..."
+          grep 'project\s*=\s*"piksel"' shared/shared.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+          grep 'environment\s*=\s*"shared"' shared/shared.auto.tfvars || (echo "Error: 'environment = \"shared\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+          echo "Required values in shared/shared.auto.tfvars verified."
+
       # --- Validation per Environment ---
       # Note: These steps assume the directory structure exists.
       # If staging/prod directories don't exist yet, these specific steps might fail
@@ -81,5 +88,14 @@ jobs:
       - name: Terraform Validate (Dev)
         id: validate-dev
         run: cd dev && terraform validate
+
+      - name: Terraform Init (Shared)
+        id: init-shared
+        run: cd shared && terraform init -backend=false
+        # -backend=false prevents state locking/reading during validation
+
+      - name: Terraform Validate (Shared)
+        id: validate-shared
+        run: cd shared && terraform validate
 
       # Add similar blocks for staging and prod once they are ready

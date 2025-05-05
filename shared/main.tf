@@ -1,4 +1,4 @@
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {} # Region: ap-southeast-3
 
 locals {
   name     = "${var.project}-${var.environment}" # Should evaluate to piksel-shared
