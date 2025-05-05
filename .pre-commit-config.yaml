@@ -24,3 +24,9 @@ repos:
           - --hook-config=--path-to-file=README.md
           - --hook-config=--add-to-existing-file=true
         files: ^dev/.*\.tf$
+      - id: terraform_docs
+        name: "Generate Documentation: Shared-env Documentation"
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+        files: ^shared/.*\.tf$
