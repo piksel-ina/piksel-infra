@@ -1,4 +1,6 @@
-data "aws_availability_zones" "available" {} # Region: ap-southeast-3
+# Shared resources configuration
+
+data "aws_availability_zones" "available" {}
 
 locals {
   name     = "${var.project}-${var.environment}" # Should evaluate to piksel-shared
