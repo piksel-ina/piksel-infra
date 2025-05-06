@@ -23,6 +23,12 @@ jobs:
     name: Validate Terraform Configuration
     runs-on: ubuntu-latest
 
+    # Required for github/codeql-action/upload-sarif to upload to Code Scanning
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,6 +43,20 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.11.2
+
+      - name: Run tfsec scanner
+        uses: aquasecurity/tfsec-sarif-action@v0.1.4
+        with:
+          soft_fail: true # action don't break the build
+          github_token: ${{ github.token }}
+          sarif_file: tfsec.sarif
+
+      - name: Upload tfsec SARIF to GitHub
+        if: always() # Always run this step, even if the previous one fails
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: tfsec.sarif
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
@@ -69,8 +89,8 @@ jobs:
       - name: Verify dev.auto.tfvars content
         run: |
           echo "Checking dev/dev.auto.tfvars for specific required values..."
-          grep -F 'project             = "piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
-          grep -F 'environment         = "dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          grep 'project\s*=\s*"piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          grep 'environment\s*=\s*"dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
           echo "Required values in dev/dev.auto.tfvars verified."
 
       - name: Verify shared.auto.tfvars content
