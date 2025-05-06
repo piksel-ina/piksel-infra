@@ -39,10 +39,18 @@ jobs:
           terraform_version: 1.11.2
 
       - name: Run tfsec scanner
-        uses: aquasecurity/tfsec-action@v1.0.0
+        uses: aquasecurity/tfsec-action@v1.0.3
         with:
           soft_fail: true # action don't break the build
           github_token: ${{ github.token }}
+          format: sarif
+
+      - name: Upload tfsec SARIF to GitHub
+        if: always() # Always run this step, even if the previous one fails
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: tfsec.sarif
 
       - name: Setup TFLint
         uses: terraform-linters/setup-tflint@v4
