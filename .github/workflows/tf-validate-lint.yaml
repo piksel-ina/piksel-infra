@@ -2,17 +2,21 @@ name: Terraform Validate and Lint
 
 on:
   pull_request:
-    branches: [main] # Trigger on Pull Requests targeting the main branch
+    branches:
+      - main # Trigger on Pull Requests targeting the main branch
     paths:
       - "**/*.tf" # Only run if Terraform files change
       - "**/*.tfvars" # Or Terraform variable files change
       - ".github/workflows/tf-validate-lint.yml" # Or this workflow file changes
   push:
-    branches: [main]
+    branches:
+      - main
+      - update-ci-workflow
     paths:
       - "**/*.tf"
       - "**/*.tfvars"
       - ".github/workflows/tf-validate-lint.yml"
+  workflow_dispatch: # Allow manual triggering of the workflow
 
 jobs:
   validate:
