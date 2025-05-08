@@ -20,6 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Use the correct setup action from the infracost/actions repository
       - name: Setup Infracost
         uses: infracost/actions/setup@v3
         with:
@@ -32,79 +33,84 @@ jobs:
           git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
           git checkout -b base refs/remotes/origin/${{ github.base_ref }}
           git checkout ${{ github.ref }}
+        shell: bash
 
       # Calculate baseline costs for dev environment (PR only)
       - name: Generate dev environment baseline
         if: inputs.is_pr
-        uses: infracost/actions/breakdown@v3
-        with:
-          path: ./dev
-          terraform-workspace: dev
-          out-file: /tmp/infracost-base-dev.json
-          terraform-plan-flags: "-var-file=dev.tfvars" # Adjust if needed
+        run: |
+          cd ./dev
+          infracost breakdown --path=. --terraform-workspace=dev --terraform-var-file=dev.auto.tfvars --format=json --out-file=/tmp/infracost-base-dev.json
+        shell: bash
 
       # Calculate baseline costs for shared environment (PR only)
       - name: Generate shared environment baseline
         if: inputs.is_pr
-        uses: infracost/actions/breakdown@v3
-        with:
-          path: ./shared
-          terraform-workspace: shared
-          out-file: /tmp/infracost-base-shared.json
-          terraform-plan-flags: "-var-file=shared.tfvars" # Adjust if needed
+        run: |
+          cd ./shared
+          infracost breakdown --path=. --terraform-workspace=shared --terraform-var-file=shared.auto.tfvars --format=json --out-file=/tmp/infracost-base-shared.json
+        shell: bash
 
       # Calculate current costs for dev environment
       - name: Generate dev environment current costs
-        uses: infracost/actions/breakdown@v3
-        with:
-          path: ./dev
-          terraform-workspace: dev
-          out-file: /tmp/infracost-dev.json
-          terraform-plan-flags: "-var-file=dev.tfvars" # Adjust if needed
+        run: |
+          cd ./dev
+          infracost breakdown --path=. --terraform-workspace=dev --terraform-var-file=dev.auto.tfvars --format=json --out-file=/tmp/infracost-dev.json
+        shell: bash
 
       # Calculate current costs for shared environment
       - name: Generate shared environment current costs
-        uses: infracost/actions/breakdown@v3
-        with:
-          path: ./shared
-          terraform-workspace: shared
-          out-file: /tmp/infracost-shared.json
-          terraform-plan-flags: "-var-file=shared.tfvars" # Adjust if needed
+        run: |
+          cd ./shared
+          infracost breakdown --path=. --terraform-workspace=shared --terraform-var-file=shared.auto.tfvars --format=json --out-file=/tmp/infracost-shared.json
+        shell: bash
 
       # For PRs, generate the diff between baseline and current
       - name: Generate dev environment diff
         if: inputs.is_pr
-        uses: infracost/actions/diff@v3
-        with:
-          path: /tmp/infracost-dev.json
-          compare-to: /tmp/infracost-base-dev.json
-          out-file: /tmp/infracost-diff-dev.json
+        run: infracost diff --path=/tmp/infracost-dev.json --compare-to=/tmp/infracost-base-dev.json --format=json --out-file=/tmp/infracost-diff-dev.json
+        shell: bash
 
       - name: Generate shared environment diff
         if: inputs.is_pr
-        uses: infracost/actions/diff@v3
-        with:
-          path: /tmp/infracost-shared.json
-          compare-to: /tmp/infracost-base-shared.json
-          out-file: /tmp/infracost-diff-shared.json
+        run: infracost diff --path=/tmp/infracost-shared.json --compare-to=/tmp/infracost-base-shared.json --format=json --out-file=/tmp/infracost-diff-shared.json
+        shell: bash
 
       # If this is a PR, post a comment showing the cost diff
       - name: Post PR cost diff comment
         if: inputs.is_pr
-        uses: infracost/actions/comment@v3
-        with:
-          path: /tmp/infracost-diff-*.json
-          behavior: update
-          show-all: true # Always show all resources even without cost changes
-          title: "Infracost PR Analysis"
+        run: |
+          infracost comment github --path=/tmp/infracost-diff-*.json \
+                               --repo=$GITHUB_REPOSITORY \
+                               --github-token=${{github.token}} \
+                               --pull-request=${{github.event.pull_request.number}} \
+                               --behavior=update
+        shell: bash
 
-      # If manually triggered, post a comment showing current costs
-      - name: Post current costs comment
+      # For manual runs, output the cost breakdown to the log
+      - name: Output dev cost breakdown to log
         if: "!inputs.is_pr"
-        uses: infracost/actions/comment@v3
-        with:
-          path: /tmp/infracost-*.json # Use all JSON files
-          behavior: update
-          show-all: true # Always show all resources
-          title: "Current Infrastructure Costs"
-          show-all-projects: true
+        run: |
+          echo "💰 Dev Environment Cost Breakdown"
+          echo "----------------------------------------"
+          cat /tmp/infracost-dev.json | jq -r '.projects[] | "Resource: \(.name), Monthly Cost: \(.monthlyCost)"'
+          echo "----------------------------------------"
+          cat /tmp/infracost-dev.json | jq -r '"Total Monthly Cost: \(.totalMonthlyCost)"'
+        shell: bash
+
+      - name: Output shared cost breakdown to log
+        if: "!inputs.is_pr"
+        run: |
+          echo "💰 Shared Environment Cost Breakdown"
+          echo "----------------------------------------"
+          cat /tmp/infracost-shared.json | jq -r '.projects[] | "Resource: \(.name), Monthly Cost: \(.monthlyCost)"'
+          echo "----------------------------------------"
+          cat /tmp/infracost-shared.json | jq -r '"Total Monthly Cost: \(.totalMonthlyCost)"'
+        shell: bash
+
+      # Generate HTML report for manual runs
+      - name: Generate HTML cost report
+        if: "!inputs.is_pr"
+        run: |
+          infracost output --path=/tmp/infracost-*.json --format=html --out-file=/tmp/cost-report.html
+        shell: bash
