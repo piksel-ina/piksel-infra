@@ -45,3 +45,26 @@ variable "tgw_ram_principals" {
   type        = list(string)
   default     = []
 }
+
+
+#########################################################
+# ECR Variables
+#########################################################
+
+variable "ecr_image_tag_mutability" {
+  description = "Image tag mutability setting for the repository (MUTABLE or IMMUTABLE)"
+  type        = string
+  default     = "IMMUTABLE"
+}
+
+variable "ecr_max_tagged_images" {
+  description = "Maximum number of tagged images to keep"
+  type        = number
+  default     = 5
+}
+
+variable "ecr_untagged_image_retention_days" {
+  description = "Days to keep untagged images before expiration"
+  type        = number
+  default     = 7
+}
