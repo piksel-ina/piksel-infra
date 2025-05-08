@@ -46,6 +46,35 @@ The networking design incorporates several key components and patterns:
       - **DNS Integration:** Endpoints with Private DNS enabled allow standard AWS service hostnames to resolve to private IP addresses within the VPC, ensuring seamless private access for applications.
       - **Dependency Services:** Endpoints for Logs, STS, and S3 are common dependencies for many AWS workflows and applications, ensuring they also benefit from private connectivity.
 
+### Container Registry (ECR)
+
+The Elastic Container Registry configuration includes the following design decisions:
+
+1. **Private ECR Repository:**
+
+   - Using private ECR repositories for secure storage of container images
+   - Configured in the primary region (`ap-southeast-3`)
+   - Centralized repository with consistent naming convention (`${project}-core`)
+
+2. **Access Control:**
+
+   - GitHub Actions access via OIDC provider for secure CI/CD integration
+   - EKS access role for Kubernetes-based workloads to pull images
+   - Fine-grained IAM policies for both push and pull operations
+
+3. **Lifecycle Management:**
+
+   - Automated cleanup of untagged images to reduce storage costs
+   - Retention policies for tagged images to maintain important versions
+   - Optimized for both storage efficiency and deployment availability
+
+4. **Security Considerations:**
+   - Repository policies restrict access to specific IAM roles
+   - Private registry ensures images are not publicly accessible
+   - Integration with AWS security services for image scanning and vulnerability detection
+
+For complete details on the container registry architecture and configuration, please refer to our [Container Registry Design Document](https://github.com/piksel-ina/piksel-document/blob/main/architecture/container-registry.md).
+
 ## Cross-Account Connectivity
 
 The Transit Gateway created here is intended to be shared with other Piksel AWS accounts using AWS Resource Access Manager (RAM).
