@@ -63,14 +63,18 @@ jobs:
   # Call reusable workflows for each environment
   validate-dev:
     needs: lint
-    uses: ./.github/workflows/tf-env-validate.yml
+    uses: ./.github/workflows/terraform-env-validate.yml
+    permissions:
+      contents: read
     with:
       environment: dev
       terraform_version: 1.11.2
 
   validate-shared:
     needs: lint
-    uses: ./.github/workflows/tf-env-validate.yml
+    uses: ./.github/workflows/terraform-env-validate.yml
+    permissions:
+      contents: read
     with:
       environment: shared
       terraform_version: 1.11.2
@@ -78,12 +82,19 @@ jobs:
   # Call security scanning workflow
   security-scan:
     needs: [validate-dev, validate-shared]
-    uses: ./.github/workflows/tf-security-scan.yml
+    uses: ./.github/workflows/terraform-security-scan.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
   # Call cost analysis workflow for pull requests
   cost-analysis:
     if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize')
     needs: [validate-dev, validate-shared]
-    uses: ./.github/workflows/tf-cost-analysis.yml
+    uses: ./.github/workflows/terraform-cost-analysis.yml
+    permissions:
+      contents: read
+      pull-requests: write
     secrets:
       INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
