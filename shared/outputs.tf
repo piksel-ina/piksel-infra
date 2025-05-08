@@ -68,3 +68,33 @@ output "vpc_endpoint_network_interface_ids" {
     for k, v in module.vpc_endpoints.endpoints : k => v.network_interface_ids if v.network_interface_ids != null
   }
 }
+
+output "ecr_repository_url" {
+  description = "The URL of the ECR private repository"
+  value       = module.piksel_core_ecr.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "The ARN of the ECR private repository"
+  value       = module.piksel_core_ecr.repository_arn
+}
+
+output "github_actions_role_arn" {
+  description = "ARN of the GitHub Actions role for ECR access"
+  value       = module.github_actions_role.iam_role_arn
+}
+
+output "github_oidc_provider_url" {
+  description = "URL of the GitHub OIDC provider"
+  value       = module.github_oidc_provider.url
+}
+
+output "github_oidc_provider_arn" {
+  description = "ARN of the GitHub OIDC provider"
+  value       = module.github_oidc_provider.arn
+}
+
+output "eks_ecr_access_role_arn" {
+  description = "ARN of the EKS role for ECR access"
+  value       = module.eks_ecr_access_role.iam_role_arn
+}

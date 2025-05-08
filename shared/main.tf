@@ -1,5 +1,5 @@
 # Shared resources configuration
-
+data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
 locals {
@@ -176,3 +176,215 @@ module "vpc_endpoints" {
 #   depends_on = [module.tgw]
 # }
 # Repeat for staging, prod CIDRs...
+
+
+
+
+
+####################################################################
+# GitHub OIDC Provider
+####################################################################
+module "github_oidc_provider" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider"
+  version = "5.55.0"
+
+  create = true
+  tags   = local.tags
+}
+
+####################################################################
+# ECR Repository - Private
+####################################################################
+module "piksel_core_ecr" {
+  source  = "terraform-aws-modules/ecr/aws"
+  version = "2.4.0"
+
+  repository_name = "${lower(var.project)}-ecr"
+  # Default is private, but setting explicitly for clarity
+  repository_type                 = "private"
+  repository_image_tag_mutability = var.ecr_image_tag_mutability
+
+  # Repository lifecycle policy
+  create_lifecycle_policy = true
+  repository_lifecycle_policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1,
+        description  = "Keep only last ${var.ecr_max_tagged_images} tagged images",
+        selection = {
+          tagStatus     = "tagged",
+          tagPrefixList = ["v", "release"],
+          countType     = "imageCountMoreThan",
+          countNumber   = var.ecr_max_tagged_images
+        },
+        action = {
+          type = "expire"
+        }
+      },
+      {
+        rulePriority = 2,
+        description  = "Expire untagged images older than ${var.ecr_untagged_image_retention_days} days",
+        selection = {
+          tagStatus   = "untagged",
+          countType   = "sinceImagePushed",
+          countUnit   = "days",
+          countNumber = var.ecr_untagged_image_retention_days
+        },
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
+
+  # Repository policy for access control
+  create_repository_policy = true
+  repository_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "GithubActionsAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.name}-github-actions"
+        },
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages"
+        ]
+      },
+      {
+        Sid    = "EKSNodeAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.name}-eks-ecr-access"
+        },
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+####################################################################
+# IAM Roles
+####################################################################
+# GitHub OIDC Role
+module "github_actions_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "5.55.0"
+
+  create_role = true
+  role_name   = "${local.name}-github-actions"
+
+  provider_urls                  = [module.github_oidc_provider.url]
+  oidc_fully_qualified_subjects  = ["repo:piksel-ina/piksel-core:*"]
+  oidc_fully_qualified_audiences = ["sts.amazonaws.com"]
+
+  role_policy_arns = [module.github_actions_ecr_policy.arn]
+
+  tags = local.tags
+}
+
+# GitHub Actions ECR Policy
+module "github_actions_ecr_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.55.0"
+
+  name        = "${local.name}-github-actions-ecr-access"
+  description = "IAM policy for GitHub Actions to access ECR"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:DescribeImages",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages"
+        ]
+        Resource = module.piksel_core_ecr.repository_arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+# EKS ECR Access Role
+module "eks_ecr_access_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+  version = "5.55.0"
+
+  create_role = true
+  role_name   = "${local.name}-eks-ecr-access"
+
+  # This will need to be updated once EKS is created
+  provider_urls                 = ["oidc.eks.${var.aws_region}.amazonaws.com/id/EXAMPLE12345"]
+  oidc_fully_qualified_subjects = ["system:serviceaccount:default:ecr-access-sa"]
+
+  role_policy_arns = [module.eks_ecr_access_policy.arn]
+
+  tags = local.tags
+}
+
+# EKS ECR Access Policy
+module "eks_ecr_access_policy" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.55.0"
+
+  name        = "${local.name}-eks-ecr-access"
+  description = "IAM policy for EKS to access ECR"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Resource = module.piksel_core_ecr.repository_arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = local.tags
+}
