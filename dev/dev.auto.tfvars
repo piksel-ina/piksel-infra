@@ -1,10 +1,11 @@
 aws_region          = "ap-southeast-3"
-project             = "piksel"
-environment         = "dev"
+project             = "Piksel"
+environment         = "Dev"
 vpc_cidr            = "10.0.0.0/16"
 allowed_cidr_blocks = ["0.0.0.0/0"] # Consider restricting this in production
 common_tags = {
-  Owner = "DevOps-Team"
+  Owner   = "DevOps-Team"
+  Service = "Piksel-Dev"
 }
 
 # Explicitly define S3 settings for dev (matches defaults)

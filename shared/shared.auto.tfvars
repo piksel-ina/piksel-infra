@@ -1,6 +1,6 @@
 aws_region  = "ap-southeast-3"
-project     = "piksel"
-environment = "shared"
+project     = "Piksel"
+environment = "Shared"
 
 # IMPORTANT: Choose a CIDR that DOES NOT overlap with dev, staging, prod, or other networks
 vpc_cidr = "10.1.0.0/16"
@@ -9,7 +9,8 @@ vpc_cidr = "10.1.0.0/16"
 transit_gateway_amazon_side_asn = 64512
 
 common_tags = {
-  Owner = "DevOps-Team"
+  Owner   = "DevOps-Team"
+  Service = "Piksel-Shared"
   # Add any other globally relevant tags
 }
 

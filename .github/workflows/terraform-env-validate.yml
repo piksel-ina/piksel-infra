@@ -1,0 +1,48 @@
+name: Terraform Environment Validation
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      terraform_version:
+        required: false
+        type: string
+        default: "1.11.2"
+
+jobs:
+  validate-environment:
+    name: Validate ${{ inputs.environment }} Environment
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform_version }}
+
+      - name: Terraform Init (${{ inputs.environment }})
+        id: init
+        run: cd ${{ inputs.environment }} && terraform init -backend=false
+
+      - name: Terraform Validate (${{ inputs.environment }})
+        id: validate
+        run: cd ${{ inputs.environment }} && terraform validate
+
+      - name: Verify ${{ inputs.environment }}.auto.tfvars content
+        run: |
+          if [ "${{ inputs.environment }}" == "dev" ]; then
+            echo "Checking dev/dev.auto.tfvars for specific required values..."
+            grep 'project\s*=\s*"Piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"Piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+            grep 'environment\s*=\s*"Dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"Dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          elif [ "${{ inputs.environment }}" == "shared" ]; then
+            echo "Checking shared/shared.auto.tfvars for specific required values..."
+            grep 'project\s*=\s*"Piksel"' shared/shared.auto.tfvars || (echo "Error: 'project = \"Piksel\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+            grep 'environment\s*=\s*"Shared"' shared/shared.auto.tfvars || (echo "Error: 'environment = \"Shared\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+          fi
+          echo "Required values in ${{ inputs.environment }}/${{ inputs.environment }}.auto.tfvars verified."

@@ -16,8 +16,8 @@ variable "environment" {
   type        = string
   validation {
     # Adjust validation if needed, or rely on tfvars
-    condition     = var.environment == "shared"
-    error_message = "Environment must be shared for this configuration."
+    condition     = var.environment == "Shared"
+    error_message = "Environment must be Shared for this configuration."
   }
 }
 
