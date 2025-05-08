@@ -84,7 +84,6 @@ For details on the specific resources created, input variables, and outputs gene
 
 | Name | Type |
 |------|------|
-| [aws_instance.test_instance](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/instance) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 
 ## Inputs

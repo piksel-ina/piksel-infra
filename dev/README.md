@@ -169,7 +169,6 @@ To ensure operational health and proactively identify potential issues, baseline
 | [aws_cloudwatch_metric_alarm.rds_low_memory](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.rds_low_storage](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.s3_5xx_errors](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
-| [aws_instance.test_instance](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/instance) | resource |
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
 | [aws_s3_bucket_metric.critical_bucket_metrics](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/s3_bucket_metric) | resource |

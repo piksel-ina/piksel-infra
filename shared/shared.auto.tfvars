@@ -1,6 +1,6 @@
 aws_region  = "ap-southeast-3"
-project     = "piksel"
-environment = "shared"
+project     = "Piksel"
+environment = "Shared"
 
 # IMPORTANT: Choose a CIDR that DOES NOT overlap with dev, staging, prod, or other networks
 vpc_cidr = "10.1.0.0/16"

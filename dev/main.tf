@@ -1,7 +1,7 @@
 data "aws_availability_zones" "available" {}
 
 locals {
-  name     = "${var.project}-${var.environment}"
+  name     = "${lower(var.project)}-${lower(var.environment)}" # Should evaluate to piksel-dev
   vpc_cidr = var.vpc_cidr
   azs      = slice(data.aws_availability_zones.available.names, 0, 2)
 

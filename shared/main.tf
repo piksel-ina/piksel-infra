@@ -3,7 +3,7 @@
 data "aws_availability_zones" "available" {}
 
 locals {
-  name     = "${var.project}-${var.environment}" # Should evaluate to piksel-shared
+  name     = "${lower(var.project)}-${lower(var.environment)}" # Should evaluate to piksel-shared
   vpc_cidr = var.vpc_cidr
   # Use 3 AZs for high availability
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
