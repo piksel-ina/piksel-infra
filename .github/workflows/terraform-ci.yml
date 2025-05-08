@@ -88,13 +88,15 @@ jobs:
       contents: read
       security-events: write
 
-  # Call cost analysis workflow for pull requests
+  # Call cost analysis workflow for pull requests or manual triggers
   cost-analysis:
-    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize')
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     needs: [validate-dev, validate-shared]
     uses: ./.github/workflows/terraform-cost-analysis.yml
     permissions:
       contents: read
       pull-requests: write
+    with:
+      is_pr: ${{ github.event_name == 'pull_request' }}
     secrets:
       INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}

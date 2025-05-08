@@ -2,17 +2,19 @@ name: Terraform Cost Analysis
 
 on:
   workflow_call:
+    inputs:
+      is_pr:
+        description: "Whether this is running in a PR context"
+        required: true
+        type: boolean
     secrets:
       INFRACOST_API_KEY:
         required: true
 
 jobs:
-  cost-analysis:
-    name: Infracost Analysis
+  infracost:
+    name: Infracost
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
 
     steps:
       - name: Checkout code
@@ -23,42 +25,86 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # Checkout the base branch of the pull request (e.g. main/master)
-      - name: Checkout base branch
-        uses: actions/checkout@v4
-        with:
-          ref: "${{ github.event.pull_request.base.ref }}"
+      # When running on a PR, checkout the base branch to compare against
+      - name: Checkout base branch for comparison (PR only)
+        if: inputs.is_pr
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
+          git checkout -b base refs/remotes/origin/${{ github.base_ref }}
+          git checkout ${{ github.ref }}
 
-      # Generate baselines for each environment
-      - name: Generate Dev Baseline
-        uses: ./.github/actions/infracost-baseline
+      # Calculate baseline costs for dev environment (PR only)
+      - name: Generate dev environment baseline
+        if: inputs.is_pr
+        uses: infracost/actions/breakdown@v3
         with:
-          environment: dev
+          path: ./dev
+          terraform-workspace: dev
+          out-file: /tmp/infracost-base-dev.json
+          terraform-plan-flags: "-var-file=dev.tfvars" # Adjust if needed
 
-      - name: Generate Shared Baseline
-        uses: ./.github/actions/infracost-baseline
+      # Calculate baseline costs for shared environment (PR only)
+      - name: Generate shared environment baseline
+        if: inputs.is_pr
+        uses: infracost/actions/breakdown@v3
         with:
-          environment: shared
+          path: ./shared
+          terraform-workspace: shared
+          out-file: /tmp/infracost-base-shared.json
+          terraform-plan-flags: "-var-file=shared.tfvars" # Adjust if needed
 
-      # Checkout the current PR branch so we can create a diff
-      - name: Checkout PR branch
-        uses: actions/checkout@v4
-
-      # Generate diffs for each environment
-      - name: Generate Dev Diff
-        uses: ./.github/actions/infracost-diff
+      # Calculate current costs for dev environment
+      - name: Generate dev environment current costs
+        uses: infracost/actions/breakdown@v3
         with:
-          environment: dev
+          path: ./dev
+          terraform-workspace: dev
+          out-file: /tmp/infracost-dev.json
+          terraform-plan-flags: "-var-file=dev.tfvars" # Adjust if needed
 
-      - name: Generate Shared Diff
-        uses: ./.github/actions/infracost-diff
+      # Calculate current costs for shared environment
+      - name: Generate shared environment current costs
+        uses: infracost/actions/breakdown@v3
         with:
-          environment: shared
+          path: ./shared
+          terraform-workspace: shared
+          out-file: /tmp/infracost-shared.json
+          terraform-plan-flags: "-var-file=shared.tfvars" # Adjust if needed
 
-      - name: Upload Infracost JSON Files
-        uses: actions/upload-artifact@v4
+      # For PRs, generate the diff between baseline and current
+      - name: Generate dev environment diff
+        if: inputs.is_pr
+        uses: infracost/actions/diff@v3
         with:
-          name: infracost-data
-          path: |
-            /tmp/infracost-dev.json
-            /tmp/infracost-shared.json
+          path: /tmp/infracost-dev.json
+          compare-to: /tmp/infracost-base-dev.json
+          out-file: /tmp/infracost-diff-dev.json
+
+      - name: Generate shared environment diff
+        if: inputs.is_pr
+        uses: infracost/actions/diff@v3
+        with:
+          path: /tmp/infracost-shared.json
+          compare-to: /tmp/infracost-base-shared.json
+          out-file: /tmp/infracost-diff-shared.json
+
+      # If this is a PR, post a comment showing the cost diff
+      - name: Post PR cost diff comment
+        if: inputs.is_pr
+        uses: infracost/actions/comment@v3
+        with:
+          path: /tmp/infracost-diff-*.json
+          behavior: update
+          show-all: true # Always show all resources even without cost changes
+          title: "Infracost PR Analysis"
+
+      # If manually triggered, post a comment showing current costs
+      - name: Post current costs comment
+        if: "!inputs.is_pr"
+        uses: infracost/actions/comment@v3
+        with:
+          path: /tmp/infracost-*.json # Use all JSON files
+          behavior: update
+          show-all: true # Always show all resources
+          title: "Current Infrastructure Costs"
+          show-all-projects: true
