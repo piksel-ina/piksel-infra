@@ -202,7 +202,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="input_odc_db_multi_az"></a> [odc\_db\_multi\_az](#input\_odc\_db\_multi\_az) | Specifies if the ODC index RDS instance is multi-AZ. | `bool` | `true` | no |
 | <a name="input_odc_db_name"></a> [odc\_db\_name](#input\_odc\_db\_name) | The name of the database to create in the ODC index RDS instance. | `string` | `"odc_index_db"` | no |
 | <a name="input_odc_db_skip_final_snapshot"></a> [odc\_db\_skip\_final\_snapshot](#input\_odc\_db\_skip\_final\_snapshot) | Determines whether a final DB snapshot is created before the ODC index DB instance is deleted. | `bool` | `true` | no |
-| <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | `"piksel"` | no |
+| <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | `"Piksel"` | no |
 | <a name="input_rds_cpu_threshold"></a> [rds\_cpu\_threshold](#input\_rds\_cpu\_threshold) | CPU Utilization percentage threshold for RDS alarm. | `number` | `80` | no |
 | <a name="input_rds_low_memory_threshold_mb"></a> [rds\_low\_memory\_threshold\_mb](#input\_rds\_low\_memory\_threshold\_mb) | Freeable memory threshold in MB for RDS alarm. | `number` | `500` | no |
 | <a name="input_rds_low_storage_threshold_gb"></a> [rds\_low\_storage\_threshold\_gb](#input\_rds\_low\_storage\_threshold\_gb) | Free storage space threshold in GB for RDS alarm. | `number` | `10` | no |

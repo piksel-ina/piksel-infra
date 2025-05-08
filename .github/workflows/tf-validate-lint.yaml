@@ -89,15 +89,15 @@ jobs:
       - name: Verify dev.auto.tfvars content
         run: |
           echo "Checking dev/dev.auto.tfvars for specific required values..."
-          grep 'project\s*=\s*"piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
-          grep 'environment\s*=\s*"dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          grep 'project\s*=\s*"Piksel"' dev/dev.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
+          grep 'environment\s*=\s*"Dev"' dev/dev.auto.tfvars || (echo "Error: 'environment = \"dev\"' not found or changed in dev/dev.auto.tfvars"; exit 1)
           echo "Required values in dev/dev.auto.tfvars verified."
 
       - name: Verify shared.auto.tfvars content
         run: |
           echo "Checking shared/shared.auto.tfvars for specific required values..."
-          grep 'project\s*=\s*"piksel"' shared/shared.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
-          grep 'environment\s*=\s*"shared"' shared/shared.auto.tfvars || (echo "Error: 'environment = \"shared\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+          grep 'project\s*=\s*"Piksel"' shared/shared.auto.tfvars || (echo "Error: 'project = \"piksel\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
+          grep 'environment\s*=\s*"Shared"' shared/shared.auto.tfvars || (echo "Error: 'environment = \"shared\"' not found or value incorrect in shared/shared.auto.tfvars"; exit 1)
           echo "Required values in shared/shared.auto.tfvars verified."
 
       # --- Validation per Environment ---

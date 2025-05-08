@@ -10,15 +10,15 @@ variable "aws_region" {
 variable "project" {
   description = "Project name used for resource naming and tagging"
   type        = string
-  default     = "piksel"
+  default     = "Piksel"
 }
 
 variable "environment" {
   description = "Environment name"
   type        = string
   validation {
-    condition     = contains(["test", "dev", "staging", "prod"], var.environment)
-    error_message = "Environment must be test, dev, staging, or prod."
+    condition     = contains(["Test", "Dev", "Staging", "Prod"], var.environment)
+    error_message = "Environment must be Test, Dev, Staging, or Prod."
   }
 }
 

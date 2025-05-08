@@ -9,7 +9,8 @@ vpc_cidr = "10.1.0.0/16"
 transit_gateway_amazon_side_asn = 64512
 
 common_tags = {
-  Owner = "DevOps-Team"
+  Owner   = "DevOps-Team"
+  Service = "Piksel-Shared"
   # Add any other globally relevant tags
 }
 
