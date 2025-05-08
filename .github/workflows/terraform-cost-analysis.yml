@@ -1,0 +1,64 @@
+name: Terraform Cost Analysis
+
+on:
+  workflow_call:
+    secrets:
+      INFRACOST_API_KEY:
+        required: true
+
+jobs:
+  cost-analysis:
+    name: Infracost Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      # Checkout the base branch of the pull request (e.g. main/master)
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.base.ref }}"
+
+      # Generate baselines for each environment
+      - name: Generate Dev Baseline
+        uses: ./.github/actions/infracost-baseline
+        with:
+          environment: dev
+
+      - name: Generate Shared Baseline
+        uses: ./.github/actions/infracost-baseline
+        with:
+          environment: shared
+
+      # Checkout the current PR branch so we can create a diff
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      # Generate diffs for each environment
+      - name: Generate Dev Diff
+        uses: ./.github/actions/infracost-diff
+        with:
+          environment: dev
+
+      - name: Generate Shared Diff
+        uses: ./.github/actions/infracost-diff
+        with:
+          environment: shared
+
+      - name: Upload Infracost JSON Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: infracost-data
+          path: |
+            /tmp/infracost-dev.json
+            /tmp/infracost-shared.json

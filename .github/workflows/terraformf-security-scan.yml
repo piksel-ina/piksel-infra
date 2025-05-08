@@ -1,0 +1,31 @@
+name: Terraform Security Scan
+
+on:
+  workflow_call:
+
+jobs:
+  security-scan:
+    name: Run Security Scans
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tfsec scanner
+        uses: aquasecurity/tfsec-sarif-action@v0.1.4
+        with:
+          soft_fail: true # action don't break the build
+          github_token: ${{ github.token }}
+          sarif_file: tfsec.sarif
+
+      - name: Upload tfsec SARIF to GitHub
+        if: always() # Always run this step, even if the previous one fails
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          # Path to SARIF file relative to the root of the repository
+          sarif_file: tfsec.sarif
