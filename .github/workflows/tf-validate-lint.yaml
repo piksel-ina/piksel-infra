@@ -176,26 +176,20 @@ jobs:
         run: |
           cd shared
           infracost diff --path=. \
-                          --format=json \
-                          --compare-to=/tmp/infracost-base-shared.json \
-                          --out-file=/tmp/infracost-shared.json
+                         --format=json \
+                         --compare-to=/tmp/infracost-base-shared.json \
+                         --out-file=/tmp/infracost-shared.json
 
       - name: Generate Infracost Report
         run: |
-          infracost output --path="/tmp/infracost-dev.json,/tmp/infracost-shared.json" \
-                    --format=html \
-                    --out-file=/tmp/infracost-report.html
+          infracost output --path=/tmp/infracost-dev.json,/tmp/infracost-shared.json \
+                  --format=html \
+                  --out-file=/tmp/infracost-report.html
 
       - name: Output Infracost Summary
         run: |
-          infracost output --path="/tmp/infracost-dev.json,/tmp/infracost-shared.json" \
-                    --format=table
+          infracost output --path=/tmp/infracost-dev.json,/tmp/infracost-shared.json \
+                  --format=table
           echo "## Infracost Summary" >> $GITHUB_STEP_SUMMARY
-          echo "$(infracost output --path="/tmp/infracost-dev.json,/tmp/infracost-shared.json" --format=markdown --show-skipped)" >> $GITHUB_STEP_SUMMARY
+          echo "$(infracost output --path=/tmp/infracost-dev.json,/tmp/infracost-shared.json --format=markdown --show-skipped)" >> $GITHUB_STEP_SUMMARY
           echo "For detailed breakdown, see job artifacts" >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload Infracost Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: infracost-report
-          path: /tmp/infracost-report.html
