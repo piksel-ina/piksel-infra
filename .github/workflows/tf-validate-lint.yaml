@@ -194,7 +194,9 @@ jobs:
                                   --repo=$GITHUB_REPOSITORY \
                                   --github-token=${{ github.token }} \
                                   --pull-request=${{ github.event.pull_request.number }} \
-                                  --behavior=update
+                                  --behavior=update \
+                                  --show-all-projects=true \
+                                  --show-skipped=true
 
   # Add this job to update Infracost Cloud when changes are pushed to main
   infracost-default-branch-update:
