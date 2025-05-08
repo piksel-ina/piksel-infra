@@ -122,4 +122,136 @@ jobs:
         id: validate-shared
         run: cd shared && terraform validate
 
-      # Add similar blocks for staging and prod once they are ready
+  infracost-pull-request-checks:
+    name: Infracost Pull Request Checks
+    if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'synchronize')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required to post comments
+
+    steps:
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      # Checkout the base branch of the pull request (e.g. main/master)
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: "${{ github.event.pull_request.base.ref }}"
+
+      # Generate Infracost JSON file as the baseline for dev environment
+      - name: Generate Infracost cost estimate baseline (Dev)
+        run: |
+          cd dev
+          infracost breakdown --path=. \
+                              --format=json \
+                              --out-file=/tmp/infracost-base-dev.json
+
+      # Generate Infracost JSON file as the baseline for shared environment
+      - name: Generate Infracost cost estimate baseline (Shared)
+        run: |
+          cd shared
+          infracost breakdown --path=. \
+                              --format=json \
+                              --out-file=/tmp/infracost-base-shared.json
+
+      # Checkout the current PR branch so we can create a diff
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+
+      # Generate an Infracost diff for dev environment
+      - name: Generate Infracost diff (Dev)
+        run: |
+          cd dev
+          infracost diff --path=. \
+                          --format=json \
+                          --compare-to=/tmp/infracost-base-dev.json \
+                          --out-file=/tmp/infracost-dev.json
+
+      # Generate an Infracost diff for shared environment
+      - name: Generate Infracost diff (Shared)
+        run: |
+          cd shared
+          infracost diff --path=. \
+                          --format=json \
+                          --compare-to=/tmp/infracost-base-shared.json \
+                          --out-file=/tmp/infracost-shared.json
+
+      # Combine the Infracost JSON files
+      - name: Combine Infracost JSON files
+        run: |
+          infracost output --path="/tmp/infracost-dev.json,/tmp/infracost-shared.json" \
+                          --format=json \
+                          --out-file=/tmp/infracost-combined.json
+
+      # Post a comment to the PR
+      - name: Post Infracost comment
+        run: |
+          infracost comment github --path=/tmp/infracost-combined.json \
+                                  --repo=$GITHUB_REPOSITORY \
+                                  --github-token=${{ github.token }} \
+                                  --pull-request=${{ github.event.pull_request.number }} \
+                                  --behavior=update
+
+  # Add this job to update Infracost Cloud when changes are pushed to main
+  infracost-default-branch-update:
+    name: Infracost Default Branch Update
+    if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'update-ci-workflow')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Infracost
+        uses: infracost/actions/setup@v3
+        with:
+          api-key: ${{ secrets.INFRACOST_API_KEY }}
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+
+      # Run Infracost for dev environment
+      - name: Run Infracost on default branch (Dev)
+        run: |
+          cd dev
+          infracost breakdown --path=. \
+                    --format=json \
+                    --out-file=/tmp/infracost-dev.json
+
+      # Run Infracost for shared environment
+      - name: Run Infracost on default branch (Shared)
+        run: |
+          cd shared
+          infracost breakdown --path=. \
+                    --format=json \
+                    --out-file=/tmp/infracost-shared.json
+
+      # Combine and upload to Infracost Cloud
+      - name: Combine and upload to Infracost Cloud
+        run: |
+          infracost output --path="/tmp/infracost-dev.json,/tmp/infracost-shared.json" \
+                          --format=json \
+                          --out-file=/tmp/infracost-combined.json
+
+          infracost upload --path=/tmp/infracost-combined.json || echo "Always pass main branch runs even if there are policy failures"
+
+  # Update PR status in Infracost Cloud when PR is closed/merged
+  infracost-pull-request-status-update:
+    name: Infracost PR Status Update
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Infracost PR Status Update
+        run: |
+          PR_STATUS="MERGED"
+          if [[ ${{ github.event.pull_request.merged }} = false ]]; then PR_STATUS="CLOSED"; fi
+
+          echo "Updating status of ${{ github.event.pull_request.html_url }} to $PR_STATUS"
+          curl -i \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --header "X-API-Key: $INFRACOST_API_KEY" \
+            --data "{ \"query\": \"mutation {updatePullRequestStatus( url: \\\"${{ github.event.pull_request.html_url }}\\\", status: $PR_STATUS )}\" }" \
+            "https://dashboard.api.infracost.io/graphql";
+        env:
+          INFRACOST_API_KEY: ${{ secrets.INFRACOST_API_KEY }}
