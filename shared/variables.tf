@@ -68,3 +68,40 @@ variable "ecr_untagged_image_retention_days" {
   type        = number
   default     = 7
 }
+
+
+#########################################################
+# DNS Variables
+#########################################################
+
+# variable "development_account_id" {
+#   description = "AWS Account ID for the Development environment"
+#   type        = string
+# }
+
+variable "public_domain_name" {
+  description = "List of public domains to create"
+  type        = string
+  default     = "piksel.big.go.id"
+}
+
+variable "internal_domains" {
+  description = "Map of internal domain names for private hosted zones"
+  type        = map(string)
+  default = {
+    dev     = "dev.piksel.internal"
+    staging = "staging.piksel.internal"
+    prod    = "prod.piksel.internal"
+  }
+}
+
+variable "public_dns_records" {
+  description = "List of DNS records to create in the public hosted zone"
+  type = list(object({
+    name    = string
+    type    = string
+    ttl     = number
+    records = list(string)
+  }))
+  default = [] # Empty default so it doesn't create any records if not specified
+}

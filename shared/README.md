@@ -111,6 +111,9 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="module_github_actions_role"></a> [github\_actions\_role](#module\_github\_actions\_role) | terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc | 5.55.0 |
 | <a name="module_github_oidc_provider"></a> [github\_oidc\_provider](#module\_github\_oidc\_provider) | terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider | 5.55.0 |
 | <a name="module_piksel_core_ecr"></a> [piksel\_core\_ecr](#module\_piksel\_core\_ecr) | terraform-aws-modules/ecr/aws | 2.4.0 |
+| <a name="module_private_zones"></a> [private\_zones](#module\_private\_zones) | terraform-aws-modules/route53/aws//modules/zones | ~> 3.0 |
+| <a name="module_public_records"></a> [public\_records](#module\_public\_records) | terraform-aws-modules/route53/aws//modules/records | ~> 3.0 |
+| <a name="module_public_zone"></a> [public\_zone](#module\_public\_zone) | terraform-aws-modules/route53/aws//modules/zones | ~> 3.0 |
 | <a name="module_tgw"></a> [tgw](#module\_tgw) | terraform-aws-modules/transit-gateway/aws | ~> 2.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.21.0 |
 | <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.21.0 |
@@ -132,7 +135,10 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="input_ecr_max_tagged_images"></a> [ecr\_max\_tagged\_images](#input\_ecr\_max\_tagged\_images) | Maximum number of tagged images to keep | `number` | `5` | no |
 | <a name="input_ecr_untagged_image_retention_days"></a> [ecr\_untagged\_image\_retention\_days](#input\_ecr\_untagged\_image\_retention\_days) | Days to keep untagged images before expiration | `number` | `7` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name (should be 'shared' for this directory) | `string` | n/a | yes |
+| <a name="input_internal_domains"></a> [internal\_domains](#input\_internal\_domains) | Map of internal domain names for private hosted zones | `map(string)` | <pre>{<br/>  "dev": "dev.piksel.internal",<br/>  "prod": "prod.piksel.internal",<br/>  "staging": "staging.piksel.internal"<br/>}</pre> | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | n/a | yes |
+| <a name="input_public_dns_records"></a> [public\_dns\_records](#input\_public\_dns\_records) | List of DNS records to create in the public hosted zone | <pre>list(object({<br/>    name    = string<br/>    type    = string<br/>    ttl     = number<br/>    records = list(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_public_domain_name"></a> [public\_domain\_name](#input\_public\_domain\_name) | List of public domains to create | `string` | `"piksel.big.go.id"` | no |
 | <a name="input_tgw_ram_principals"></a> [tgw\_ram\_principals](#input\_tgw\_ram\_principals) | List of AWS Account IDs or OU ARNs to share the TGW with. | `list(string)` | `[]` | no |
 | <a name="input_transit_gateway_amazon_side_asn"></a> [transit\_gateway\_amazon\_side\_asn](#input\_transit\_gateway\_amazon\_side\_asn) | Private Autonomous System Number (ASN) for the Amazon side of a BGP session. Required if creating a new TGW. | `number` | `64512` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the Shared VPC | `string` | n/a | yes |
@@ -148,7 +154,11 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="output_github_oidc_provider_arn"></a> [github\_oidc\_provider\_arn](#output\_github\_oidc\_provider\_arn) | ARN of the GitHub OIDC provider |
 | <a name="output_github_oidc_provider_url"></a> [github\_oidc\_provider\_url](#output\_github\_oidc\_provider\_url) | URL of the GitHub OIDC provider |
 | <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | List of IDs of private subnets in the Shared VPC |
+| <a name="output_private_zone_arns"></a> [private\_zone\_arns](#output\_private\_zone\_arns) | The ARNs of the private hosted zones |
+| <a name="output_private_zone_ids"></a> [private\_zone\_ids](#output\_private\_zone\_ids) | The IDs of the private hosted zones |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets in the Shared VPC |
+| <a name="output_public_zone_id"></a> [public\_zone\_id](#output\_public\_zone\_id) | The ID of the public hosted zone |
+| <a name="output_public_zone_name_servers"></a> [public\_zone\_name\_servers](#output\_public\_zone\_name\_servers) | Name servers for the public hosted zone (needed for delegation) |
 | <a name="output_transit_gateway_arn"></a> [transit\_gateway\_arn](#output\_transit\_gateway\_arn) | The ARN of the Transit Gateway |
 | <a name="output_transit_gateway_id"></a> [transit\_gateway\_id](#output\_transit\_gateway\_id) | The ID of the Transit Gateway |
 | <a name="output_transit_gateway_subnets"></a> [transit\_gateway\_subnets](#output\_transit\_gateway\_subnets) | List of IDs of private subnets used for TGW attachments in the Shared VPC |

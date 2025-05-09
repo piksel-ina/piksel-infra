@@ -8,13 +8,13 @@ terraform {
     }
   }
 
-  #   cloud {
-  #     organization = "piksel-ina"
+  cloud {
+    organization = "piksel-ina"
 
-  #     workspaces {
-  #       name = "piksel-shared-dev"
-  #     }
-  #   }
+    workspaces {
+      name = "piksel-infra-shared"
+    }
+  }
 }
 
 provider "aws" {

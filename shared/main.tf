@@ -388,3 +388,49 @@ module "eks_ecr_access_policy" {
 
   tags = local.tags
 }
+
+
+####################################################################
+# Route53
+####################################################################
+
+# Create public hosted zone for piksel.big.go.id
+module "public_zone" {
+  source  = "terraform-aws-modules/route53/aws//modules/zones"
+  version = "~> 3.0"
+
+  zones = {
+    (var.public_domain_name) = {
+      comment = "${var.project} public hosted zone"
+      tags    = local.tags
+    }
+  }
+}
+
+# Create private hosted zones for internal domains
+module "private_zones" {
+  source  = "terraform-aws-modules/route53/aws//modules/zones"
+  version = "~> 3.0"
+
+  zones = {
+    for env, domain in var.internal_domains : domain => {
+      comment = "${var.project} ${env} private hosted zone"
+      vpc = [
+        {
+          vpc_id = module.vpc.vpc_id
+        }
+      ]
+      tags = local.tags
+    }
+  }
+}
+
+module "public_records" {
+  source  = "terraform-aws-modules/route53/aws//modules/records"
+  version = "~> 3.0"
+
+  zone_name  = var.public_domain_name
+  depends_on = [module.public_zone]
+
+  records = var.public_dns_records
+}
