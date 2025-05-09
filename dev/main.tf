@@ -1048,3 +1048,41 @@ resource "aws_accessanalyzer_analyzer" "this" {
     Name = "${local.name}-analyzer"
   })
 }
+
+
+
+################################################################################
+# Route53 Cross Account Role
+################################################################################
+resource "aws_iam_role" "cross_account_route53_role" {
+  name = "CrossAccountRoute53Role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "route53_permissions" {
+  name = "Route53Permissions"
+  role = aws_iam_role.cross_account_route53_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = [
+        "route53:AssociateVPCWithHostedZone",
+        "route53:DisassociateVPCWithHostedZone",
+        "ec2:DescribeVpcs"
+      ]
+      Effect   = "Allow"
+      Resource = "*"
+    }]
+  })
+}

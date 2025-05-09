@@ -22,10 +22,13 @@ tgw_ram_principals = [
 # development_account_id = "236122835646"
 
 internal_domains = {
-  dev     = "dev.piksel.internal"
-  staging = "staging.piksel.internal"
-  prod    = "prod.piksel.internal"
+  main_internal = "piksel.internal",
+  dev           = "dev.piksel.internal"
+  # staging = "staging.piksel.internal"
+  # prod    = "prod.piksel.internal"
 }
+
+resolver_rule_domain_name = "piksel.internal"
 
 # Define DNS records
 # public_dns_records = [
@@ -43,3 +46,7 @@ internal_domains = {
 #   records = ["piksel.big.go.id"]
 # }
 # ]
+
+spoke_vpc_cidrs = [
+  "10.0.0.0/16", # CIDR for Spoke Dev VPC
+]
