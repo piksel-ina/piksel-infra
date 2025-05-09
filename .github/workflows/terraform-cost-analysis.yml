@@ -26,13 +26,19 @@ jobs:
         with:
           api-key: ${{ secrets.INFRACOST_API_KEY }}
 
-      # When running on a PR, checkout the base branch to compare against
+      # When running on a PR, checkout the base branch for comparison (PR only)
       - name: Checkout base branch for comparison (PR only)
         if: inputs.is_pr
         run: |
+          # First capture the current HEAD commit
+          HEAD_COMMIT=$(git rev-parse HEAD)
+
+          # Checkout the base branch for baseline comparison
           git fetch --no-tags --prune --depth=1 origin +refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}
           git checkout -b base refs/remotes/origin/${{ github.base_ref }}
-          git checkout ${{ github.ref }}
+
+          # Return to the PR head commit
+          git checkout $HEAD_COMMIT
         shell: bash
 
       # Calculate baseline costs for dev environment (PR only)
