@@ -187,9 +187,8 @@ module "vpc_endpoints" {
 module "github_oidc_provider" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider"
   version = "5.55.0"
-
-  create = true
-  tags   = local.tags
+  create  = true
+  tags    = local.tags
 }
 
 ####################################################################
@@ -407,24 +406,6 @@ module "public_zone" {
   }
 }
 
-# Create private hosted zones for internal domains
-module "private_zones" {
-  source  = "terraform-aws-modules/route53/aws//modules/zones"
-  version = "~> 3.0"
-
-  zones = {
-    for env, domain in var.internal_domains : domain => {
-      comment = "${var.project} ${env} private hosted zone"
-      vpc = [
-        {
-          vpc_id = module.vpc.vpc_id
-        }
-      ]
-      tags = local.tags
-    }
-  }
-}
-
 module "public_records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 3.0"
@@ -433,4 +414,156 @@ module "public_records" {
   depends_on = [module.public_zone]
 
   records = var.public_dns_records
+}
+
+####################################################################
+# Route53 - Private Hosted Zones
+####################################################################
+
+resource "aws_route53_zone" "private_hosted_zones_shared" {
+  for_each = var.internal_domains # Map of internal domains
+  name     = each.value
+  comment  = "${var.project} ${each.key} private hosted zone (Shared Account)"
+
+  vpc {
+    vpc_id = module.vpc.vpc_id # CRITICAL: This associates the PHZ with SHARED VPC
+  }
+
+  tags = local.tags
+}
+
+####################################################################
+# Route53 Resolver Endpoints and Rules
+####################################################################
+
+resource "aws_security_group" "resolver_inbound_sg" {
+  name        = "${var.project}-resolver-inbound-sg"
+  description = "Allow DNS queries to Inbound Resolver Endpoint"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description = "DNS from Spoke VPCs"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = concat(var.spoke_vpc_cidrs, [module.vpc.vpc_cidr_block])
+  }
+  ingress {
+    description = "DNS from Spoke VPCs"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = concat(var.spoke_vpc_cidrs, [module.vpc.vpc_cidr_block])
+  }
+  egress { # Typically, inbound resolvers don't need much egress unless they forward elsewhere
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] # Or restrict as needed
+  }
+  tags = merge(local.tags, { Name = "${var.project}-resolver-inbound-sg" })
+}
+
+resource "aws_security_group" "resolver_outbound_sg" {
+  name        = "${var.project}-resolver-outbound-sg"
+  description = "Allow DNS queries from Outbound Resolver Endpoint"
+  vpc_id      = module.vpc.vpc_id
+
+  # Ingress for outbound is usually not strictly needed unless for health checks from within VPC
+  # egress is the important part for outbound resolvers
+  egress {
+    description = "DNS to internal and external resolvers (TCP)"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Allows forwarding to any DNS server
+  }
+  egress {
+    description = "DNS to internal and external resolvers (UDP)"
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = merge(local.tags, { Name = "${var.project}-resolver-outbound-sg" })
+}
+
+# --- INBOUND RESOLVER ENDPOINT ---
+module "inbound_resolver_endpoint" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
+  version = "~> 5.0"
+
+  create    = true
+  name      = "${var.project}-inbound-resolver"
+  direction = "INBOUND"
+  vpc_id    = module.vpc.vpc_id
+
+  protocols = ["Do53"]
+  # Provide at least two subnets in different AZs
+  ip_address = [
+    { subnet_id = module.vpc.private_subnets[0] },
+    { subnet_id = module.vpc.private_subnets[1] },
+    { subnet_id = module.vpc.private_subnets[2] }
+  ]
+
+  # To use the security group:
+  create_security_group = false
+  security_group_ids    = [aws_security_group.resolver_inbound_sg.id]
+
+  tags = merge(local.tags, { Name = "${var.project}-inbound-resolver" })
+}
+
+# --- OUTBOUND RESOLVER ENDPOINT ---
+module "outbound_resolver_endpoint" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
+  version = "~> 5.0"
+
+  create    = true
+  name      = "${var.project}-outbound-resolver"
+  direction = "OUTBOUND"
+  vpc_id    = module.vpc.vpc_id
+
+  protocols = ["Do53"]
+  ip_address = [
+    { subnet_id = module.vpc.private_subnets[0] },
+    { subnet_id = module.vpc.private_subnets[1] },
+    { subnet_id = module.vpc.private_subnets[2] }
+  ]
+
+  create_security_group = false
+  security_group_ids    = [aws_security_group.resolver_outbound_sg.id]
+
+  tags = merge(local.tags, { Name = "${var.project}-outbound-resolver" })
+}
+
+# --- RESOLVER RULE ---
+# This rule forwards queries for "internal.example.com" from the Shared VPC
+# TO the Inbound Resolver Endpoints of the Shared VPC itself.
+# This setup is for enabling spoke VPCs (associated with this rule via RAM)
+# to resolve Private Hosted Zones in the Shared VPC.
+resource "aws_route53_resolver_rule" "central_internal_domains_rule" {
+  name        = "${var.project}-internal-domains-resolver-rule"
+  domain_name = var.resolver_rule_domain_name # This is the domain name for which the rule applies
+  rule_type   = "FORWARD"
+
+  # This rule is processed by the OUTBOUND resolver when a query originates *from within this Shared VPC*.
+  # However, when shared and associated with Spoke VPCs, the Spoke VPCs' DNS will use this rule
+  # to forward queries to the target_ips.
+  resolver_endpoint_id = module.outbound_resolver_endpoint.route53_resolver_endpoint_id # The outbound endpoint of this VPC
+
+
+  # Dynamically create a target_ip block for each IP address
+  # of the INBOUND resolver endpoint.
+  dynamic "target_ip" {
+    # module.inbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses is a list of IP strings
+    for_each = module.inbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses
+    content {
+      # target_ip.value will be each individual IP address string from the list
+      ip = target_ip.value
+      # port = 53 # Optional, defaults to 53. Uncomment if need a different port.
+      # protocol = "Do53" # Optional, defaults to Do53 (standard DNS UDP/TCP).
+    }
+  }
+
+  tags = merge(local.tags, { Name = "${var.project}-internal-domains-rule" })
 }

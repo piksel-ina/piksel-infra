@@ -74,10 +74,8 @@ variable "ecr_untagged_image_retention_days" {
 # DNS Variables
 #########################################################
 
-# variable "development_account_id" {
-#   description = "AWS Account ID for the Development environment"
-#   type        = string
-# }
+
+
 
 variable "public_domain_name" {
   description = "List of public domains to create"
@@ -104,4 +102,15 @@ variable "public_dns_records" {
     records = list(string)
   }))
   default = [] # Empty default so it doesn't create any records if not specified
+}
+
+variable "resolver_rule_domain_name" {
+  description = "The domain name for which the central FORWARD resolver rule will apply (e.g., company.internal). This domain (and its subdomains) will be resolvable by spoke VPCs."
+  type        = string
+}
+
+variable "spoke_vpc_cidrs" {
+  description = "List of CIDR blocks for spoke VPCs that need to query the inbound resolver"
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
 }

@@ -110,17 +110,9 @@ output "public_zone_name_servers" {
   value       = module.public_zone.route53_zone_name_servers
 }
 
-output "private_zone_ids" {
-  description = "The IDs of the private hosted zones"
-  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_id[domain] }
-}
 
-output "private_zone_arns" {
-  description = "The ARNs of the private hosted zones"
-  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_arn[domain] }
-}
 
-# output "ram_resource_share_arn" {
-#   description = "ARN of the RAM resource share for DNS zones"
-#   value       = aws_ram_resource_share.dev_zone_share.arn
-# }
+output "resolver_rule_arn" {
+  description = "ARN of the shared Route53 Resolver Rule for internal domains"
+  value       = aws_route53_resolver_rule.central_internal_domains_rule.arn
+}
