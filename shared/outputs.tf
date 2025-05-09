@@ -98,3 +98,29 @@ output "eks_ecr_access_role_arn" {
   description = "ARN of the EKS role for ECR access"
   value       = module.eks_ecr_access_role.iam_role_arn
 }
+
+
+output "public_zone_id" {
+  description = "The ID of the public hosted zone"
+  value       = module.public_zone.route53_zone_zone_id
+}
+
+output "public_zone_name_servers" {
+  description = "Name servers for the public hosted zone (needed for delegation)"
+  value       = module.public_zone.route53_zone_name_servers
+}
+
+output "private_zone_ids" {
+  description = "The IDs of the private hosted zones"
+  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_id[domain] }
+}
+
+output "private_zone_arns" {
+  description = "The ARNs of the private hosted zones"
+  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_arn[domain] }
+}
+
+# output "ram_resource_share_arn" {
+#   description = "ARN of the RAM resource share for DNS zones"
+#   value       = aws_ram_resource_share.dev_zone_share.arn
+# }

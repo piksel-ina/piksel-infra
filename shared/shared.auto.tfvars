@@ -17,3 +17,29 @@ common_tags = {
 tgw_ram_principals = [
   "236122835646" # Dev Account ID, add staging and production ID here
 ]
+
+
+# development_account_id = "236122835646"
+
+internal_domains = {
+  dev     = "dev.piksel.internal"
+  staging = "staging.piksel.internal"
+  prod    = "prod.piksel.internal"
+}
+
+# Define DNS records
+# public_dns_records = [
+# Uncomment and modify when domain have been registered and set up services
+# {
+#   name    = ""
+#   type    = "A"
+#   ttl     = 3600
+#   records = ["192.0.2.1"]
+# },
+# {
+#   name    = "www"
+#   type    = "CNAME"
+#   ttl     = 3600
+#   records = ["piksel.big.go.id"]
+# }
+# ]
