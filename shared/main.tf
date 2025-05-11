@@ -2,6 +2,40 @@
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
+data "terraform_remote_state" "dev" {
+  backend = "remote"
+
+  config = {
+    organization = "piksel-ina"
+    workspaces = {
+      name = "piksel-infra-dev"
+    }
+  }
+}
+
+## Uncomment if staging and prod remote states are configured
+# data "terraform_remote_state" "staging" {
+#   backend = "remote"
+
+#   config = {
+#     organization = "piksel-ina"
+#     workspaces = {
+#       name = "piksel-infra-staging"
+#     }
+#   }
+# }
+
+# data "terraform_remote_state" "prod" {
+#   backend = "remote"
+
+#   config = {
+#     organization = "piksel-ina"
+#     workspaces = {
+#       name = "piksel-infra-prod"
+#     }
+#   }
+# }
+###############################################################
 locals {
   name     = "${lower(var.project)}-${lower(var.environment)}" # Should evaluate to piksel-shared
   vpc_cidr = var.vpc_cidr
@@ -151,35 +185,21 @@ module "vpc_endpoints" {
   tags = local.tags # Apply common tags to endpoints
 }
 
-################################################################################
-# Routing (Example: Allow Shared Private Subnets to reach Spoke VPCs via TGW)
-# Note: Spoke VPC routes pointing back to Shared VPC via TGW are configured
-#       in the respective dev/staging/prod Terraform configurations.
-################################################################################
+#####################################################################
+# Routing (Allow Shared Private Subnets to reach Spoke VPCs via TGW)
+#####################################################################
 
-# Explicit routes within the Shared VPC pointing to the TGW might still be needed
-# depending on your setup and whether you rely solely on propagation.
-# The TGW module typically creates necessary routes in the TGW route tables.
-# You might need routes in your *VPC* route tables (e.g., private)
-# pointing destination CIDRs (like spoke VPCs) to the TGW.
+# Route traffic destined for Dev VPC (10.0.0.0/16) via TGW
+resource "aws_route" "private_to_dev_via_tgw" {
+  count = length(module.vpc.private_route_table_ids)
 
-# Example (if needed): Route traffic destined for Dev VPC (e.g., 10.0.0.0/16) via TGW
-# resource "aws_route" "private_to_dev_via_tgw" {
-#   count = length(module.vpc.private_route_table_ids)
-#
-#   route_table_id         = module.vpc.private_route_table_ids[count.index]
-#   destination_cidr_block = "10.0.0.0/16" # Replace with actual Dev VPC CIDR
-#   # Reference the TGW ID output from the TGW module
-#   transit_gateway_id     = module.tgw.ec2_transit_gateway_id
-#
-#   # Ensure attachment exists before creating route
-#   depends_on = [module.tgw]
-# }
-# Repeat for staging, prod CIDRs...
+  route_table_id         = module.vpc.private_route_table_ids[count.index]
+  destination_cidr_block = "10.0.0.0/16"
+  transit_gateway_id     = module.tgw.ec2_transit_gateway_id
 
-
-
-
+  # Ensure attachment exists before creating route
+  depends_on = [module.tgw]
+}
 
 ####################################################################
 # GitHub OIDC Provider
@@ -187,9 +207,8 @@ module "vpc_endpoints" {
 module "github_oidc_provider" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider"
   version = "5.55.0"
-
-  create = true
-  tags   = local.tags
+  create  = true
+  tags    = local.tags
 }
 
 ####################################################################
@@ -407,24 +426,6 @@ module "public_zone" {
   }
 }
 
-# Create private hosted zones for internal domains
-module "private_zones" {
-  source  = "terraform-aws-modules/route53/aws//modules/zones"
-  version = "~> 3.0"
-
-  zones = {
-    for env, domain in var.internal_domains : domain => {
-      comment = "${var.project} ${env} private hosted zone"
-      vpc = [
-        {
-          vpc_id = module.vpc.vpc_id
-        }
-      ]
-      tags = local.tags
-    }
-  }
-}
-
 module "public_records" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 3.0"
@@ -433,4 +434,129 @@ module "public_records" {
   depends_on = [module.public_zone]
 
   records = var.public_dns_records
+}
+
+####################################################################
+# Route53 - Private Hosted Zones
+####################################################################
+
+resource "aws_route53_zone" "private_hosted_zones_shared" {
+  for_each = var.internal_domains # Map of internal domains
+  name     = each.value
+  comment  = "${var.project} ${each.key} private hosted zone (Shared Account)"
+
+  vpc {
+    vpc_id = module.vpc.vpc_id # CRITICAL: This associates the PHZ with SHARED VPC
+  }
+
+  tags = local.tags
+}
+
+####################################################################
+# Route53 Resolver Endpoints and Rules
+####################################################################
+
+# --- INBOUND RESOLVER ENDPOINT ---
+module "inbound_resolver_endpoint" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
+  version = "~> 5.0"
+
+  create    = true
+  name      = "${local.name}-inbound-resolver"
+  direction = "INBOUND"
+  vpc_id    = module.vpc.vpc_id
+
+  protocols = ["Do53"]
+
+  # Provide at least two subnets in different AZs
+  ip_address = [
+    { subnet_id = module.vpc.private_subnets[0] },
+    { subnet_id = module.vpc.private_subnets[1] }
+  ]
+
+  # Create security group
+  create_security_group              = true
+  security_group_name                = "${var.project}-resolver-inbound-sg"
+  security_group_description         = "Allow DNS queries to Inbound Resolver Endpoint for ${var.project}"
+  security_group_ingress_cidr_blocks = concat(var.spoke_vpc_cidrs, [module.vpc.vpc_cidr_block])
+
+  tags                = merge(local.tags, { Name = "${var.project}-inbound-resolver" })
+  security_group_tags = merge(local.tags, { Name = "${var.project}-resolver-inbound-sg" })
+}
+
+# --- OUTBOUND RESOLVER ENDPOINT ---
+module "outbound_resolver_endpoint" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
+  version = "~> 5.0" # Or your specific desired version
+
+  create    = true
+  name      = "${local.name}-outbound-resolver"
+  direction = "OUTBOUND"
+  vpc_id    = module.vpc.vpc_id
+
+  protocols = ["Do53"]
+
+  ip_address = [
+    { subnet_id = module.vpc.private_subnets[0] },
+    { subnet_id = module.vpc.private_subnets[1] }
+  ]
+
+  # Let the module create and manage the security group
+  create_security_group              = true
+  security_group_name                = "${local.name}-resolver-outbound-sg"
+  security_group_description         = "Allow DNS queries from Outbound Resolver Endpoint for ${var.project}"
+  security_group_ingress_cidr_blocks = [module.vpc.vpc_cidr_block]
+
+  tags                = merge(local.tags, { Name = "${local.name}-outbound-resolver" })
+  security_group_tags = merge(local.tags, { Name = "${local.name}-resolver-outbound-sg" }) # Tags for the SG
+}
+
+##########################################################################
+# RESOLVER RULE
+##########################################################################
+locals {
+  internal_domains_target_ips_list = [
+    for addr in module.inbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses : addr.ip if try(addr.ip, null) != null
+  ]
+}
+
+module "internal_domains_resolver_rule" {
+  source  = "AutomateTheCloud/route53_resolver_rule/aws"
+  version = "1.11.0"
+  providers = {
+    aws.this = aws.shared
+  }
+
+  name = "${local.name}-internal-domains-resolver-rule"
+
+  details = {
+    scope           = "Infrastructure"
+    purpose         = "Route53 Resolver Rule"
+    environment     = var.environment
+    additional_tags = local.tags
+  }
+
+  # --- Rule Configuration ---
+  domain_name          = var.resolver_rule_domain_name
+  resolver_endpoint_id = module.outbound_resolver_endpoint.route53_resolver_endpoint_id
+  rule_type            = "FORWARD" # Default is FORWARD, but explicit is good
+  target_ip            = local.internal_domains_target_ips_list
+
+  # --- List of AWS Account IDs to share this rule with ---
+  account_share = var.tgw_ram_principals
+}
+
+module "resolver_rule_associations" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-rule-associations"
+  version = "~> 5.0"
+  create  = true
+
+  resolver_rule_associations = {
+    "dev_vpc_association" = {
+      resolver_rule_id = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
+      vpc_id           = data.terraform_remote_state.dev.outputs.vpc_id
+      name             = "piksel-dev-vpc-rule-assoc"
+    }
+  }
+
 }

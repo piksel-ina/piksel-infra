@@ -100,6 +100,7 @@ For details on the specific resources created, input variables, and outputs gene
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.95.0 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -110,10 +111,13 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="module_github_actions_ecr_policy"></a> [github\_actions\_ecr\_policy](#module\_github\_actions\_ecr\_policy) | terraform-aws-modules/iam/aws//modules/iam-policy | 5.55.0 |
 | <a name="module_github_actions_role"></a> [github\_actions\_role](#module\_github\_actions\_role) | terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc | 5.55.0 |
 | <a name="module_github_oidc_provider"></a> [github\_oidc\_provider](#module\_github\_oidc\_provider) | terraform-aws-modules/iam/aws//modules/iam-github-oidc-provider | 5.55.0 |
+| <a name="module_inbound_resolver_endpoint"></a> [inbound\_resolver\_endpoint](#module\_inbound\_resolver\_endpoint) | terraform-aws-modules/route53/aws//modules/resolver-endpoints | ~> 5.0 |
+| <a name="module_internal_domains_resolver_rule"></a> [internal\_domains\_resolver\_rule](#module\_internal\_domains\_resolver\_rule) | AutomateTheCloud/route53_resolver_rule/aws | 1.11.0 |
+| <a name="module_outbound_resolver_endpoint"></a> [outbound\_resolver\_endpoint](#module\_outbound\_resolver\_endpoint) | terraform-aws-modules/route53/aws//modules/resolver-endpoints | ~> 5.0 |
 | <a name="module_piksel_core_ecr"></a> [piksel\_core\_ecr](#module\_piksel\_core\_ecr) | terraform-aws-modules/ecr/aws | 2.4.0 |
-| <a name="module_private_zones"></a> [private\_zones](#module\_private\_zones) | terraform-aws-modules/route53/aws//modules/zones | ~> 3.0 |
 | <a name="module_public_records"></a> [public\_records](#module\_public\_records) | terraform-aws-modules/route53/aws//modules/records | ~> 3.0 |
 | <a name="module_public_zone"></a> [public\_zone](#module\_public\_zone) | terraform-aws-modules/route53/aws//modules/zones | ~> 3.0 |
+| <a name="module_resolver_rule_associations"></a> [resolver\_rule\_associations](#module\_resolver\_rule\_associations) | terraform-aws-modules/route53/aws//modules/resolver-rule-associations | ~> 5.0 |
 | <a name="module_tgw"></a> [tgw](#module\_tgw) | terraform-aws-modules/transit-gateway/aws | ~> 2.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.21.0 |
 | <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.21.0 |
@@ -122,8 +126,11 @@ For details on the specific resources created, input variables, and outputs gene
 
 | Name | Type |
 |------|------|
+| [aws_route.private_to_dev_via_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route) | resource |
+| [aws_route53_zone.private_hosted_zones_shared](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_zone) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
+| [terraform_remote_state.dev](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
 
@@ -134,11 +141,13 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="input_ecr_image_tag_mutability"></a> [ecr\_image\_tag\_mutability](#input\_ecr\_image\_tag\_mutability) | Image tag mutability setting for the repository (MUTABLE or IMMUTABLE) | `string` | `"IMMUTABLE"` | no |
 | <a name="input_ecr_max_tagged_images"></a> [ecr\_max\_tagged\_images](#input\_ecr\_max\_tagged\_images) | Maximum number of tagged images to keep | `number` | `5` | no |
 | <a name="input_ecr_untagged_image_retention_days"></a> [ecr\_untagged\_image\_retention\_days](#input\_ecr\_untagged\_image\_retention\_days) | Days to keep untagged images before expiration | `number` | `7` | no |
-| <a name="input_environment"></a> [environment](#input\_environment) | Environment name (should be 'shared' for this directory) | `string` | n/a | yes |
+| <a name="input_environment"></a> [environment](#input\_environment) | Environment name (should be 'Shared' for this directory) | `string` | n/a | yes |
 | <a name="input_internal_domains"></a> [internal\_domains](#input\_internal\_domains) | Map of internal domain names for private hosted zones | `map(string)` | <pre>{<br/>  "dev": "dev.piksel.internal",<br/>  "prod": "prod.piksel.internal",<br/>  "staging": "staging.piksel.internal"<br/>}</pre> | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | n/a | yes |
 | <a name="input_public_dns_records"></a> [public\_dns\_records](#input\_public\_dns\_records) | List of DNS records to create in the public hosted zone | <pre>list(object({<br/>    name    = string<br/>    type    = string<br/>    ttl     = number<br/>    records = list(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_public_domain_name"></a> [public\_domain\_name](#input\_public\_domain\_name) | List of public domains to create | `string` | `"piksel.big.go.id"` | no |
+| <a name="input_resolver_rule_domain_name"></a> [resolver\_rule\_domain\_name](#input\_resolver\_rule\_domain\_name) | The domain name for which the central FORWARD resolver rule will apply (e.g., company.internal). This domain (and its subdomains) will be resolvable by spoke VPCs. | `string` | n/a | yes |
+| <a name="input_spoke_vpc_cidrs"></a> [spoke\_vpc\_cidrs](#input\_spoke\_vpc\_cidrs) | List of CIDR blocks for spoke VPCs that need to query the inbound resolver | `list(string)` | <pre>[<br/>  "10.0.0.0/16"<br/>]</pre> | no |
 | <a name="input_tgw_ram_principals"></a> [tgw\_ram\_principals](#input\_tgw\_ram\_principals) | List of AWS Account IDs or OU ARNs to share the TGW with. | `list(string)` | `[]` | no |
 | <a name="input_transit_gateway_amazon_side_asn"></a> [transit\_gateway\_amazon\_side\_asn](#input\_transit\_gateway\_amazon\_side\_asn) | Private Autonomous System Number (ASN) for the Amazon side of a BGP session. Required if creating a new TGW. | `number` | `64512` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the Shared VPC | `string` | n/a | yes |
@@ -153,12 +162,25 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="output_github_actions_role_arn"></a> [github\_actions\_role\_arn](#output\_github\_actions\_role\_arn) | ARN of the GitHub Actions role for ECR access |
 | <a name="output_github_oidc_provider_arn"></a> [github\_oidc\_provider\_arn](#output\_github\_oidc\_provider\_arn) | ARN of the GitHub OIDC provider |
 | <a name="output_github_oidc_provider_url"></a> [github\_oidc\_provider\_url](#output\_github\_oidc\_provider\_url) | URL of the GitHub OIDC provider |
+| <a name="output_inbound_resolver_arn"></a> [inbound\_resolver\_arn](#output\_inbound\_resolver\_arn) | The ARN of the Inbound Resolver Endpoint. |
+| <a name="output_inbound_resolver_id"></a> [inbound\_resolver\_id](#output\_inbound\_resolver\_id) | The ID of the Inbound Resolver Endpoint. |
+| <a name="output_inbound_resolver_ip_addresses"></a> [inbound\_resolver\_ip\_addresses](#output\_inbound\_resolver\_ip\_addresses) | IP Addresses of the Inbound Resolver Endpoint. |
+| <a name="output_inbound_resolver_security_group_id"></a> [inbound\_resolver\_security\_group\_id](#output\_inbound\_resolver\_security\_group\_id) | Security Group ID used by the Inbound Resolver Endpoint. |
+| <a name="output_internal_domains_target_ips_list"></a> [internal\_domains\_target\_ips\_list](#output\_internal\_domains\_target\_ips\_list) | List of IP addresses for the inbound resolver endpoint in the shared VPC. |
+| <a name="output_outbound_resolver_id"></a> [outbound\_resolver\_id](#output\_outbound\_resolver\_id) | The ID of the Outbound Resolver Endpoint. |
+| <a name="output_outbound_resolver_ip_addresses"></a> [outbound\_resolver\_ip\_addresses](#output\_outbound\_resolver\_ip\_addresses) | IP Addresses of the Outbound Resolver Endpoint. |
+| <a name="output_outbound_resolver_security_group_id"></a> [outbound\_resolver\_security\_group\_id](#output\_outbound\_resolver\_security\_group\_id) | Security Group ID used by the Outbound Resolver Endpoint. |
 | <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | List of IDs of private subnets in the Shared VPC |
-| <a name="output_private_zone_arns"></a> [private\_zone\_arns](#output\_private\_zone\_arns) | The ARNs of the private hosted zones |
-| <a name="output_private_zone_ids"></a> [private\_zone\_ids](#output\_private\_zone\_ids) | The IDs of the private hosted zones |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets in the Shared VPC |
 | <a name="output_public_zone_id"></a> [public\_zone\_id](#output\_public\_zone\_id) | The ID of the public hosted zone |
 | <a name="output_public_zone_name_servers"></a> [public\_zone\_name\_servers](#output\_public\_zone\_name\_servers) | Name servers for the public hosted zone (needed for delegation) |
+| <a name="output_ram_resource_share_arn"></a> [ram\_resource\_share\_arn](#output\_ram\_resource\_share\_arn) | The ARN of the RAM Resource Share used for this resolver rule (if applicable). |
+| <a name="output_resolver_rule_arn"></a> [resolver\_rule\_arn](#output\_resolver\_rule\_arn) | The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
+| <a name="output_resolver_rule_association_id"></a> [resolver\_rule\_association\_id](#output\_resolver\_rule\_association\_id) | ID of Route53 Resolver rule associations |
+| <a name="output_resolver_rule_association_name"></a> [resolver\_rule\_association\_name](#output\_resolver\_rule\_association\_name) | Name of Route53 Resolver rule associations |
+| <a name="output_resolver_rule_association_resolver_rule_id"></a> [resolver\_rule\_association\_resolver\_rule\_id](#output\_resolver\_rule\_association\_resolver\_rule\_id) | ID of Route53 Resolver rule associations resolver rule |
+| <a name="output_resolver_rule_id"></a> [resolver\_rule\_id](#output\_resolver\_rule\_id) | The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
+| <a name="output_resolver_rule_name"></a> [resolver\_rule\_name](#output\_resolver\_rule\_name) | The actual name of the Route 53 Resolver Rule as created by the module. |
 | <a name="output_transit_gateway_arn"></a> [transit\_gateway\_arn](#output\_transit\_gateway\_arn) | The ARN of the Transit Gateway |
 | <a name="output_transit_gateway_id"></a> [transit\_gateway\_id](#output\_transit\_gateway\_id) | The ID of the Transit Gateway |
 | <a name="output_transit_gateway_subnets"></a> [transit\_gateway\_subnets](#output\_transit\_gateway\_subnets) | List of IDs of private subnets used for TGW attachments in the Shared VPC |

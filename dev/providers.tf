@@ -18,5 +18,6 @@ terraform {
 }
 
 provider "aws" {
+  alias  = "dev-account"
   region = var.aws_region
 }

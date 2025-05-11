@@ -110,17 +110,80 @@ output "public_zone_name_servers" {
   value       = module.public_zone.route53_zone_name_servers
 }
 
-output "private_zone_ids" {
-  description = "The IDs of the private hosted zones"
-  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_id[domain] }
+
+## Resolver Outputs
+output "inbound_resolver_id" {
+  description = "The ID of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_id
 }
 
-output "private_zone_arns" {
-  description = "The ARNs of the private hosted zones"
-  value       = { for env, domain in var.internal_domains : env => module.private_zones.route53_zone_zone_arn[domain] }
+output "inbound_resolver_arn" {
+  description = "The ARN of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_arn
 }
 
-# output "ram_resource_share_arn" {
-#   description = "ARN of the RAM resource share for DNS zones"
-#   value       = aws_ram_resource_share.dev_zone_share.arn
-# }
+output "inbound_resolver_ip_addresses" {
+  description = "IP Addresses of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses
+}
+
+output "inbound_resolver_security_group_id" {
+  description = "Security Group ID used by the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_security_group_ids
+}
+
+output "outbound_resolver_id" {
+  description = "The ID of the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_id
+}
+
+output "outbound_resolver_ip_addresses" {
+  description = "IP Addresses of the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses
+}
+
+output "outbound_resolver_security_group_id" {
+  description = "Security Group ID used by the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_security_group_ids
+}
+
+output "internal_domains_target_ips_list" {
+  description = "List of IP addresses for the inbound resolver endpoint in the shared VPC."
+  value       = local.internal_domains_target_ips_list
+}
+
+output "resolver_rule_id" {
+  description = "The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
+}
+
+output "resolver_rule_arn" {
+  description = "The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.arn
+}
+
+output "resolver_rule_name" {
+  description = "The actual name of the Route 53 Resolver Rule as created by the module."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.name
+}
+
+output "ram_resource_share_arn" {
+  description = "The ARN of the RAM Resource Share used for this resolver rule (if applicable)."
+  value       = try(module.internal_domains_resolver_rule.metadata.ram_resource_share.arn, null)
+  # Use try() in case sharing is disabled and ram_resource_share is null
+}
+
+output "resolver_rule_association_id" {
+  description = "ID of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_id
+}
+
+output "resolver_rule_association_name" {
+  description = "Name of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_name
+}
+
+output "resolver_rule_association_resolver_rule_id" {
+  description = "ID of Route53 Resolver rule associations resolver rule"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_resolver_rule_id
+}
