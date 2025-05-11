@@ -20,8 +20,4 @@ terraform {
 provider "aws" {
   alias  = "dev-account"
   region = var.aws_region
-
-  assume_role {
-    role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CrossAccountRoute53Role"
-  }
 }
