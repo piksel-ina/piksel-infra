@@ -1,5 +1,16 @@
 data "aws_availability_zones" "available" {}
 
+data "terraform_remote_state" "shared" {
+  backend = "remote"
+  config = {
+    organization = "piksel-ina"
+    workspaces = {
+      name = "piksel-infra-shared"
+    }
+  }
+}
+
+
 locals {
   name     = "${lower(var.project)}-${lower(var.environment)}" # Should evaluate to piksel-dev
   vpc_cidr = var.vpc_cidr
@@ -10,6 +21,11 @@ locals {
     Environment = var.environment
     ManagedBy   = "Terraform"
   })
+  # Outputs from Shared Services
+  shared_tgw_id   = data.terraform_remote_state.shared.outputs.transit_gateway_id
+  shared_vpc_cidr = data.terraform_remote_state.shared.outputs.vpc_cidr_block
+  # shared_inbound_resolver_ips_list = data.terraform_remote_state.shared.outputs.internal_domains_target_ips_list
+  shared_resolver_rule_id = data.terraform_remote_state.shared.outputs.resolver_rule_id
 }
 
 ################################################################################
@@ -25,9 +41,12 @@ module "vpc" {
   azs  = local.azs
 
   # Subnet CIDR blocks
-  public_subnets   = ["10.0.0.0/24", "10.0.3.0/24"] # Public subnets for NAT Gateway, ALB
-  private_subnets  = ["10.0.1.0/24", "10.0.4.0/24"] # Private app subnets for EKS nodes
-  database_subnets = ["10.0.2.0/24", "10.0.5.0/24"] # Private data subnets for RDS, ElastiCache
+  public_subnets   = ["10.0.16.0/22", "10.0.80.0/22"] # Public subnets for NAT Gateway, ALB
+  private_subnets  = ["10.0.0.0/20", "10.0.64.0/20"]  # Private app subnets for EKS nodes
+  database_subnets = ["10.0.20.0/23", "10.0.84.0/23"] # Private data subnets for RDS, ElastiCache
+  # public_subnets   = ["10.0.144.0/22"] # AZ 3 CIDR allocation
+  # private_subnets  = ["10.0.128.0/20" ] # AZ 3 CIDR allocation
+  # database_subnets = ["10.0.148.0/23" ] # AZ 3 CIDR allocation
 
   # Subnet naming
   public_subnet_names   = ["Public Subnet A", "Public Subnet B"]
@@ -40,8 +59,8 @@ module "vpc" {
 
   # NAT Gateway configuration
   enable_nat_gateway     = true
-  single_nat_gateway     = var.environment != "prod" # Use single NAT for non-prod environments
-  one_nat_gateway_per_az = var.environment == "prod" # One NAT per AZ for prod as per network.md
+  single_nat_gateway     = var.single_nat_gateway_enabled     # Use single NAT for dev/staging, multiple for prod
+  one_nat_gateway_per_az = var.one_nat_gateway_per_az_enabled # One NAT per AZ for prod as per network.md
 
   # VPC Flow Logs configuration
   enable_flow_log                      = true
@@ -265,6 +284,40 @@ module "rds_sg" {
 
   depends_on = [module.eks_nodes_sg] # Explicit dependency is safe here as RDS depends on Nodes, but not vice-versa
 }
+
+################################################################################
+# TGW Attachment for Spoke VPC
+################################################################################
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "spoke_to_shared_tgw" {
+
+  transit_gateway_id = local.shared_tgw_id
+  vpc_id             = module.vpc.vpc_id
+  subnet_ids         = module.vpc.private_subnets # Attach to private subnets
+
+  dns_support = "enable"
+
+  tags = merge(local.tags, {
+    Name = "${local.name}-tgw-attachment"
+  })
+}
+
+################################################################################
+# Spoke VPC Route Table Configuration
+################################################################################
+
+# Add a route to the Shared Services VPC CIDR via the TGW
+# This is for general traffic to the shared VPC, including DNS queries to the resolver endpoints
+resource "aws_route" "spoke_to_shared_vpc_via_tgw" {
+  count = length(module.vpc.private_route_table_ids)
+
+  route_table_id         = module.vpc.private_route_table_ids[count.index]
+  destination_cidr_block = local.shared_vpc_cidr
+  transit_gateway_id     = local.shared_tgw_id
+
+  depends_on = [aws_ec2_transit_gateway_vpc_attachment.spoke_to_shared_tgw]
+}
+
 
 ################################################################################
 # KMS Key for S3 Encryption
@@ -1047,4 +1100,22 @@ resource "aws_accessanalyzer_analyzer" "this" {
   tags = merge(local.tags, {
     Name = "${local.name}-analyzer"
   })
+}
+
+################################################################################
+# Resolver Rule Association
+################################################################################
+module "resolver_rule_associations" {
+  source  = "terraform-aws-modules/route53/aws//modules/resolver-rule-associations"
+  version = "~> 5.0"
+  create  = true
+
+  resolver_rule_associations = {
+    "dev_vpc_association" = {
+      resolver_rule_id = local.shared_resolver_rule_id
+      vpc_id           = module.vpc.vpc_id
+      name             = "piksel-dev-vpc-rule-assoc"
+    }
+  }
+
 }

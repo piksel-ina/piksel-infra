@@ -100,7 +100,6 @@ For details on the specific resources created, input variables, and outputs gene
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.95.0 |
-| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -117,7 +116,6 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="module_piksel_core_ecr"></a> [piksel\_core\_ecr](#module\_piksel\_core\_ecr) | terraform-aws-modules/ecr/aws | 2.4.0 |
 | <a name="module_public_records"></a> [public\_records](#module\_public\_records) | terraform-aws-modules/route53/aws//modules/records | ~> 3.0 |
 | <a name="module_public_zone"></a> [public\_zone](#module\_public\_zone) | terraform-aws-modules/route53/aws//modules/zones | ~> 3.0 |
-| <a name="module_resolver_rule_associations"></a> [resolver\_rule\_associations](#module\_resolver\_rule\_associations) | terraform-aws-modules/route53/aws//modules/resolver-rule-associations | ~> 5.0 |
 | <a name="module_tgw"></a> [tgw](#module\_tgw) | terraform-aws-modules/transit-gateway/aws | ~> 2.0 |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | 5.21.0 |
 | <a name="module_vpc_endpoints"></a> [vpc\_endpoints](#module\_vpc\_endpoints) | terraform-aws-modules/vpc/aws//modules/vpc-endpoints | 5.21.0 |
@@ -130,7 +128,6 @@ For details on the specific resources created, input variables, and outputs gene
 | [aws_route53_zone.private_hosted_zones_shared](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_zone) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
-| [terraform_remote_state.dev](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
 
@@ -176,9 +173,6 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="output_public_zone_name_servers"></a> [public\_zone\_name\_servers](#output\_public\_zone\_name\_servers) | Name servers for the public hosted zone (needed for delegation) |
 | <a name="output_ram_resource_share_arn"></a> [ram\_resource\_share\_arn](#output\_ram\_resource\_share\_arn) | The ARN of the RAM Resource Share used for this resolver rule (if applicable). |
 | <a name="output_resolver_rule_arn"></a> [resolver\_rule\_arn](#output\_resolver\_rule\_arn) | The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
-| <a name="output_resolver_rule_association_id"></a> [resolver\_rule\_association\_id](#output\_resolver\_rule\_association\_id) | ID of Route53 Resolver rule associations |
-| <a name="output_resolver_rule_association_name"></a> [resolver\_rule\_association\_name](#output\_resolver\_rule\_association\_name) | Name of Route53 Resolver rule associations |
-| <a name="output_resolver_rule_association_resolver_rule_id"></a> [resolver\_rule\_association\_resolver\_rule\_id](#output\_resolver\_rule\_association\_resolver\_rule\_id) | ID of Route53 Resolver rule associations resolver rule |
 | <a name="output_resolver_rule_id"></a> [resolver\_rule\_id](#output\_resolver\_rule\_id) | The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
 | <a name="output_resolver_rule_name"></a> [resolver\_rule\_name](#output\_resolver\_rule\_name) | The actual name of the Route 53 Resolver Rule as created by the module. |
 | <a name="output_transit_gateway_arn"></a> [transit\_gateway\_arn](#output\_transit\_gateway\_arn) | The ARN of the Transit Gateway |
