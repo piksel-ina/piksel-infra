@@ -140,6 +140,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.95.0 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -151,6 +152,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="module_eks_nodes_sg"></a> [eks\_nodes\_sg](#module\_eks\_nodes\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
 | <a name="module_odc_rds"></a> [odc\_rds](#module\_odc\_rds) | terraform-aws-modules/rds/aws | 6.12.0 |
 | <a name="module_rds_sg"></a> [rds\_sg](#module\_rds\_sg) | terraform-aws-modules/security-group/aws | 5.3.0 |
+| <a name="module_resolver_rule_associations"></a> [resolver\_rule\_associations](#module\_resolver\_rule\_associations) | terraform-aws-modules/route53/aws//modules/resolver-rule-associations | ~> 5.0 |
 | <a name="module_s3_bucket_data"></a> [s3\_bucket\_data](#module\_s3\_bucket\_data) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_s3_bucket_notebooks"></a> [s3\_bucket\_notebooks](#module\_s3\_bucket\_notebooks) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
 | <a name="module_s3_bucket_web"></a> [s3\_bucket\_web](#module\_s3\_bucket\_web) | terraform-aws-modules/s3-bucket/aws | 4.7.0 |
@@ -169,8 +171,10 @@ To ensure operational health and proactively identify potential issues, baseline
 | [aws_cloudwatch_metric_alarm.rds_low_memory](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.rds_low_storage](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
 | [aws_cloudwatch_metric_alarm.s3_5xx_errors](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/cloudwatch_metric_alarm) | resource |
+| [aws_ec2_transit_gateway_vpc_attachment.spoke_to_shared_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/ec2_transit_gateway_vpc_attachment) | resource |
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
+| [aws_route.spoke_to_shared_vpc_via_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route) | resource |
 | [aws_s3_bucket_metric.critical_bucket_metrics](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/s3_bucket_metric) | resource |
 | [aws_sns_topic.monitoring_alerts](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic) | resource |
 | [aws_sns_topic_subscription.email_alert_subscriptions](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic_subscription) | resource |
@@ -180,6 +184,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | [aws_iam_policy_document.notebooks_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.s3_log_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.s3_tls_only_enforcement](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/iam_policy_document) | data source |
+| [terraform_remote_state.shared](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
 
@@ -202,6 +207,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="input_odc_db_multi_az"></a> [odc\_db\_multi\_az](#input\_odc\_db\_multi\_az) | Specifies if the ODC index RDS instance is multi-AZ. | `bool` | `true` | no |
 | <a name="input_odc_db_name"></a> [odc\_db\_name](#input\_odc\_db\_name) | The name of the database to create in the ODC index RDS instance. | `string` | `"odc_index_db"` | no |
 | <a name="input_odc_db_skip_final_snapshot"></a> [odc\_db\_skip\_final\_snapshot](#input\_odc\_db\_skip\_final\_snapshot) | Determines whether a final DB snapshot is created before the ODC index DB instance is deleted. | `bool` | `true` | no |
+| <a name="input_one_nat_gateway_per_az_enabled"></a> [one\_nat\_gateway\_per\_az\_enabled](#input\_one\_nat\_gateway\_per\_az\_enabled) | Enable one NAT Gateway per AZ for the VPC | `bool` | `false` | no |
 | <a name="input_project"></a> [project](#input\_project) | Project name used for resource naming and tagging | `string` | `"Piksel"` | no |
 | <a name="input_rds_cpu_threshold"></a> [rds\_cpu\_threshold](#input\_rds\_cpu\_threshold) | CPU Utilization percentage threshold for RDS alarm. | `number` | `80` | no |
 | <a name="input_rds_low_memory_threshold_mb"></a> [rds\_low\_memory\_threshold\_mb](#input\_rds\_low\_memory\_threshold\_mb) | Freeable memory threshold in MB for RDS alarm. | `number` | `500` | no |
@@ -211,6 +217,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="input_s3_log_retention_days"></a> [s3\_log\_retention\_days](#input\_s3\_log\_retention\_days) | Number of days to retain S3 access logs before deleting. | `number` | `90` | no |
 | <a name="input_s3_noncurrent_version_retention_days"></a> [s3\_noncurrent\_version\_retention\_days](#input\_s3\_noncurrent\_version\_retention\_days) | Number of days to keep noncurrent S3 object versions before expiration. | `number` | `7` | no |
 | <a name="input_s3_notebook_outputs_expiration_days"></a> [s3\_notebook\_outputs\_expiration\_days](#input\_s3\_notebook\_outputs\_expiration\_days) | Number of days before expiring notebook outputs. | `number` | `30` | no |
+| <a name="input_single_nat_gateway_enabled"></a> [single\_nat\_gateway\_enabled](#input\_single\_nat\_gateway\_enabled) | Enable a single NAT Gateway for the VPC | `bool` | `false` | no |
 | <a name="input_use_custom_domain"></a> [use\_custom\_domain](#input\_use\_custom\_domain) | Whether to use a custom domain for CloudFront | `bool` | `false` | no |
 | <a name="input_vpc_cidr"></a> [vpc\_cidr](#input\_vpc\_cidr) | CIDR block for the VPC | `string` | `"10.0.0.0/16"` | no |
 

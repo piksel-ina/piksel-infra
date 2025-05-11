@@ -2,16 +2,16 @@
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
-data "terraform_remote_state" "dev" {
-  backend = "remote"
+# data "terraform_remote_state" "dev" {
+#   backend = "remote"
 
-  config = {
-    organization = "piksel-ina"
-    workspaces = {
-      name = "piksel-infra-dev"
-    }
-  }
-}
+#   config = {
+#     organization = "piksel-ina"
+#     workspaces = {
+#       name = "piksel-infra-dev"
+#     }
+#   }
+# }
 
 ## Uncomment if staging and prod remote states are configured
 # data "terraform_remote_state" "staging" {
@@ -544,19 +544,4 @@ module "internal_domains_resolver_rule" {
 
   # --- List of AWS Account IDs to share this rule with ---
   account_share = var.tgw_ram_principals
-}
-
-module "resolver_rule_associations" {
-  source  = "terraform-aws-modules/route53/aws//modules/resolver-rule-associations"
-  version = "~> 5.0"
-  create  = true
-
-  resolver_rule_associations = {
-    "dev_vpc_association" = {
-      resolver_rule_id = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
-      vpc_id           = data.terraform_remote_state.dev.outputs.vpc_id
-      name             = "piksel-dev-vpc-rule-assoc"
-    }
-  }
-
 }

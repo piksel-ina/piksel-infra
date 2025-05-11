@@ -28,6 +28,18 @@ variable "common_tags" {
   default     = {}
 }
 
+variable "single_nat_gateway_enabled" {
+  description = "Enable a single NAT Gateway for the VPC"
+  type        = bool
+  default     = false
+}
+
+variable "one_nat_gateway_per_az_enabled" {
+  description = "Enable one NAT Gateway per AZ for the VPC"
+  type        = bool
+  default     = false
+}
+
 # Networking variables
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"

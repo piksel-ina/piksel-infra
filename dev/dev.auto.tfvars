@@ -1,8 +1,10 @@
-aws_region          = "ap-southeast-3"
-project             = "Piksel"
-environment         = "Dev"
-vpc_cidr            = "10.0.0.0/16"
-allowed_cidr_blocks = ["0.0.0.0/0"] # Consider restricting this in production
+aws_region                     = "ap-southeast-3"
+project                        = "Piksel"
+environment                    = "Dev"
+vpc_cidr                       = "10.0.0.0/16"
+allowed_cidr_blocks            = ["0.0.0.0/0"] # Consider restricting this in production
+single_nat_gateway_enabled     = true          # Set to false for production
+one_nat_gateway_per_az_enabled = false         # Set to true for production
 common_tags = {
   Owner   = "DevOps-Team"
   Service = "Piksel-Dev"

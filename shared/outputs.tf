@@ -172,18 +172,3 @@ output "ram_resource_share_arn" {
   value       = try(module.internal_domains_resolver_rule.metadata.ram_resource_share.arn, null)
   # Use try() in case sharing is disabled and ram_resource_share is null
 }
-
-output "resolver_rule_association_id" {
-  description = "ID of Route53 Resolver rule associations"
-  value       = module.resolver_rule_associations.route53_resolver_rule_association_id
-}
-
-output "resolver_rule_association_name" {
-  description = "Name of Route53 Resolver rule associations"
-  value       = module.resolver_rule_associations.route53_resolver_rule_association_name
-}
-
-output "resolver_rule_association_resolver_rule_id" {
-  description = "ID of Route53 Resolver rule associations resolver rule"
-  value       = module.resolver_rule_associations.route53_resolver_rule_association_resolver_rule_id
-}
