@@ -126,6 +126,7 @@ For details on the specific resources created, input variables, and outputs gene
 
 | Name | Type |
 |------|------|
+| [aws_route.private_to_dev_via_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route) | resource |
 | [aws_route53_zone.private_hosted_zones_shared](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_zone) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
@@ -165,6 +166,7 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="output_inbound_resolver_id"></a> [inbound\_resolver\_id](#output\_inbound\_resolver\_id) | The ID of the Inbound Resolver Endpoint. |
 | <a name="output_inbound_resolver_ip_addresses"></a> [inbound\_resolver\_ip\_addresses](#output\_inbound\_resolver\_ip\_addresses) | IP Addresses of the Inbound Resolver Endpoint. |
 | <a name="output_inbound_resolver_security_group_id"></a> [inbound\_resolver\_security\_group\_id](#output\_inbound\_resolver\_security\_group\_id) | Security Group ID used by the Inbound Resolver Endpoint. |
+| <a name="output_internal_domains_target_ips_list"></a> [internal\_domains\_target\_ips\_list](#output\_internal\_domains\_target\_ips\_list) | List of IP addresses for the inbound resolver endpoint in the shared VPC. |
 | <a name="output_outbound_resolver_id"></a> [outbound\_resolver\_id](#output\_outbound\_resolver\_id) | The ID of the Outbound Resolver Endpoint. |
 | <a name="output_outbound_resolver_ip_addresses"></a> [outbound\_resolver\_ip\_addresses](#output\_outbound\_resolver\_ip\_addresses) | IP Addresses of the Outbound Resolver Endpoint. |
 | <a name="output_outbound_resolver_security_group_id"></a> [outbound\_resolver\_security\_group\_id](#output\_outbound\_resolver\_security\_group\_id) | Security Group ID used by the Outbound Resolver Endpoint. |

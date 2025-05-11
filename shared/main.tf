@@ -185,35 +185,21 @@ module "vpc_endpoints" {
   tags = local.tags # Apply common tags to endpoints
 }
 
-################################################################################
-# Routing (Example: Allow Shared Private Subnets to reach Spoke VPCs via TGW)
-# Note: Spoke VPC routes pointing back to Shared VPC via TGW are configured
-#       in the respective dev/staging/prod Terraform configurations.
-################################################################################
+#####################################################################
+# Routing (Allow Shared Private Subnets to reach Spoke VPCs via TGW)
+#####################################################################
 
-# Explicit routes within the Shared VPC pointing to the TGW might still be needed
-# depending on your setup and whether you rely solely on propagation.
-# The TGW module typically creates necessary routes in the TGW route tables.
-# You might need routes in your *VPC* route tables (e.g., private)
-# pointing destination CIDRs (like spoke VPCs) to the TGW.
+# Route traffic destined for Dev VPC (10.0.0.0/16) via TGW
+resource "aws_route" "private_to_dev_via_tgw" {
+  count = length(module.vpc.private_route_table_ids)
 
-# Example (if needed): Route traffic destined for Dev VPC (e.g., 10.0.0.0/16) via TGW
-# resource "aws_route" "private_to_dev_via_tgw" {
-#   count = length(module.vpc.private_route_table_ids)
-#
-#   route_table_id         = module.vpc.private_route_table_ids[count.index]
-#   destination_cidr_block = "10.0.0.0/16" # Replace with actual Dev VPC CIDR
-#   # Reference the TGW ID output from the TGW module
-#   transit_gateway_id     = module.tgw.ec2_transit_gateway_id
-#
-#   # Ensure attachment exists before creating route
-#   depends_on = [module.tgw]
-# }
-# Repeat for staging, prod CIDRs...
+  route_table_id         = module.vpc.private_route_table_ids[count.index]
+  destination_cidr_block = "10.0.0.0/16"
+  transit_gateway_id     = module.tgw.ec2_transit_gateway_id
 
-
-
-
+  # Ensure attachment exists before creating route
+  depends_on = [module.tgw]
+}
 
 ####################################################################
 # GitHub OIDC Provider
@@ -516,13 +502,10 @@ module "outbound_resolver_endpoint" {
   ]
 
   # Let the module create and manage the security group
-  create_security_group = true
-  security_group_name   = "${local.name}-resolver-outbound-sg"
-  # security_group_description = "Allow DNS queries from Outbound Resolver Endpoint for ${var.project}" # Optional
-  # Ingress: Allow VPC resources to query this outbound endpoint
-  security_group_ingress_cidr_blocks = [module.vpc.vpc_cidr_block] # Or more specific CIDRs from your VPC
-  # Egress for the SG will default to allow TCP/UDP 53 to 0.0.0.0/0, allowing it to forward to any DNS server.
-  security_group_egress_cidr_blocks = ["0.0.0.0/0"] # Explicitly set, or rely on module default
+  create_security_group              = true
+  security_group_name                = "${local.name}-resolver-outbound-sg"
+  security_group_description         = "Allow DNS queries from Outbound Resolver Endpoint for ${var.project}"
+  security_group_ingress_cidr_blocks = [module.vpc.vpc_cidr_block]
 
   tags                = merge(local.tags, { Name = "${local.name}-outbound-resolver" })
   security_group_tags = merge(local.tags, { Name = "${local.name}-resolver-outbound-sg" }) # Tags for the SG

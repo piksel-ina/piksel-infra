@@ -147,6 +147,11 @@ output "outbound_resolver_security_group_id" {
   value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_security_group_ids
 }
 
+output "internal_domains_target_ips_list" {
+  description = "List of IP addresses for the inbound resolver endpoint in the shared VPC."
+  value       = local.internal_domains_target_ips_list
+}
+
 output "resolver_rule_id" {
   description = "The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
   value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
