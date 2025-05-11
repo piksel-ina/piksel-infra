@@ -18,9 +18,6 @@ tgw_ram_principals = [
   "236122835646" # Dev Account ID, add staging and production ID here
 ]
 
-
-# development_account_id = "236122835646"
-
 internal_domains = {
   main_internal = "piksel.internal",
   dev           = "dev.piksel.internal"

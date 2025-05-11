@@ -12,13 +12,8 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "Environment name (should be 'shared' for this directory)"
+  description = "Environment name (should be 'Shared' for this directory)"
   type        = string
-  validation {
-    # Adjust validation if needed, or rely on tfvars
-    condition     = var.environment == "Shared"
-    error_message = "Environment must be Shared for this configuration."
-  }
 }
 
 variable "common_tags" {
@@ -73,9 +68,6 @@ variable "ecr_untagged_image_retention_days" {
 #########################################################
 # DNS Variables
 #########################################################
-
-
-
 
 variable "public_domain_name" {
   description = "List of public domains to create"

@@ -111,8 +111,74 @@ output "public_zone_name_servers" {
 }
 
 
+## Resolver Outputs
+output "inbound_resolver_id" {
+  description = "The ID of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_id
+}
+
+output "inbound_resolver_arn" {
+  description = "The ARN of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_arn
+}
+
+output "inbound_resolver_ip_addresses" {
+  description = "IP Addresses of the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses
+}
+
+output "inbound_resolver_security_group_id" {
+  description = "Security Group ID used by the Inbound Resolver Endpoint."
+  value       = module.inbound_resolver_endpoint.route53_resolver_endpoint_security_group_ids
+}
+
+output "outbound_resolver_id" {
+  description = "The ID of the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_id
+}
+
+output "outbound_resolver_ip_addresses" {
+  description = "IP Addresses of the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_ip_addresses
+}
+
+output "outbound_resolver_security_group_id" {
+  description = "Security Group ID used by the Outbound Resolver Endpoint."
+  value       = module.outbound_resolver_endpoint.route53_resolver_endpoint_security_group_ids
+}
+
+output "resolver_rule_id" {
+  description = "The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
+}
 
 output "resolver_rule_arn" {
-  description = "ARN of the shared Route53 Resolver Rule for internal domains"
-  value       = aws_route53_resolver_rule.central_internal_domains_rule.arn
+  description = "The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.arn
+}
+
+output "resolver_rule_name" {
+  description = "The actual name of the Route 53 Resolver Rule as created by the module."
+  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.name
+}
+
+output "ram_resource_share_arn" {
+  description = "The ARN of the RAM Resource Share used for this resolver rule (if applicable)."
+  value       = try(module.internal_domains_resolver_rule.metadata.ram_resource_share.arn, null)
+  # Use try() in case sharing is disabled and ram_resource_share is null
+}
+
+output "resolver_rule_association_id" {
+  description = "ID of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_id
+}
+
+output "resolver_rule_association_name" {
+  description = "Name of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_name
+}
+
+output "resolver_rule_association_resolver_rule_id" {
+  description = "ID of Route53 Resolver rule associations resolver rule"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_resolver_rule_id
 }
