@@ -254,6 +254,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="output_s3_kms_key_arn"></a> [s3\_kms\_key\_arn](#output\_s3\_kms\_key\_arn) | ARN of the KMS key used for S3 encryption |
 | <a name="output_s3_log_bucket_id"></a> [s3\_log\_bucket\_id](#output\_s3\_log\_bucket\_id) | ID (name) of the S3 bucket used for access logging |
 | <a name="output_security_group_ids"></a> [security\_group\_ids](#output\_security\_group\_ids) | Security group IDs for different components |
-| <a name="output_vpc_endpoints"></a> [vpc\_endpoints](#output\_vpc\_endpoints) | VPC Endpoint IDs |
+| <a name="output_vpc_endpoints"></a> [vpc\_endpoints](#output\_vpc\_endpoints) | VPC Endpoint |
+| <a name="output_vpc_endpoints_ids"></a> [vpc\_endpoints\_ids](#output\_vpc\_endpoints\_ids) | VPC Endpoint IDs |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC |
 <!-- END_TF_DOCS -->

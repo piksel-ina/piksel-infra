@@ -19,13 +19,14 @@ output "database_subnets" {
   value       = module.vpc.database_subnets
 }
 
-output "vpc_endpoints" {
+output "vpc_endpoints_ids" {
   description = "VPC Endpoint IDs"
-  value = {
-    s3      = module.vpc_endpoints.endpoints["s3"].id
-    ecr_api = module.vpc_endpoints.endpoints["ecr_api"].id
-    ecr_dkr = module.vpc_endpoints.endpoints["ecr_dkr"].id
-  }
+  value       = { for k, v in module.vpc_endpoints.endpoints : k => v.id }
+}
+
+output "vpc_endpoints" {
+  description = "VPC Endpoint "
+  value       = { for k, v in module.vpc_endpoints.endpoints : k => v }
 }
 
 ################################################################################
