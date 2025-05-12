@@ -2,16 +2,16 @@
 data "aws_caller_identity" "current" {}
 data "aws_availability_zones" "available" {}
 
-# data "terraform_remote_state" "dev" {
-#   backend = "remote"
+data "terraform_remote_state" "dev" {
+  backend = "remote"
 
-#   config = {
-#     organization = "piksel-ina"
-#     workspaces = {
-#       name = "piksel-infra-dev"
-#     }
-#   }
-# }
+  config = {
+    organization = "piksel-ina"
+    workspaces = {
+      name = "piksel-infra-dev"
+    }
+  }
+}
 
 ## Uncomment if staging and prod remote states are configured
 # data "terraform_remote_state" "staging" {
@@ -47,6 +47,8 @@ locals {
     Environment = var.environment
     ManagedBy   = "Terraform"
   })
+
+  dev_vpc_id = data.terraform_remote_state.dev.outputs.vpc_id
 }
 
 ################################################################################
@@ -544,4 +546,16 @@ module "internal_domains_resolver_rule" {
 
   # --- List of AWS Account IDs to share this rule with ---
   account_share = var.tgw_ram_principals
+}
+
+
+####################################################################
+# Route53 Zone Associations
+####################################################################
+resource "aws_route53_vpc_association_authorization" "dev_vpc_authorization" {
+  provider   = aws.shared
+  zone_id    = aws_route53_zone.private_hosted_zones_shared["dev"].zone_id
+  vpc_id     = local.dev_vpc_id
+  depends_on = [aws_route53_zone.private_hosted_zones_shared]
+  vpc_region = var.aws_region
 }
