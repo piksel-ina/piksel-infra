@@ -48,7 +48,8 @@ locals {
     ManagedBy   = "Terraform"
   })
 
-  dev_vpc_id = data.terraform_remote_state.dev.outputs.vpc_id
+  dev_vpc_id           = data.terraform_remote_state.dev.outputs.vpc_id
+  dev_odc_rds_endpoint = data.terraform_remote_state.dev.outputs.odc_rds_instance_endpoint
 }
 
 ################################################################################
@@ -453,6 +454,15 @@ resource "aws_route53_zone" "private_hosted_zones_shared" {
 
   tags = local.tags
 }
+
+resource "aws_route53_record" "rds_domain_dev" {
+  zone_id = aws_route53_zone.private_hosted_zones_shared["dev"].zone_id
+  name    = "db.dev.piksel.internal"
+  type    = "CNAME"
+  ttl     = "300"
+  records = local.dev_odc_rds_endpoint
+}
+
 
 ####################################################################
 # Route53 Resolver Endpoints and Rules
