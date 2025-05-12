@@ -175,6 +175,7 @@ To ensure operational health and proactively identify potential issues, baseline
 | [aws_kms_alias.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_alias) | resource |
 | [aws_kms_key.s3_key](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/kms_key) | resource |
 | [aws_route.spoke_to_shared_vpc_via_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route) | resource |
+| [aws_route53_zone_association.dev_phz_vpc_association](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_zone_association) | resource |
 | [aws_s3_bucket_metric.critical_bucket_metrics](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/s3_bucket_metric) | resource |
 | [aws_sns_topic.monitoring_alerts](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic) | resource |
 | [aws_sns_topic_subscription.email_alert_subscriptions](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/sns_topic_subscription) | resource |
@@ -238,7 +239,12 @@ To ensure operational health and proactively identify potential issues, baseline
 | <a name="output_odc_rds_master_user_secret_arn"></a> [odc\_rds\_master\_user\_secret\_arn](#output\_odc\_rds\_master\_user\_secret\_arn) | ARN of the Secrets Manager secret storing the master credentials for the ODC index RDS. |
 | <a name="output_odc_rds_security_group_id"></a> [odc\_rds\_security\_group\_id](#output\_odc\_rds\_security\_group\_id) | The ID of the security group attached to the ODC index RDS instance. |
 | <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | List of IDs of private subnets |
+| <a name="output_private_zone_association_id"></a> [private\_zone\_association\_id](#output\_private\_zone\_association\_id) | ID of the private hosted zone association |
+| <a name="output_private_zone_association_owner_id"></a> [private\_zone\_association\_owner\_id](#output\_private\_zone\_association\_owner\_id) | The account ID of the account that created the hosted zone |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets |
+| <a name="output_resolver_rule_association_id"></a> [resolver\_rule\_association\_id](#output\_resolver\_rule\_association\_id) | ID of Route53 Resolver rule associations |
+| <a name="output_resolver_rule_association_name"></a> [resolver\_rule\_association\_name](#output\_resolver\_rule\_association\_name) | Name of Route53 Resolver rule associations |
+| <a name="output_resolver_rule_association_resolver_rule_id"></a> [resolver\_rule\_association\_resolver\_rule\_id](#output\_resolver\_rule\_association\_resolver\_rule\_id) | ID of Route53 Resolver rule associations resolver rule |
 | <a name="output_s3_bucket_data_arn"></a> [s3\_bucket\_data\_arn](#output\_s3\_bucket\_data\_arn) | ARN of the S3 data bucket |
 | <a name="output_s3_bucket_data_id"></a> [s3\_bucket\_data\_id](#output\_s3\_bucket\_data\_id) | ID (name) of the S3 data bucket |
 | <a name="output_s3_bucket_notebooks_arn"></a> [s3\_bucket\_notebooks\_arn](#output\_s3\_bucket\_notebooks\_arn) | ARN of the S3 notebooks bucket |
