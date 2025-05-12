@@ -26,6 +26,7 @@ locals {
   shared_vpc_cidr = data.terraform_remote_state.shared.outputs.vpc_cidr_block
   # shared_inbound_resolver_ips_list = data.terraform_remote_state.shared.outputs.internal_domains_target_ips_list
   shared_resolver_rule_id = data.terraform_remote_state.shared.outputs.resolver_rule_id
+  shared_phz_dev_id       = data.terraform_remote_state.shared.outputs.private_zone_id_dev
 }
 
 ################################################################################
@@ -1118,4 +1119,16 @@ module "resolver_rule_associations" {
     }
   }
 
+}
+
+#################################################################################
+# Route53 Zone Association
+#################################################################################
+resource "aws_route53_zone_association" "dev_phz_vpc_association" {
+  count = length(local.shared_phz_dev_id) > 0 ? 1 : 0
+
+  zone_id    = local.shared_phz_dev_id
+  vpc_id     = module.vpc.vpc_id
+  vpc_region = var.aws_region
+  depends_on = [module.vpc]
 }

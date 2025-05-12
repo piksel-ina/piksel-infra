@@ -148,3 +148,29 @@ output "odc_rds_security_group_id" {
   description = "The ID of the security group attached to the ODC index RDS instance."
   value       = module.rds_sg.security_group_id
 }
+
+# --- Route53 Outputs ---
+output "resolver_rule_association_id" {
+  description = "ID of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_id
+}
+
+output "resolver_rule_association_name" {
+  description = "Name of Route53 Resolver rule associations"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_name
+}
+
+output "resolver_rule_association_resolver_rule_id" {
+  description = "ID of Route53 Resolver rule associations resolver rule"
+  value       = module.resolver_rule_associations.route53_resolver_rule_association_resolver_rule_id
+}
+
+output "private_zone_association_id" {
+  description = "ID of the private hosted zone association"
+  value       = aws_route53_zone_association.dev_phz_vpc_association[0].id
+}
+
+output "private_zone_association_owner_id" {
+  description = "The account ID of the account that created the hosted zone"
+  value       = aws_route53_zone_association.dev_phz_vpc_association[0].owning_account
+}
