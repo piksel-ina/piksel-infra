@@ -448,7 +448,7 @@ resource "aws_route53_zone" "private_hosted_zones_shared" {
   comment  = "${var.project} ${each.key} private hosted zone (Shared Account)"
 
   vpc {
-    vpc_id = module.vpc.vpc_id # CRITICAL: This associates the PHZ with SHARED VPC
+    vpc_id = module.vpc.vpc_id # This associates the PHZ with SHARED VPC
   }
 
   tags = local.tags
@@ -550,7 +550,7 @@ module "internal_domains_resolver_rule" {
 
 
 ####################################################################
-# Route53 Zone Associations
+# Route53 Zone Authorization
 ####################################################################
 resource "aws_route53_vpc_association_authorization" "dev_vpc_authorization" {
   provider   = aws.shared

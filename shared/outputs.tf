@@ -99,7 +99,7 @@ output "eks_ecr_access_role_arn" {
   value       = module.eks_ecr_access_role.iam_role_arn
 }
 
-
+# --- public zone outputs ---
 output "public_zone_id" {
   description = "The ID of the public hosted zone"
   value       = module.public_zone.route53_zone_zone_id
@@ -110,6 +110,57 @@ output "public_zone_name_servers" {
   value       = module.public_zone.route53_zone_name_servers
 }
 
+output "public_zone_arn" {
+  description = "The ARN of the public hosted zone"
+  value       = module.public_zone.route53_zone_zone_arn
+}
+
+output "public_zone_name" {
+  description = "The name of the public hosted zone"
+  value       = module.public_zone.route53_zone_name
+}
+
+# --- private zone outputs (piksel.internal) ---
+output "private_zone_id_main" {
+  description = "The ID of the main private hosted zone"
+  value       = aws_route53_zone.private_hosted_zones_shared["main_internal"].zone_id
+}
+
+output "private_zone_arn_main" {
+  description = "The ARN of the main private hosted zone"
+  value       = aws_route53_zone.private_hosted_zones_shared["main_internal"].arn
+}
+
+output "private_zone_name_server_main" {
+  description = "Name servers for the main private hosted zone"
+  value       = aws_route53_zone.private_hosted_zones_shared["main_internal"].name_servers
+}
+
+output "private_zone_primary_name_main" {
+  description = "The name of the main private hosted zone"
+  value       = aws_route53_zone.private_hosted_zones_shared["main_internal"].primary_name_server
+}
+
+# --- private zone outputs (dev.piksel.internal) ---
+output "private_zone_id_dev" {
+  description = "The ID of the shared private hosted zone for dev"
+  value       = aws_route53_zone.private_hosted_zones_shared["dev"].zone_id
+}
+
+output "private_zone_arn_dev" {
+  description = "The ARN of the shared private hosted zone for dev"
+  value       = aws_route53_zone.private_hosted_zones_shared["dev"].arn
+}
+
+output "private_zone_name_server_dev" {
+  description = "Name servers for the shared private hosted zone for dev"
+  value       = aws_route53_zone.private_hosted_zones_shared["dev"].name_servers
+}
+
+output "private_zone_primary_name_dev" {
+  description = "The name of the shared private hosted zone for dev"
+  value       = aws_route53_zone.private_hosted_zones_shared["dev"].primary_name_server
+}
 
 ## Resolver Outputs
 output "inbound_resolver_id" {
