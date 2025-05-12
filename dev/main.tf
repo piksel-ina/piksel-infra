@@ -97,17 +97,36 @@ module "vpc_endpoints" {
       route_table_ids = concat(module.vpc.private_route_table_ids, module.vpc.public_route_table_ids)
       tags            = { Name = "${local.name}-s3-endpoint" }
     },
-    ecr_api = {
-      service             = "ecr.api"
+    logs = {
+      service             = "logs"
       private_dns_enabled = true
       subnet_ids          = module.vpc.private_subnets
-      tags                = { Name = "${local.name}-ecr-api-endpoint" }
+      tags                = { Name = "${local.name}-logs-endpoint" }
     },
-    ecr_dkr = {
-      service             = "ecr.dkr"
+    kms = {
+      service             = "sts"
       private_dns_enabled = true
       subnet_ids          = module.vpc.private_subnets
-      tags                = { Name = "${local.name}-ecr-dkr-endpoint" }
+      tags                = { Name = "${local.name}-kms-endpoint" }
+    },
+    sns = {
+      service             = "sns"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+      tags                = { Name = "${local.name}-sns-endpoint" }
+    },
+    monitoring = {
+      service             = "monitoring"
+      private_dns_enabled = true
+      subnet_ids          = module.vpc.private_subnets
+      tags                = { Name = "${local.name}-monitoring-endpoint" }
+    },
+    rds = {
+      service             = "rds"
+      private_dns_enabled = false
+      subnet_ids          = module.vpc.database_subnets
+      security_group_ids  = [module.rds_sg.security_group_id]
+      tags                = { Name = "${local.name}-rds-endpoint" }
     }
   }
 
