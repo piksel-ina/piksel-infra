@@ -100,6 +100,8 @@ For details on the specific resources created, input variables, and outputs gene
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 5.95.0 |
+| <a name="provider_aws.shared"></a> [aws.shared](#provider\_aws.shared) | 5.95.0 |
+| <a name="provider_terraform"></a> [terraform](#provider\_terraform) | n/a |
 
 ## Modules
 
@@ -125,9 +127,11 @@ For details on the specific resources created, input variables, and outputs gene
 | Name | Type |
 |------|------|
 | [aws_route.private_to_dev_via_tgw](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route) | resource |
+| [aws_route53_vpc_association_authorization.dev_vpc_authorization](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_vpc_association_authorization) | resource |
 | [aws_route53_zone.private_hosted_zones_shared](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/resources/route53_zone) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/availability_zones) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/5.95/docs/data-sources/caller_identity) | data source |
+| [terraform_remote_state.dev](https://registry.terraform.io/providers/hashicorp/terraform/latest/docs/data-sources/remote_state) | data source |
 
 ## Inputs
 
