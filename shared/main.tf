@@ -48,8 +48,8 @@ locals {
     ManagedBy   = "Terraform"
   })
 
-  dev_vpc_id           = data.terraform_remote_state.dev.outputs.vpc_id
-  dev_odc_rds_endpoint = data.terraform_remote_state.dev.outputs.odc_rds_instance_endpoint
+  dev_vpc_id          = data.terraform_remote_state.dev.outputs.vpc_id
+  dev_odc_rds_address = data.terraform_remote_state.dev.outputs.odc_rds_instance_address
 }
 
 ################################################################################
@@ -460,7 +460,7 @@ resource "aws_route53_record" "rds_domain_dev" {
   name    = "db.dev.piksel.internal"
   type    = "CNAME"
   ttl     = "300"
-  records = local.dev_odc_rds_endpoint
+  records = [local.dev_odc_rds_address]
 }
 
 

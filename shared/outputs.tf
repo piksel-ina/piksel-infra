@@ -162,6 +162,18 @@ output "private_zone_primary_name_dev" {
   value       = aws_route53_zone.private_hosted_zones_shared["dev"].primary_name_server
 }
 
+# --- phz records dev ---
+output "rds_dev_records_name" {
+  description = "The name of the RDS dev record"
+  value       = aws_route53_record.rds_domain_dev.name
+}
+
+output "rds_dev_fqdn" {
+  description = "The FQDN of the RDS dev record"
+  value       = aws_route53_record.rds_domain_dev.fqdn
+
+}
+
 ## Resolver Outputs
 output "inbound_resolver_id" {
   description = "The ID of the Inbound Resolver Endpoint."

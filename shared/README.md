@@ -187,6 +187,8 @@ For details on the specific resources created, input variables, and outputs gene
 | <a name="output_public_zone_name"></a> [public\_zone\_name](#output\_public\_zone\_name) | The name of the public hosted zone |
 | <a name="output_public_zone_name_servers"></a> [public\_zone\_name\_servers](#output\_public\_zone\_name\_servers) | Name servers for the public hosted zone (needed for delegation) |
 | <a name="output_ram_resource_share_arn"></a> [ram\_resource\_share\_arn](#output\_ram\_resource\_share\_arn) | The ARN of the RAM Resource Share used for this resolver rule (if applicable). |
+| <a name="output_rds_dev_fqdn"></a> [rds\_dev\_fqdn](#output\_rds\_dev\_fqdn) | The FQDN of the RDS dev record |
+| <a name="output_rds_dev_records_name"></a> [rds\_dev\_records\_name](#output\_rds\_dev\_records\_name) | The name of the RDS dev record |
 | <a name="output_resolver_rule_arn"></a> [resolver\_rule\_arn](#output\_resolver\_rule\_arn) | The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
 | <a name="output_resolver_rule_id"></a> [resolver\_rule\_id](#output\_resolver\_rule\_id) | The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module). |
 | <a name="output_resolver_rule_name"></a> [resolver\_rule\_name](#output\_resolver\_rule\_name) | The actual name of the Route 53 Resolver Rule as created by the module. |
