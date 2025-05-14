@@ -13,6 +13,7 @@ identity_token "aws" {
   audience = ["aws.workload.identity"]
 }
 
+# --- Deployment for Shared Account ---
 deployment "shared" {
   inputs = {
     # --- General Configuration ---
@@ -34,6 +35,7 @@ deployment "shared" {
   }
 }
 
+# --- Deployment for Dev Account ---
 deployment "development" {
   inputs = {
     # --- General Configuration ---
@@ -51,5 +53,21 @@ deployment "development" {
     one_nat_gateway_per_az = false
     enable_flow_log        = false
     cluster_name           = "piksel-dev-eks-cluster"
+  }
+}
+
+# --- Auto-approve plans for shared ---
+orchestrate "auto_approve" "shared_env_approval" {
+  check {
+    condition = context.plan.deployment == deployment.shared && context.success
+    reason    = "Operation unsuccessful. Error Summary: ${context.errors.summary}."
+  }
+}
+
+# --- Auto-approve plans for dev ---
+orchestrate "auto_approve" "dev_env_approval" {
+  check {
+    condition = context.plan.deployment == deployment.development && context.success
+    reason    = "Operation unsuccessful. Error Summary: ${context.errors.summary}."
   }
 }

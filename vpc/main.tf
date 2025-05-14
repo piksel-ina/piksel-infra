@@ -5,8 +5,8 @@ locals {
   cidr                 = var.vpc_cidr
   az_count             = var.az_count
   azs                  = slice(data.aws_availability_zones.available.names, 0, var.az_count)
-  public_subnet_names  = [for az in local.azs : "${local.prefix}-public-${az}"]
-  private_subnet_names = [for az in local.azs : "${local.prefix}-private-${az}"]
+  public_subnet_names  = [for az in local.azs : "${local.prefix}-public-subnet-${trimprefix(az, "ap-southeast-")}"]
+  private_subnet_names = [for az in local.azs : "${local.prefix}-private-subnet-${trimprefix(az, "ap-southeast-")}"]
   tags                 = var.default_tags
 }
 
