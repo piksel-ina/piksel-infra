@@ -1,21 +1,21 @@
 name: CI pipeline
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "**/*.tf"
-      - "**/*.tfvars"
-      - ".github/workflows/**"
-  push:
-    branches:
-      - main
-      - update-ci-workflow
-    paths:
-      - "**/*.tf"
-      - "**/*.tfvars"
-      - ".github/workflows/**"
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "**/*.tf"
+  #     - "**/*.tfvars"
+  #     - ".github/workflows/**"
+  # push:
+  #   branches:
+  #     - main
+  #     - update-ci-workflow
+  #   paths:
+  #     - "**/*.tf"
+  #     - "**/*.tfvars"
+  #     - ".github/workflows/**"
   workflow_dispatch:
 
 jobs:
