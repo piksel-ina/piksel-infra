@@ -56,18 +56,18 @@ deployment "development" {
   }
 }
 
-# --- Auto-approve plans for shared ---
-orchestrate "auto_approve" "shared_env_approval" {
+# --- Auto-approve plans for shared and dev---
+orchestrate "auto_approve" "safe_plan_shared" {
   check {
-    condition = context.plan.deployment == deployment.shared && context.success
-    reason    = "Operation unsuccessful. Error Summary: ${context.errors.summary}."
+    condition = context.plan.deployment == deployment.shared || context.plan.deployment == deployment.development
+    reason    = "Only automatically approved plans that are for the shared or dev deployment."
   }
-}
-
-# --- Auto-approve plans for dev ---
-orchestrate "auto_approve" "dev_env_approval" {
   check {
-    condition = context.plan.deployment == deployment.development && context.success
-    reason    = "Operation unsuccessful. Error Summary: ${context.errors.summary}."
+    condition = context.success
+    reason    = "Operation unsuccessful. Check HCP Terraform UI for error details."
+  }
+  check {
+    condition = context.plan.changes.remove == 0
+    reason    = "Plan is destroying ${context.plan.changes.remove} resources."
   }
 }
