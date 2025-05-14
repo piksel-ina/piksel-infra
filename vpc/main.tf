@@ -1,7 +1,7 @@
 data "aws_availability_zones" "available" {}
 
 locals {
-  prefix               = "${var.project}-${var.environment}"
+  prefix               = "${lower(var.project)}-${lower(var.environment)}"
   cidr                 = var.vpc_cidr
   az_count             = var.az_count
   azs                  = slice(data.aws_availability_zones.available.names, 0, var.az_count)
