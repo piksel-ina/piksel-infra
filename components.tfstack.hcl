@@ -19,3 +19,19 @@ component "vpc" {
     aws = provider.aws.configurations
   }
 }
+
+component "phz_association" {
+  source = "./aws-route53-za"
+
+  inputs = {
+    environment = var.environment
+    project     = var.project
+    vpc_id      = component.vpc.vpc_id
+    zone_ids    = var.zone_ids
+  }
+
+  providers = {
+    aws = provider.aws.configurations
+  }
+
+}

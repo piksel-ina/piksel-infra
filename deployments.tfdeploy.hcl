@@ -31,6 +31,11 @@ deployment "development" {
     one_nat_gateway_per_az = false
     enable_flow_log        = false
     cluster_name           = "piksel-dev-eks-cluster"
+    # --- PHZ Association ---
+    zone_ids = {
+      "dev.piksel.internal" : "Z05809823L9KMZQJNUEF"
+      "piksel.internal" : "Z069042630870O1I2Q797"
+    }
   }
 }
 
