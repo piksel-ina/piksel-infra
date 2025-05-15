@@ -5,7 +5,7 @@ locals {
     "Service"   = "piksel.big.go.id"
     "Owner"     = "Piksel-Devops-Team"
   }
-  regions = ["ap-southeast-3"]
+  region  = "ap-southeast-3"
   project = "Piksel"
 }
 
@@ -17,7 +17,7 @@ identity_token "aws" {
 deployment "shared" {
   inputs = {
     # --- General Configuration ---
-    regions      = local.regions
+    aws_region   = local.region
     project      = local.project
     environment  = "Shared"
     default_tags = merge(local.common_tags, { "Environment" = "Shared" })
@@ -39,7 +39,7 @@ deployment "shared" {
 deployment "development" {
   inputs = {
     # --- General Configuration ---
-    regions      = local.regions
+    aws_region   = local.region
     project      = local.project
     environment  = "Dev"
     default_tags = merge(local.common_tags, { "Environment" = "Development" })

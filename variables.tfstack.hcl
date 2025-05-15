@@ -10,8 +10,10 @@ variable "environment" {
   type        = string
 }
 
-variable "regions" {
-  type = set(string)
+variable "aws_region" {
+  description = "Region to deploy resources in"
+  type        = string
+  default     = "ap-southeast-3"
 }
 
 variable "default_tags" {

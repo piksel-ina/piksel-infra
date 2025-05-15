@@ -1,10 +1,8 @@
 component "vpc" {
-  for_each = var.regions
-
-  source = "./vpc"
+  source = "./aws-vpc"
 
   inputs = {
-    region                  = each.value
+    region                  = var.aws_region
     project                 = var.project
     environment             = var.environment
     vpc_cidr                = var.vpc_cidr
@@ -18,6 +16,6 @@ component "vpc" {
   }
 
   providers = {
-    aws = provider.aws.configurations[each.value]
+    aws = provider.aws.configurations
   }
 }
