@@ -143,8 +143,8 @@ module "inbound_resolver_endpoint" {
 
   # Provide at least two subnets in different AZs
   ip_address = [
-    { subnet_id = var.vpc.private_subnets[0] },
-    { subnet_id = var.vpc.private_subnets[1] }
+    { subnet_id = var.private_subnets[0] },
+    { subnet_id = var.private_subnets[1] }
   ]
 
   # Create security group
@@ -187,10 +187,9 @@ module "outbound_resolver_endpoint" {
 
 # --- Authorization for VPC Association ---
 resource "aws_route53_vpc_association_authorization" "dev_vpc_authorization" {
-  provider   = aws.shared
-  zone_id    = module.zones.route53_zone_id["${var.private_domain_name_dev}"]
+  zone_id    = module.zones.route53_zone_zone_id["${var.private_domain_name_dev}"]
   vpc_id     = var.vpc_id_dev
-  depends_on = module.zones
+  depends_on = [module.zones]
 }
 
 // Add authorization for prod VPC association after prod vpc is created

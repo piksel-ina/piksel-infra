@@ -95,7 +95,7 @@ variable "spoke_vpc_cidrs" {
   default     = []
 }
 
-variable "vpc_private_subnets" {
+variable "private_subnets" {
   description = "values of private subnets"
   type        = list(string)
 }
@@ -104,4 +104,9 @@ variable "aws_account_ids" {
   description = "values of AWS account IDs"
   type        = list(string)
   default     = []
+}
+
+variable "vpc_id_dev" {
+  description = "values of VPC ID for dev environment"
+  type        = string
 }

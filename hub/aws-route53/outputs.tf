@@ -42,27 +42,6 @@ output "inbound_resolver_security_group_id" {
 }
 
 
-output "resolver_rule_id" {
-  description = "The ID of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
-  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.id
-}
-
-output "resolver_rule_arn" {
-  description = "The ARN of the created Route 53 Resolver Rule (from AutomateTheCloud module)."
-  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.arn
-}
-
-output "resolver_rule_name" {
-  description = "The actual name of the Route 53 Resolver Rule as created by the module."
-  value       = module.internal_domains_resolver_rule.metadata.route53_resolver_rule.name
-}
-
-output "ram_resource_share_arn" {
-  description = "The ARN of the RAM Resource Share used for this resolver rule (if applicable)."
-  value       = try(module.internal_domains_resolver_rule.metadata.ram_resource_share.arn, null)
-  # Use try() in case sharing is disabled and ram_resource_share is null
-}
-
 // Only include this output if the resolver rule is shared
 # output "outbound_resolver_id" {
 #   description = "The ID of the Outbound Resolver Endpoint."
