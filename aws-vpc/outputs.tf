@@ -15,22 +15,22 @@ output "vpc_name" {
 }
 
 # --- Subnet Outputs ---
-output "public_subnet_ids" {
+output "public_subnets" {
   description = "List of IDs of public subnets"
   value       = module.vpc.public_subnets
 }
 
-output "public_subnet_cidr_blocks" {
+output "public_subnets_cidr_blocks" {
   description = "List of CIDR blocks of public subnets"
   value       = module.vpc.public_subnets_cidr_blocks
 }
 
-output "private_subnet_ids" {
+output "private_subnets" {
   description = "List of IDs of private subnets"
   value       = module.vpc.private_subnets
 }
 
-output "private_subnet_cidr_blocks" {
+output "private_subnets_cidr_blocks" {
   description = "List of CIDR blocks of private subnets"
   value       = module.vpc.private_subnets_cidr_blocks
 }
@@ -42,14 +42,14 @@ output "azs" {
 }
 
 # --- NAT Gateway Outputs ---
-output "nat_gateway_ids" {
+output "natgw_ids" {
   description = "List of NAT Gateway IDs"
   value       = module.vpc.natgw_ids
 }
 
-output "nat_gateway_count" {
-  description = "Number of NAT Gateways created"
-  value       = length(module.vpc.natgw_ids)
+output "nat_public_ips" {
+  description = "List of public IPs of NAT Gateways"
+  value       = module.vpc.nat_public_ips
 }
 
 # --- Route Table Outputs ---
@@ -64,12 +64,12 @@ output "private_route_table_ids" {
 }
 
 # Flow Logs Output
-output "flow_log_id" {
+output "vpc_flow_log_id" {
   description = "ID of the VPC Flow Log (if enabled)"
-  value       = var.enable_flow_log ? module.vpc.vpc_flow_log_id : "Flow Logs Disabled"
+  value       = module.vpc.vpc_flow_log_id
 }
 
-output "flow_log_cloudwatch_log_group_arn" {
+output "vpc_flow_log_cloudwatch_iam_role_arn" {
   description = "ARN of the CloudWatch Log Group for Flow Logs (if enabled)"
-  value       = var.enable_flow_log ? module.vpc.vpc_flow_log_cloudwatch_iam_role_arn : "Flow Logs Disabled"
+  value       = module.vpc.vpc_flow_log_cloudwatch_iam_role_arn
 }
