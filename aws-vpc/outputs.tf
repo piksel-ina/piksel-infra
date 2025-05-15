@@ -1,3 +1,8 @@
+# --- Account Identifier ---
+output "account_id" {
+  value = data.aws_caller_identity.current.account_id
+}
+
 # --- VPC Outputs ---
 output "vpc_id" {
   description = "ID of the VPC"

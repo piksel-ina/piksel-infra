@@ -1,25 +1,25 @@
 variable "project" {
-    description = "The name of the project"
-    type        = string
+  description = "The name of the project"
+  type        = string
 }
 
 variable "environment" {
-    description = "The name of the environment"
-    type        = string
+  description = "The name of the environment"
+  type        = string
 }
 
 variable "vpc_id" {
-    description = "The ID of the VPC to associate with the resolver rule"
-    type        = string
+  description = "The ID of the VPC to associate with the resolver rule"
+  type        = string
 }
 
 variable "zone_ids" {
-    description = "List of Route53 Hosted Zone IDs to associate with the VPC"
-    type        = list(string)
+  description = "List of Route53 Hosted Zone IDs to associate with the VPC"
+  type        = list(string)
 }
 
 locals {
-  prefix               = "${lower(var.project)}-${lower(var.environment)}"
+  prefix = "${lower(var.project)}-${lower(var.environment)}"
 }
 
 
@@ -27,8 +27,8 @@ locals {
 resource "aws_route53_zone_association" "vpc_association" {
   for_each = var.zone_ids
 
-  zone_id    = each.value
-  vpc_id     = var.vpc_id
+  zone_id = each.value
+  vpc_id  = var.vpc_id
 }
 
 # --- Route53 Association Outputs ---

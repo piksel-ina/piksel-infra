@@ -1,3 +1,11 @@
+# --- Data Source ---
+output "account_id" {
+  type        = string
+  description = "The AWS account ID"
+  value       = component.vpc.account_id
+}
+
+
 # --- VPC Outputs ---
 output "vpc_id" {
   type        = string

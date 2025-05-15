@@ -79,7 +79,7 @@ module "records_public" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 5.0"
 
-  create = var.enable_records_public
+  create     = var.enable_records_public
   zone_name  = var.domain_name
   depends_on = [module.zones]
 
@@ -91,7 +91,7 @@ module "records_subdomain" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 5.0"
 
-  create = var.enable_records_subdomain
+  create     = var.enable_records_subdomain
   zone_name  = var.subdomain_name
   depends_on = [module.zones]
 
@@ -103,7 +103,7 @@ module "records_private_dev" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 5.0"
 
-  create = var.enable_records_private_dev
+  create     = var.enable_records_private_dev
   zone_name  = var.private_domain_name_dev
   depends_on = [module.zones]
 
@@ -121,7 +121,7 @@ module "records_private_prod" {
   source  = "terraform-aws-modules/route53/aws//modules/records"
   version = "~> 5.0"
 
-  create = var.enable_records_private_prod
+  create     = var.enable_records_private_prod
   zone_name  = var.private_domain_name_prod
   depends_on = [module.zones]
 

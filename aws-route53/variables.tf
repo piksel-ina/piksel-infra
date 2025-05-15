@@ -73,35 +73,35 @@ variable "enable_records_private_prod" {
 
 # --- Inbound and Outbound Rules Variables ---
 variable "create_inbound_resolver_endpoint" {
-    description = "Create an inbound resolver endpoint"
-    type        = bool
-    default     = true
+  description = "Create an inbound resolver endpoint"
+  type        = bool
+  default     = true
 }
 
 variable "create_outbound_resolver_endpoint" {
-    description = "Create an outbound resolver endpoint"
-    type        = bool
-    default     = false
+  description = "Create an outbound resolver endpoint"
+  type        = bool
+  default     = false
 }
 
 variable "vpc_cidr_block_shared" {
-    description = "CIDR block of the shared VPC"
-    type        = string
+  description = "CIDR block of the shared VPC"
+  type        = string
 }
 
 variable "spoke_vpc_cidrs" {
   description = "values of spoke VPC CIDR blocks"
-    type        = list(string)
-    default     = []
+  type        = list(string)
+  default     = []
 }
 
 variable "vpc_private_subnets" {
-    description = "values of private subnets"
-        type        = list(string)
+  description = "values of private subnets"
+  type        = list(string)
 }
 
-variable aws_account_ids {
-    description = "values of AWS account IDs"
-    type        = list(string)
-    default     = []
+variable "aws_account_ids" {
+  description = "values of AWS account IDs"
+  type        = list(string)
+  default     = []
 }
