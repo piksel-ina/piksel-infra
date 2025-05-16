@@ -81,3 +81,14 @@ variable "zone_ids" {
   description = "List of Route53 Hosted Zone IDs to associate with the VPC"
   type        = map(string)
 }
+
+# --- Transit Gateway Attachment and Routes variables ---
+variable "vpc_cidr_shared" {
+  description = "CIDR block for the hub VPC"
+  type        = string
+}
+
+variable "transit_gateway_id" {
+  description = "ID of the shared Transit Gateway from hub account"
+  type        = string
+}

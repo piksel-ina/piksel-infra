@@ -34,4 +34,25 @@ component "phz_association" {
     aws = provider.aws.configurations
   }
 
+  depends_on = [component.vpc]
+}
+
+component "tgw-spoke" {
+  source = "./aws-tgw-spoke"
+
+  inputs = {
+    project                  = var.project
+    environment              = var.environment
+    vpc_id                   = component.vpc.vpc_id
+    vpc_cidr_shared          = var.vpc_cidr_shared
+    private_subnet_ids       = component.vpc.private_subnets
+    spoke_vpc_route_table_id = component.vpc.private_route_table_ids
+    transit_gateway_id       = var.transit_gateway_id
+    default_tags             = var.default_tags
+  }
+
+  providers = {
+    aws = provider.aws.configurations
+  }
+  depends_on = [component.phz_association]
 }
