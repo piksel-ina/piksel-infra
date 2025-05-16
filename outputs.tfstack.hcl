@@ -69,7 +69,7 @@ output "private_route_table_ids" {
   value       = component.vpc.private_route_table_ids
 }
 
-# Flow Logs Output
+# --- Flow Logs Output ---
 output "vpc_flow_log_id" {
   type        = string
   description = "ID of the VPC Flow Log (if enabled)"
@@ -80,4 +80,11 @@ output "vpc_flow_log_cloudwatch_iam_role_arn" {
   type        = string
   description = "ARN of the CloudWatch Log Group for Flow Logs (if enabled)"
   value       = component.vpc.vpc_flow_log_cloudwatch_iam_role_arn
+}
+
+# --- Route53 Zone Association Outputs ---
+output "private_zone_association_id" {
+  type        = list(string)
+  description = "The account ID of the account that created the hosted zone"
+  value       = component.phz_association.private_zone_association_id
 }

@@ -36,3 +36,8 @@ output "private_zone_association_owner_id" {
   description = "The account ID of the account that created the hosted zone"
   value       = [for zone in aws_route53_zone_association.vpc_association : zone.owning_account]
 }
+
+output "private_zone_association_id" {
+  description = "The account ID of the account that created the hosted zone"
+  value       = [for zone in aws_route53_zone_association.vpc_association : zone.id]
+}
