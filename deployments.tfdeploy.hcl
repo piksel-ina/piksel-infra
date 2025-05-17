@@ -34,7 +34,6 @@ deployment "development" {
     }
     transit_gateway_id = upstream_input.shared.transit_gateway_id
     vpc_cidr_shared    = "10.0.0.0/16"
-    create_test_ec2    = true
   }
 }
 

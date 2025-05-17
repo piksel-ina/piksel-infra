@@ -1,9 +1,11 @@
 variable "vpc_id" {
   description = "ID of the VPC to deploy the EC2 instances"
+  default     = "vpc-0e6ae39878ebb0013"
 }
 
 variable "subnet_id" {
   description = "ID of the public subnet to deploy the EC2 instances"
+  default     = "subnet-003afdf05b81e4f28"
 }
 
 variable "key_name" {
