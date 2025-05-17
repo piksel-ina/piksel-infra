@@ -5,10 +5,8 @@ locals {
     "Service"   = "piksel.big.go.id"
     "Owner"     = "Piksel-Devops-Team"
   }
-  region             = "ap-southeast-3"
-  project            = "Piksel"
-  transit_gateway_id = "tgw-01f241c653629b467"
-  vpc_cidr_shared    = "10.0.0.0/16"
+  region  = "ap-southeast-3"
+  project = "Piksel"
 }
 
 identity_token "aws" {
@@ -30,9 +28,12 @@ deployment "development" {
     one_nat_gateway_per_az = false
     enable_flow_log        = false
     cluster_name           = "piksel-dev-eks-cluster"
-    zone_ids               = { "piksel.internal" = "Z069042630870O1I2Q797" }
-    transit_gateway_id     = local.transit_gateway_id
-    vpc_cidr_shared        = local.vpc_cidr_shared
+    zone_ids = {
+      "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
+      "dev.piksel.internal" = upstream_input.shared.zone_ids["dev.piksel.internal"]
+    }
+    transit_gateway_id = upstream_input.shared.transit_gateway_id
+    vpc_cidr_shared    = "10.0.0.0/16"
   }
 }
 
