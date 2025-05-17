@@ -18,26 +18,21 @@ identity_token "aws" {
 # --- Deployment for Dev Account ---
 deployment "development" {
   inputs = {
-    # --- General Configuration ---
-    aws_region   = local.region
-    project      = local.project
-    environment  = "Dev"
-    default_tags = merge(local.common_tags, { "Environment" = "Development" })
-    # --- Authentication ---
-    aws_role  = "arn:aws:iam::236122835646:role/stacks-piksel-ina-piksel-ina"
-    aws_token = identity_token.aws.jwt
-    # --- VPC Configuration ---
+    aws_region             = local.region
+    project                = local.project
+    environment            = "Dev"
+    default_tags           = merge(local.common_tags, { "Environment" = "Development" })
+    aws_role               = "arn:aws:iam::236122835646:role/stacks-piksel-ina-piksel-ina"
+    aws_token              = identity_token.aws.jwt
     vpc_cidr               = "10.1.0.0/16"
     az_count               = "2"
     single_nat_gateway     = true
     one_nat_gateway_per_az = false
     enable_flow_log        = false
     cluster_name           = "piksel-dev-eks-cluster"
-    # --- PHZ Association ---
-    zone_ids = { "piksel.internal" = "Z069042630870O1I2Q797" }
-    # --- Transit Gateway Spoke ---
-    transit_gateway_id = local.transit_gateway_id
-    vpc_cidr_shared    = local.vpc_cidr_shared
+    zone_ids               = { "piksel.internal" = "Z069042630870O1I2Q797" }
+    transit_gateway_id     = local.transit_gateway_id
+    vpc_cidr_shared        = local.vpc_cidr_shared
   }
 }
 

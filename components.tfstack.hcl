@@ -56,3 +56,20 @@ component "tgw-spoke" {
   }
   depends_on = [component.phz_association]
 }
+
+
+component "security_group" {
+  source = "./aws-security-group"
+
+  inputs = {
+    vpc_id          = component.vpc.vpc_id
+    vpc_cidr_shared = var.vpc_cidr_shared
+    default_tags    = var.default_tags
+  }
+
+  providers = {
+    aws = provider.aws.configurations
+  }
+
+  depends_on = [component.vpc]
+}
