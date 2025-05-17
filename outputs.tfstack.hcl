@@ -88,3 +88,35 @@ output "private_zone_association_id" {
   description = "The account ID of the account that created the hosted zone"
   value       = component.phz_association.private_zone_association_id
 }
+
+# --- Transit Gateway Attachment Outputs ---
+output "tgw_attachment_arn" {
+  description = "The ARN of the Transit Gateway attachment"
+  type        = string
+  value       = component.tgw-spoke.tgw_attachment_arn
+}
+
+output "tgw_attachment_id" {
+  description = "The ID of the Transit Gateway attachment"
+  type        = string
+  value       = component.tgw-spoke.tgw_attachment_id
+}
+
+output "tgw_vpc_owner_id" {
+  description = "The owner ID of the Transit Gateway attachment"
+  type        = string
+  value       = component.tgw-spoke.tgw_vpc_owner_id
+
+}
+
+# --- Route Table Outputs ---
+output "spoke_to_shared_vpc_via_tgw_route_id" {
+  description = "The ID of the route to the shared VPC via Transit Gateway"
+  type        = list(string)
+  value       = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_id
+}
+output "spoke_to_shared_vpc_via_tgw_route_state" {
+  description = "The state of the route to the shared VPC via Transit Gateway"
+  type        = list(string)
+  value       = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_state
+}
