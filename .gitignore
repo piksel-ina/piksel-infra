@@ -19,3 +19,7 @@ local_override.tf
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+# Ignore keypairs directory
+keys/
+keys/*
