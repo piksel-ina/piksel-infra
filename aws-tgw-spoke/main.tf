@@ -12,6 +12,9 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "spoke_to_shared_tgw" {
 
   dns_support = "enable"
 
+  transit_gateway_default_route_table_association = true
+  transit_gateway_default_route_table_propagation = true
+
   tags = merge(local.tags, {
     Name = "${local.prefix}-tgw-attachment"
   })

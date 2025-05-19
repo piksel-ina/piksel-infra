@@ -1,11 +1,21 @@
+variable "create_test_ec2" {
+  description = "Boolean to control whether to create the testing EC2 instance"
+  type        = bool
+  default     = true
+}
+
+variable "create_dev_ec2" {
+  description = "Boolean to control whether to create the personal dev EC2 instance"
+  type        = bool
+  default     = true
+}
+
 variable "vpc_id" {
   description = "ID of the VPC to deploy the EC2 instances"
-  default     = "vpc-0e6ae39878ebb0013"
 }
 
 variable "subnet_id" {
   description = "ID of the public subnet to deploy the EC2 instances"
-  default     = "subnet-003afdf05b81e4f28"
 }
 
 variable "key_name" {
@@ -34,14 +44,12 @@ variable "local_key_path" {
   default     = "./keys"
 }
 
-variable "create_test_ec2" {
-  description = "Boolean to control whether to create the testing EC2 instance"
+variable "create_test_target_ec2" {
+  description = "Boolean to control whether to create the test target EC2 instance"
   type        = bool
-  default     = true
+  default     = false
 }
 
-variable "create_dev_ec2" {
-  description = "Boolean to control whether to create the personal dev EC2 instance"
-  type        = bool
-  default     = true
+variable "subnet_id_target" {
+  description = "Subent id of the Recorded IP Adress resides (test target EC2) "
 }

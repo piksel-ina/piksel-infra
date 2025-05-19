@@ -28,3 +28,8 @@ output "public_key_path" {
   description = "Path to the generated public key file"
   value       = (var.create_test_ec2 || var.create_dev_ec2) ? "${var.local_key_path}/${var.key_name}.pub" : "Not created (no instances requested)"
 }
+
+output "test_target_ec2_ip" {
+  description = "Private IP of the Dev VPC test target EC2 instance"
+  value       = var.create_test_target_ec2 ? aws_instance.dev_test_target_ec2[0].private_ip : "Not created"
+}
