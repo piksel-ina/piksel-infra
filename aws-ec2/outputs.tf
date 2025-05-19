@@ -6,7 +6,12 @@ output "test_ec2_public_ip" {
 
 output "test_ssh_command" {
   description = "SSH command to connect to the testing instance"
-  value       = var.create_test_ec2 ? "ssh -i ${var.local_key_path}/${var.key_name}.pem ubuntu@${aws_instance.test_ec2[0].public_ip}" : "Not created (create_test_ec2 = false)"
+  value       = var.create_test_ec2 ? "ssh -i ${var.local_key_path}/${var.key_name}.pem -J ubuntu@${aws_instance.bastion[0].public_ip} ubuntu@${aws_instance.test_ec2[0].private_ip}" : "Not created (create_test_ec2 = false)"
+}
+
+output "bastion_ssh_command" {
+  description = "SSH command to connect directly to the bastion host"
+  value       = var.create_test_ec2 ? "ssh -i ${var.local_key_path}/${var.key_name}.pem ubuntu@${aws_instance.bastion[0].public_ip}" : "Not created (create_test_ec2 = false)"
 }
 
 output "dev_ec2_public_ip" {

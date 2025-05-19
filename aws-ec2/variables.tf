@@ -14,10 +14,6 @@ variable "vpc_id" {
   description = "ID of the VPC to deploy the EC2 instances"
 }
 
-variable "subnet_id" {
-  description = "ID of the public subnet to deploy the EC2 instances"
-}
-
 variable "key_name" {
   description = "Name of the SSH key pair in AWS"
   default     = "ec2-keypair"
@@ -50,6 +46,14 @@ variable "create_test_target_ec2" {
   default     = false
 }
 
-variable "subnet_id_target" {
-  description = "Subent id of the Recorded IP Adress resides (test target EC2) "
+variable "my_ip" {
+  description = "EC2 variables"
+}
+
+variable "public_subnet_id" {
+  description = "EC2 variables"
+}
+
+variable "private_subnet_id" {
+  description = "EC2 variables"
 }

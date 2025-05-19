@@ -48,7 +48,7 @@ resource "aws_key_pair" "test_keypair" {
   }
 }
 
-# --- Security Group to allow SSH access ---
+# --- Security Group to allow SSH access for Bastion Host ---
 resource "aws_security_group" "ec2_sg" {
   count       = (var.create_test_ec2 || var.create_dev_ec2) ? 1 : 0
   name        = "ec2-sg"
@@ -60,14 +60,14 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = -1
     to_port     = -1
     protocol    = "icmp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
   ingress {
     description = "HTTP from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
   # Allow SSH inbound
   ingress {
@@ -75,7 +75,35 @@ resource "aws_security_group" "ec2_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/8"]
+  }
+
+  tags = {
+    Name = "ec2-sg-for-testing"
+  }
+}
+
+# --- Security Group for bastion host ---
+resource "aws_security_group" "bastion_sg" {
+  count       = var.create_test_ec2 ? 1 : 0
+  name        = "bastion-sg"
+  description = "Security Group for bastion host"
+  vpc_id      = var.vpc_id
+
+  # Only allow SSH from your IP
+  ingress {
+    description = "SSH from my IP only"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.my_ip}/32"]
   }
 
   egress {
@@ -86,19 +114,34 @@ resource "aws_security_group" "ec2_sg" {
   }
 
   tags = {
-    Name = "ec2-sg-for-testing"
+    Name = "bastion-sg"
   }
 }
 
-# --- Create Testing EC2 instance ---
+# --- Create a bastion host in the public subnet ---
+resource "aws_instance" "bastion" {
+  count                       = var.create_test_ec2 ? 1 : 0
+  ami                         = data.aws_ami.ubuntu.id
+  instance_type               = "t3.micro"
+  subnet_id                   = var.public_subnet_id
+  key_name                    = aws_key_pair.test_keypair[0].key_name
+  vpc_security_group_ids      = [aws_security_group.bastion_sg[0].id]
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "bastion-host"
+  }
+}
+
+# --- Create Testing EC2 instance in a private subnet ---
 resource "aws_instance" "test_ec2" {
   count                       = var.create_test_ec2 ? 1 : 0
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.test_instance_type
-  subnet_id                   = var.subnet_id
+  subnet_id                   = var.private_subnet_id
   key_name                    = aws_key_pair.test_keypair[0].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg[0].id]
-  associate_public_ip_address = true
+  associate_public_ip_address = false
 
   user_data = <<-EOF
               #!/bin/bash
@@ -118,7 +161,7 @@ resource "aws_instance" "dev_test_target_ec2" {
   count                  = var.create_test_target_ec2 ? 1 : 0
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.test_instance_type
-  subnet_id              = var.subnet_id_target
+  subnet_id              = var.private_subnet_id
   key_name               = aws_key_pair.test_keypair[0].key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg[0].id]
   private_ip             = "10.1.15.200"
@@ -143,7 +186,7 @@ resource "aws_instance" "dev_ec2" {
   count                       = var.create_dev_ec2 ? 1 : 0
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = var.dev_instance_type
-  subnet_id                   = var.subnet_id
+  subnet_id                   = var.public_subnet_id
   key_name                    = aws_key_pair.test_keypair[0].key_name
   vpc_security_group_ids      = [aws_security_group.ec2_sg[0].id]
   associate_public_ip_address = true
