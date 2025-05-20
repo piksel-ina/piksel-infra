@@ -1,5 +1,5 @@
 create_test_ec2        = true
-create_test_target_ec2 = true
+create_test_target_ec2 = false
 create_dev_ec2         = false
 vpc_id                 = "vpc-0389be1a69d34ee5a"
 public_subnet_id       = "subnet-018c1ed233ee06785"

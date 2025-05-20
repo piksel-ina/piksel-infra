@@ -24,10 +24,11 @@ component "phz_association" {
   source = "./aws-route53-za"
 
   inputs = {
-    environment = var.environment
-    project     = var.project
-    vpc_id      = component.vpc.vpc_id
-    zone_ids    = var.zone_ids
+    environment                   = var.environment
+    project                       = var.project
+    vpc_id                        = component.vpc.vpc_id
+    zone_ids                      = var.zone_ids
+    inbound_resolver_ip_addresses = var.inbound_resolver_ip_addresses
   }
 
   providers = {

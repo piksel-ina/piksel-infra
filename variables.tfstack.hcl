@@ -82,6 +82,11 @@ variable "zone_ids" {
   type        = map(string)
 }
 
+variable "inbound_resolver_ip_addresses" {
+  description = "List of inbound resolver ip addresses"
+  type        = list(string)
+}
+
 # --- Transit Gateway Attachment and Routes variables ---
 variable "vpc_cidr_shared" {
   description = "CIDR block for the hub VPC"

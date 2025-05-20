@@ -32,8 +32,9 @@ deployment "development" {
       "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
       "dev.piksel.internal" = upstream_input.shared.zone_ids["dev.piksel.internal"]
     }
-    transit_gateway_id = upstream_input.shared.transit_gateway_id
-    vpc_cidr_shared    = "10.0.0.0/16"
+    transit_gateway_id            = upstream_input.shared.transit_gateway_id
+    vpc_cidr_shared               = "10.0.0.0/16"
+    inbound_resolver_ip_addresses = upstream_input.shared.inbound_resolver_ips
   }
 }
 
