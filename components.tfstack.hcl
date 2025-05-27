@@ -59,6 +59,15 @@ component "tgw-spoke" {
 }
 
 
+removed {
+    source = "./aws-tgw-spoke"
+    from = component.tgw-spoke[each.value]
+    providers = {
+        aws = provider.aws.configurations
+    }
+}
+
+
 component "security_group" {
   source = "./aws-security-group"
 
