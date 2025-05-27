@@ -37,7 +37,7 @@ variable "public_subnet_bits" {
 variable "private_subnet_bits" {
   description = "Number of bits to allocate for private subnet CIDR"
   type        = number
-  default     = 6
+  default     = 2 # This will create a /18 CIDR for private subnets. /18 CIDR allows for 16384 IP addresses, suitable for larger private subnets
   validation {
     condition     = var.private_subnet_bits >= 1 && var.private_subnet_bits <= 8
     error_message = "Private subnet bits must be between 1 and 8."
