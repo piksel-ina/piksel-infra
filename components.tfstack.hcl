@@ -106,3 +106,23 @@ component "data" {
     aws = provider.aws.virginia
   }
 }
+
+component "karpenter" {
+  source = "./karpenter"
+
+  inputs = {
+    cluster_name      = var.cluster_name
+    oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    cluster_endpoint  = component.eks-cluster.cluster_endpoint
+    public_repository_username = component.data.repository_username
+    public_repository_passowrd = component.data.repository_password
+    default_tags      = var.default_tags
+  }
+
+  providers = {
+    aws = provider.aws.configurations
+    helm = provider.helm.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+
+}

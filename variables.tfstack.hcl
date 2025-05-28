@@ -22,6 +22,12 @@ variable "default_tags" {
   default     = {}
 }
 
+variable "aws_virginia" {
+  description = "us-east-1 / virginia region"
+  type = string
+  default = "us-east-1"
+}
+
 # --- AWS OIDC Variables ---
 variable "aws_token" {
   type      = string

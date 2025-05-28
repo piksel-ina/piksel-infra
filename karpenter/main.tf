@@ -48,8 +48,8 @@ resource "helm_release" "karpenter" {
   create_namespace    = true
   name                = "karpenter"
   repository          = "oci://public.ecr.aws/karpenter"
-  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-  repository_password = data.aws_ecrpublic_authorization_token.token.password
+  repository_username = var.public_repository_username
+  repository_password = var.public_repository_passowrd
   chart               = "karpenter"
 
   values = [

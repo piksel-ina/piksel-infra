@@ -24,14 +24,21 @@ output "karpenter_helm_release_status" {
 }
 
 output "karpenter_node_class_name" {
-  description = "The name of the Karpenter EC2NodeClass"
-  value       = yamldecode(kubectl_manifest.karpenter_node_class.yaml_body).metadata.name
+  description = "The name of the Karpenter EC2NodeClass."
+  value       = try(kubernetes_manifest.karpenter_node_class.object["metadata"]["name"], null)
 }
 
-output "karpenter_node_pool_names" {
-  description = "The names of the Karpenter NodePools"
-  value = [
-    yamldecode(kubectl_manifest.karpenter_node_pool.yaml_body).metadata.name,
-    yamldecode(kubectl_manifest.karpenter_node_pool_gpu.yaml_body).metadata.name
-  ]
+output "karpenter_node_pool_name" {
+  description = "The name of the default Karpenter NodePool."
+  value       = try(kubernetes_manifest.karpenter_node_pool.object["metadata"]["name"], null)
+}
+
+output "karpenter_node_pool_gpu_name" {
+  description = "The name of the GPU Karpenter NodePool."
+  value       = try(kubernetes_manifest.karpenter_node_pool_gpu.object["metadata"]["name"], null)
+}
+
+output "karpenter_node_class_status" {
+  description = "Status of the Karpenter EC2NodeClass."
+  value       = try(kubernetes_manifest.karpenter_node_class.object["status"], null)
 }
