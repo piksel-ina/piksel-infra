@@ -1,0 +1,36 @@
+variable "cluster_name" {
+  description = "Name of the EKS cluster for tagging subnets"
+  type        = string
+  default     = "piksel-eks-cluster"
+}
+
+variable "default_tags" {
+  description = "Default tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "eks-version" {
+  type        = string
+  description = "The version of Kubernetes for this environment"
+}
+
+variable "coredns-version" {
+  type        = string
+  description = "The version of CoreDNS for this environment"
+}
+
+variable "vpc-cni-version" {
+  type        = string
+  description = "The version of VPC CNI for this environment"
+}
+
+variable "sso-admin-role-arn" {
+  type        = string
+  description = "The ARN of SSO Admin group"
+}
+
+variable "kube-proxy-version" {
+  type        = string
+  description = "The version of kube-proxy for this environment"
+}
