@@ -79,31 +79,45 @@ resource "helm_release" "karpenter" {
 }
 
 # --- Karpenter nodeclass and nodepool ---
-resource "kubectl_manifest" "karpenter_node_class" {
-  yaml_body = <<-YAML
-    apiVersion: karpenter.k8s.aws/v1
-    kind: EC2NodeClass
-    metadata:
-      name: default
-    spec:
-      amiFamily: AL2
-      amiSelectorTerms:
-        - name: ${data.aws_ami.ubuntu_eks.id}
-      role: ${module.karpenter.node_iam_role_name}
-      blockDeviceMappings:
-      - deviceName: /dev/xvda
-        ebs:
-          volumeSize: 120Gi
-          volumeType: gp3
-      subnetSelectorTerms:
-        - tags:
-            karpenter.sh/discovery: ${local.cluster}
-      securityGroupSelectorTerms:
-        - tags:
-            karpenter.sh/discovery: ${local.cluster}
-      tags:
-        karpenter.sh/discovery: ${local.cluster}
-  YAML
+resource "kubernetes_manifest" "karpenter_node_class" {
+  manifest = {
+    apiVersion = "karpenter.k8s.aws/v1"
+    kind       = "EC2NodeClass"
+    metadata = {
+      name = "default"
+    }
+    spec = {
+      amiFamily = "AL2"
+      amiSelectorTerms = [{ name = data.aws_ami.ubuntu_eks.id }]
+      role = module.karpenter.node_iam_role_name
+      blockDeviceMappings = [
+        {
+          deviceName = "/dev/xvda"
+          ebs = {
+            volumeSize = "120Gi"
+            volumeType = "gp3"
+          }
+        }
+      ]
+      subnetSelectorTerms = [
+        {
+          tags = {
+            "karpenter.sh/discovery" = local.cluster
+          }
+        }
+      ]
+      securityGroupSelectorTerms = [
+        {
+          tags = {
+            "karpenter.sh/discovery" = local.cluster
+          }
+        }
+      ]
+      tags = {
+        "karpenter.sh/discovery" = local.cluster
+      }
+    }
+  }
 
   depends_on = [
     helm_release.karpenter
@@ -111,77 +125,108 @@ resource "kubectl_manifest" "karpenter_node_class" {
 }
 
 # --- Karpenter default nodepool ---
-resource "kubectl_manifest" "karpenter_node_pool" {
-  yaml_body = <<-YAML
-    apiVersion: karpenter.sh/v1
-    kind: NodePool
-    metadata:
-      name: default
-    spec:
-      template:
-        spec:
-          nodeClassRef:
-            group: karpenter.k8s.aws
-            kind: EC2NodeClass
-            name: default
-          requirements:
-            - key: "karpenter.k8s.aws/instance-category"
-              operator: In
-              values: ["c", "m", "r", "t", "z"]
-            - key: "karpenter.k8s.aws/instance-cpu"
-              operator: In
-              values: ["4", "8", "16", "32", "48", "64", "96", "192"]
-            - key: "karpenter.k8s.aws/instance-hypervisor"
-              operator: In
-              values: ["nitro"]
-            - key: "karpenter.k8s.aws/instance-generation"
-              operator: Gt
-              values: ["2"]
-            - key: "kubernetes.io/arch"
-              operator: In
-              values: ["amd64"]
-      limits:
-        cpu: 10000
-      disruption:
-        consolidationPolicy: WhenEmpty
-        consolidateAfter: 30s
+resource "kubernetes_manifest" "karpenter_node_pool" {
+  manifest = {
+    apiVersion = "karpenter.sh/v1"
+    kind       = "NodePool"
+    metadata = {
+      name = "default"
+    }
+    spec = {
+      template = {
+        spec = {
+          nodeClassRef = {
+            group = "karpenter.k8s.aws"
+            kind  = "EC2NodeClass"
+            name  = "default"
+          }
+          requirements = [
+            {
+              key      = "karpenter.k8s.aws/instance-category"
+              operator = "In"
+              values   = ["c", "m", "r", "t", "z"]
+            },
+            {
+              key      = "karpenter.k8s.aws/instance-cpu"
+              operator = "In"
+              values   = ["4", "8", "16", "32", "48", "64", "96", "192"]
+            },
+            {
+              key      = "karpenter.k8s.aws/instance-hypervisor"
+              operator = "In"
+              values   = ["nitro"]
+            },
+            {
+              key      = "karpenter.k8s.aws/instance-generation"
+              operator = "Gt"
+              values   = ["2"]
+            },
+            {
+              key      = "kubernetes.io/arch"
+              operator = "In"
+              values   = ["amd64"]
+            }
+          ]
+        }
+      }
+      limits = {
+        cpu = 10000
+      }
+      disruption = {
+        consolidationPolicy = "WhenEmpty"
+        consolidateAfter    = "30s"
+      }
+    }
+  }
 
-  YAML
   depends_on = [
-    kubectl_manifest.karpenter_node_class
+    kubernetes_manifest.karpenter_node_class
   ]
 }
 
 # --- Karpenter nodepool for GPU instances ---
-resource "kubectl_manifest" "karpenter_node_pool_gpu" {
-  yaml_body = <<-YAML
-    apiVersion: karpenter.sh/v1
-    kind: NodePool
-    metadata:
-      name: gpu
-    spec:
-      template:
-        spec:
-          nodeClassRef:
-            name: default
-            kind: EC2NodeClass
-            group: karpenter.k8s.aws
-          requirements:
-          - key: node.kubernetes.io/instance-type
-            operator: In
-            values: ["g5.xlarge", "g5.2xlarge", "g5.4xlarge"]
-          taints:
-          - key: nvidia.com/gpu
-            value: "true"
-            effect: NoSchedule
-      limits:
-        gpu: 30
-      disruption:
-        consolidationPolicy: WhenEmptyOrUnderutilized
-        consolidateAfter: Never
+resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
+  manifest = {
+    apiVersion = "karpenter.sh/v1"
+    kind       = "NodePool"
+    metadata = {
+      name = "gpu"
+    }
+    spec = {
+      template = {
+        spec = {
+          nodeClassRef = {
+            group = "karpenter.k8s.aws"
+            kind  = "EC2NodeClass"
+            name  = "default"
+          }
+          requirements = [
+            {
+              key      = "node.kubernetes.io/instance-type"
+              operator = "In"
+              values   = ["g5.xlarge", "g5.2xlarge", "g5.4xlarge"]
+            }
+          ]
+          taints = [
+            {
+              key    = "nvidia.com/gpu"
+              value  = "true"
+              effect = "NoSchedule"
+            }
+          ]
+        }
+      }
+      limits = {
+        gpu = 30
+      }
+      disruption = {
+        consolidationPolicy = "WhenEmptyOrUnderutilized"
+        consolidateAfter    = "Never"
+      }
+    }
+  }
 
-  YAML
   depends_on = [
-    resource.kubectl_manifest.karpenter_node_class
+    kubernetes_manifest.karpenter_node_class
   ]
 }
