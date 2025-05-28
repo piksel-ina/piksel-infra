@@ -35,6 +35,7 @@ deployment "development" {
     transit_gateway_id            = upstream_input.shared.transit_gateway_id
     vpc_cidr_shared               = "10.0.0.0/16"
     inbound_resolver_ip_addresses = upstream_input.shared.inbound_resolver_ips
+    sso-admin-role-arn            = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
   }
 }
 

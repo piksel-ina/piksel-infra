@@ -10,6 +10,17 @@ variable "default_tags" {
   default     = {}
 }
 
+variable "vpc_id" {
+    description = "VPC ID value"
+    type = string
+}
+
+variable "private_subnets_ids" {
+    description = "List of private subnets ID"
+    type = list(string)
+}
+
+# --- EKS Specific Variables ---
 variable "eks-version" {
   type        = string
   description = "The version of Kubernetes for this environment"

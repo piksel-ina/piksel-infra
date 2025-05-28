@@ -73,3 +73,29 @@ component "security_group" {
 
   depends_on = [component.vpc]
 }
+
+component "eks-cluster" {
+  source = "./aws-eks-cluster"
+
+  inputs = {
+    cluster_name        = var.cluster_name
+    vpc_id              = component.vpc.vpc_id
+    private_subnets_ids = component.vpc.private_subnets
+    eks-version         = var.eks-version
+    coredns-version     = var.coredns-version
+    vpc-cni-version     = var.vpc-cni-version
+    kube-proxy-version  = var.kube-proxy-version
+    sso-admin-role-arn  = var.sso-admin-role-arn
+    default_tags        = var.default_tags
+  }
+
+  providers = {
+    aws       = provider.aws.configurations
+    tls       = provider.tls.this
+    time      = provider.time.this
+    null      = provider.null.this
+    cloudinit = provider.cloudinit.this
+  }
+
+  depends_on = [component.vpc]
+}

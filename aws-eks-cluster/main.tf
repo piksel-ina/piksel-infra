@@ -81,8 +81,8 @@ module "eks" {
     }
   }
 
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  vpc_id     = var.vpc_id
+  subnet_ids = var.private_subnets_ids
 
   # Fargate profiles use the cluster primary security group so these are not utilized
   create_cluster_security_group = false
