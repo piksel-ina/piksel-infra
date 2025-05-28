@@ -27,7 +27,7 @@ deployment "development" {
     single_nat_gateway     = true
     one_nat_gateway_per_az = false
     enable_flow_log        = false
-    cluster_name           = "piksel-dev-eks-cluster"
+    cluster_name           = "piksel-dev"
     zone_ids = {
       "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
       "dev.piksel.internal" = upstream_input.shared.zone_ids["dev.piksel.internal"]
