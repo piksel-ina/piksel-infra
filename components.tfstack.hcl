@@ -99,3 +99,10 @@ component "eks-cluster" {
 
   depends_on = [component.vpc]
 }
+
+component "data" {
+  source = "./utils"
+  providers = {
+    aws = provider.aws.virginia
+  }
+}

@@ -1,8 +1,3 @@
-# --- Get authorization to pull karpenter Images ---
-data "aws_ecrpublic_authorization_token" "token" {
-  region = "us-east-1"
-}
-
 # --- Select Ubuntu EKS AMIs Dynamically ---
 data "aws_ami" "ubuntu_eks" {
   most_recent = true
@@ -87,9 +82,9 @@ resource "kubernetes_manifest" "karpenter_node_class" {
       name = "default"
     }
     spec = {
-      amiFamily = "AL2"
+      amiFamily        = "AL2"
       amiSelectorTerms = [{ name = data.aws_ami.ubuntu_eks.id }]
-      role = module.karpenter.node_iam_role_name
+      role             = module.karpenter.node_iam_role_name
       blockDeviceMappings = [
         {
           deviceName = "/dev/xvda"

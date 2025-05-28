@@ -1,7 +1,7 @@
 required_providers {
   aws = {
     source  = "hashicorp/aws"
-    version = "= 6.0.0-beta2"
+    version = "= 5.95"
   }
   tls = {
     source  = "hashicorp/tls"
@@ -32,6 +32,20 @@ provider "aws" "configurations" {
       tags = var.default_tags
     }
   }
+}
+
+provider "aws" "virginia" {
+  config {
+    region = "us-east-1"
+    assume_role_with_web_identity {
+      role_arn           = var.aws_role
+      web_identity_token = var.aws_token
+    }
+    default_tags {
+      tags = var.default_tags
+    }
+  }
+
 }
 
 provider "tls" "this" {}
