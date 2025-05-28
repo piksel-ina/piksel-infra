@@ -72,7 +72,7 @@ module "eks" {
     }
     vpc-cni = {
       addon_version            = var.vpc-cni-version
-      service_account_role_arn = module.vpc_cni_irsa_role
+      service_account_role_arn = module.vpc_cni_irsa_role.iam_role_arn
     }
     aws-ebs-csi-driver = {
       most_recent              = true
