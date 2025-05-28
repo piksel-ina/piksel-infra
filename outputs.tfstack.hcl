@@ -137,3 +137,24 @@ output security_group_metadata {
     description = component.security_group.security_group_description
   }
 }
+
+# --- EKS Cluster Outputs ---
+output "eks_cluster_metadata" {
+  description = "Output of EKS Cluster"
+  type = object({
+    name                  = string
+    endpoint              = string
+    certificate_authority = string
+    oidc_provider_arn     = string
+    oidc_issuer_url       = string
+    tls_fingerprint       = string
+  })
+  value = {
+    name                  = component.eks-cluster.cluster_name
+    endpoint              = component.eks-cluster.cluster_endpoint
+    certificate_authority = component.eks-cluster.cluster_certificate_authority_data
+    oidc_provider_arn     = component.eks-cluster.cluster_oidc_provider_arn
+    oidc_issuer_url       = component.eks-cluster.cluster_oidc_issuer_url
+    tls_fingerprint       = component.eks-cluster.cluster_tls_certificate_sha1_fingerprint
+  }
+}
