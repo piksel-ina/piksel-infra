@@ -28,3 +28,9 @@ output "cluster_tls_certificate_sha1_fingerprint" {
   description = "EKS Cluster TLS Certificate SHA1 Fingerprint"
   value       = module.eks.cluster_tls_certificate_sha1_fingerprint
 }
+
+output "authentication_token" {
+  description = "Token to use to authenticate with the cluster"
+  value       = data.aws_eks_cluster_auth.this.token
+  sensitive   = true
+}
