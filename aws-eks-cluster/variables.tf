@@ -11,13 +11,13 @@ variable "default_tags" {
 }
 
 variable "vpc_id" {
-    description = "VPC ID value"
-    type = string
+  description = "VPC ID value"
+  type        = string
 }
 
 variable "private_subnets_ids" {
-    description = "List of private subnets ID"
-    type = list(string)
+  description = "List of private subnets ID"
+  type        = list(string)
 }
 
 # --- EKS Specific Variables ---
