@@ -32,10 +32,12 @@ deployment "development" {
       "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
       "dev.piksel.internal" = upstream_input.shared.zone_ids["dev.piksel.internal"]
     }
-    transit_gateway_id            = upstream_input.shared.transit_gateway_id
-    vpc_cidr_shared               = "10.0.0.0/16"
-    inbound_resolver_ip_addresses = upstream_input.shared.inbound_resolver_ips
-    sso-admin-role-arn            = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
+    transit_gateway_id                = upstream_input.shared.transit_gateway_id
+    vpc_cidr_shared                   = "10.0.0.0/16"
+    inbound_resolver_ip_addresses     = upstream_input.shared.inbound_resolver_ips
+    sso-admin-role-arn                = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
+    subdomains                        = ["dev.piksel.big.go.id", "dev.piksel.internal"]
+    externaldns_crossaccount_role_arn = upstream_input.shared.externaldns_route53_policy_arns["dev"]
   }
 }
 

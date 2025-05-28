@@ -111,17 +111,33 @@ component "karpenter" {
   source = "./karpenter"
 
   inputs = {
-    cluster_name      = var.cluster_name
-    oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
-    cluster_endpoint  = component.eks-cluster.cluster_endpoint
+    cluster_name               = var.cluster_name
+    oidc_provider_arn          = component.eks-cluster.cluster_oidc_provider_arn
+    cluster_endpoint           = component.eks-cluster.cluster_endpoint
     public_repository_username = component.data.repository_username
     public_repository_passowrd = component.data.repository_password
-    default_tags      = var.default_tags
+    default_tags               = var.default_tags
   }
 
   providers = {
-    aws = provider.aws.configurations
-    helm = provider.helm.configurations
+    aws        = provider.aws.configurations
+    helm       = provider.helm.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}
+
+component "addons" {
+  source = "./aws-eks-addons"
+
+  inputs = {
+    subdomains                        = var.subdomains
+    oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
+    oidc_provider_arn                 = component.eks-cluster.cluster_oidc_provider_arn
+    externaldns_crossaccount_role_arn = var.externaldns_crossaccount_role_arn
+  }
+  providers = {
+    aws        = provider.aws.configurations
+    helm       = provider.helm.configurations
     kubernetes = provider.kubernetes.configurations
   }
 

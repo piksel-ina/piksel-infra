@@ -24,8 +24,8 @@ variable "default_tags" {
 
 variable "aws_virginia" {
   description = "us-east-1 / virginia region"
-  type = string
-  default = "us-east-1"
+  type        = string
+  default     = "us-east-1"
 }
 
 # --- AWS OIDC Variables ---
@@ -132,4 +132,14 @@ variable "kube-proxy-version" {
 variable "sso-admin-role-arn" {
   type        = string
   description = "The ARN of SSO Admin group"
+}
+
+variable "subdomains" {
+  description = "List of domain filters for ExternalDNS"
+  type        = list(string)
+}
+
+variable "externaldns_crossaccount_role_arn" {
+  description = "The ARN of the cross-account IAM role in Route53 account"
+  type        = string
 }

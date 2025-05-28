@@ -6,8 +6,8 @@ module "external_dns_helm" {
   argo_enabled      = false
   argo_helm_enabled = false
 
-  cluster_identity_oidc_issuer     = module.eks.oidc_provider
-  cluster_identity_oidc_issuer_arn = module.eks.oidc_provider_arn
+  cluster_identity_oidc_issuer     = var.oidc_provider
+  cluster_identity_oidc_issuer_arn = var.oidc_provider_arn
 
   namespace                 = "aws-external-dns-helm"
   helm_release_name         = "aws-ext-dns-helm"
