@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "external_dns" {
       "route53:ChangeResourceRecordSets",
     ]
     resources = [
-      for zone_id in var.zone_ids :
+      for zone_id in values(var.zone_ids) :
       "arn:${var.aws_partition}:route53:::hostedzone/${zone_id}"
     ]
   }

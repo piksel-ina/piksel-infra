@@ -14,7 +14,7 @@ variable "vpc_id" {
 }
 
 variable "zone_ids" {
-  description = "List of Route53 Hosted Zone IDs to associate with the VPC"
+  description = "Maps of Route53 Hosted Zone IDs to associate with the VPC"
 }
 
 variable "default_tags" {

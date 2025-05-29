@@ -134,7 +134,9 @@ component "addons" {
     oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
     oidc_provider_arn                 = component.eks-cluster.cluster_oidc_provider_arn
     externaldns_crossaccount_role_arn = var.externaldns_crossaccount_role_arn
+    zone_ids                          = var.zone_ids
   }
+
   providers = {
     aws        = provider.aws.configurations
     helm       = provider.helm.configurations

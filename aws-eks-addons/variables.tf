@@ -17,8 +17,7 @@ variable "oidc_provider_arn" {
 }
 
 variable "zone_ids" {
-  description = "List of Route53 hosted zone IDs ExternalDNS is allowed to manage."
-  type        = list(string)
+  description = "Map of domain name to Route53 hosted zone IDs"
 }
 
 variable "aws_partition" {
