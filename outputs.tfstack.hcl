@@ -158,3 +158,30 @@ output "eks_cluster_metadata" {
     tls_fingerprint       = component.eks-cluster.cluster_tls_certificate_sha1_fingerprint
   }
 }
+
+# --- Karpenter Outputs ---
+output "karpenter_metadata" {
+  description = "Output of Karpenter configuration and resources"
+  type = object({
+    iam_role_arn            = string
+    node_iam_role_name      = string
+    interruption_queue_name = string
+    ubuntu_eks_ami_id       = string
+    helm_release_status     = string
+    node_class_name         = optional(string)
+    node_pool_name          = optional(string)
+    node_pool_gpu_name      = optional(string)
+    node_class_status       = optional(map(string))
+  })
+  value = {
+    iam_role_arn            = component.karpenter.karpenter_iam_role_arn
+    node_iam_role_name      = component.karpenter.karpenter_node_iam_role_name
+    interruption_queue_name = component.karpenter.karpenter_interruption_queue_name
+    ubuntu_eks_ami_id       = component.karpenter.ubuntu_eks_ami_id
+    helm_release_status     = component.karpenter.karpenter_helm_release_status
+    node_class_name         = component.karpenter.karpenter_node_class_name
+    node_pool_name          = component.karpenter.karpenter_node_pool_name
+    node_pool_gpu_name      = component.karpenter.karpenter_node_pool_gpu_name
+    node_class_status       = component.karpenter.karpenter_node_class_status
+  }
+}
