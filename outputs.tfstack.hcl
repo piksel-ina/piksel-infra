@@ -185,3 +185,26 @@ output "karpenter_metadata" {
     node_class_status       = component.karpenter.karpenter_node_class_status
   }
 }
+
+# --- External DNS Outputs ---
+output "external_dns_metadata" {
+  description = "Output of External DNS configuration and resources"
+  type = object({
+    iam_role_arn           = string
+    namespace              = string
+    service_account_name   = string
+    helm_release_name      = string
+    helm_release_namespace = string
+    helm_release_status    = string
+    helm_chart_version     = string
+  })
+  value = {
+    iam_role_arn           = component.addons.external_dns_iam_role_arn
+    namespace              = component.addons.external_dns_namespace
+    service_account_name   = component.addons.external_dns_service_account_name
+    helm_release_name      = component.addons.external_dns_helm_release_name
+    helm_release_namespace = component.addons.external_dns_helm_release_namespace
+    helm_release_status    = component.addons.external_dns_helm_release_status
+    helm_chart_version     = component.addons.external_dns_helm_chart_version
+  }
+}
