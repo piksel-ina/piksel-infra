@@ -1,9 +1,11 @@
-output "addon_externaldns" {
-  description = "The addon module outputs"
-  value       = module.external_dns_helm.addon
+output "service_account_name" {
+  value = kubernetes_service_account.external_dns.metadata[0].name
 }
 
-output "addon_irsa_externaldns" {
-  description = "The addon IRSA module outputs"
-  value       = module.external_dns_helm.addon_irsa
+output "service_account_namespace" {
+  value = kubernetes_service_account.external_dns.metadata[0].namespace
+}
+
+output "helm_release_status" {
+  value = helm_release.external_dns.status
 }
