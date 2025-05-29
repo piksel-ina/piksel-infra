@@ -130,11 +130,14 @@ component "addons" {
   source = "./aws-eks-addons"
 
   inputs = {
+    aws_region                        = var.aws_region
+    cluster_name                      = var.cluster_name
     subdomains                        = var.subdomains
     oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
     oidc_provider_arn                 = component.eks-cluster.cluster_oidc_provider_arn
     externaldns_crossaccount_role_arn = var.externaldns_crossaccount_role_arn
     zone_ids                          = var.zone_ids
+    default_tags                      = var.default_tags
   }
 
   providers = {

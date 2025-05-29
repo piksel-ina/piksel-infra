@@ -41,10 +41,16 @@ resource "aws_iam_role" "external_dns" {
         Condition = {
           StringEquals = {
             "${replace(var.oidc_provider, "https://", "")}:sub" = "system:serviceaccount:aws-external-dns-helm:external-dns"
+            "${replace(var.oidc_provider, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
       }
     ]
+  })
+
+  tags = merge(var.default_tags, {
+    Name      = "external-dns-irsa"
+    Component = "external-dns"
   })
 }
 
@@ -76,45 +82,100 @@ resource "aws_iam_role_policy" "external_dns_assume_crossaccount" {
 resource "kubernetes_namespace" "external_dns" {
   metadata {
     name = "aws-external-dns-helm"
+
+    labels = {
+      name      = "aws-external-dns-helm"
+      component = "external-dns"
+    }
   }
 }
 
-# --- Deploy ExternalDNS via Helm release ---
+# --- Deploy ExternalDNS via Helm release (Let Helm manage the service account) ---
 resource "helm_release" "external_dns" {
   name       = "aws-ext-dns-helm"
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  version    = "1.16.0"
+  version    = "1.14.3"
+
+  # Ensure proper dependency order
+  depends_on = [
+    kubernetes_namespace.external_dns,
+    aws_iam_role_policy.external_dns,
+    aws_iam_role_policy.external_dns_assume_crossaccount
+  ]
 
   values = [
     yamlencode({
-      logLevel                = "error"
-      provider                = { name = "aws" }
+      # Logging configuration
+      logLevel  = "error"
+      logFormat = "json"
+
+      # Provider configuration
+      provider = {
+        name = "aws"
+      }
+
+      # DNS configuration
       registry                = "txt"
-      txtOwnerId              = "eks-cluster"
+      txtOwnerId              = "eks-cluster-${var.cluster_name}"
       txtPrefix               = "external-dns"
       policy                  = "sync"
       domainFilters           = var.subdomains
       publishInternalServices = true
       triggerLoopOnEvent      = true
-      interval                = "5s"
+      interval                = "30s"
+
+      # Service Account configuration
       serviceAccount = {
         create = true
         name   = "external-dns"
         annotations = {
           "eks.amazonaws.com/role-arn" = aws_iam_role.external_dns.arn
         }
+        labels = {
+          app       = "external-dns"
+          component = "external-dns"
+        }
       }
+
+      # Pod configuration
       podLabels = {
-        app = "aws-external-dns-helm"
+        app       = "external-dns"
+        component = "external-dns"
       }
+
+      podAnnotations = {
+        "cluster-autoscaler.kubernetes.io/safe-to-evict" = "true"
+      }
+
+      # AWS specific configuration
       aws = {
-        assumeRoleArn = var.externaldns_crossaccount_role_arn
+        region          = var.aws_region
+        assumeRoleArn   = var.externaldns_crossaccount_role_arn
+        batchChangeSize = 1000
+      }
+
+      # Resource limits for better stability
+      resources = {
+        limits = {
+          memory = "256Mi"
+          cpu    = "200m"
+        }
+        requests = {
+          memory = "128Mi"
+          cpu    = "100m"
+        }
       }
     })
   ]
 
-  timeout = 240
-  wait    = true
+  timeout         = 300
+  wait            = true
+  wait_for_jobs   = true
+  cleanup_on_fail = true
+
+  # Handle upgrades gracefully
+  force_update  = false
+  recreate_pods = false
 }
