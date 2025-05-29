@@ -79,21 +79,6 @@ resource "kubernetes_namespace" "external_dns" {
   }
 }
 
-# --- Kubernetes Service Account with IRSA Annotation ---
-resource "kubernetes_service_account" "external_dns" {
-  metadata {
-    name      = "external-dns"
-    namespace = "aws-external-dns-helm"
-    annotations = {
-      "eks.amazonaws.com/role-arn" = aws_iam_role.external_dns.arn
-    }
-    labels = {
-      "app" = "aws-external-dns-helm"
-    }
-  }
-  automount_service_account_token = true
-}
-
 # --- Deploy ExternalDNS via Helm release ---
 resource "helm_release" "external_dns" {
   name       = "aws-ext-dns-helm"
@@ -105,18 +90,21 @@ resource "helm_release" "external_dns" {
   values = [
     yamlencode({
       logLevel                = "error"
-      provider                = "aws"
+      provider                = { name = "aws" }
       registry                = "txt"
       txtOwnerId              = "eks-cluster"
       txtPrefix               = "external-dns"
       policy                  = "sync"
       domainFilters           = var.subdomains
-      publishInternalServices = "true"
-      triggerLoopOnEvent      = "true"
+      publishInternalServices = true
+      triggerLoopOnEvent      = true
       interval                = "5s"
       serviceAccount = {
-        create = false
-        name   = kubernetes_service_account.external_dns.metadata[0].name
+        create = true
+        name   = "external-dns"
+        annotations = {
+          "eks.amazonaws.com/role-arn" = aws_iam_role.external_dns.arn
+        }
       }
       podLabels = {
         app = "aws-external-dns-helm"
