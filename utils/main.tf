@@ -1,5 +1,5 @@
 # --- Get authorization to pull karpenter Images ---
- resource "null_resource" "force_refresh" {
+resource "null_resource" "force_refresh" {
   triggers = {
     always_run = timestamp()
   }

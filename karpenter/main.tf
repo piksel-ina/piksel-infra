@@ -73,6 +73,14 @@ resource "kubernetes_manifest" "karpenter_node_class" {
       amiFamily = "AL2023"
       role      = module.karpenter.node_iam_role_name
 
+      amiSelectorTerms = [
+        {
+          tags = {
+            "karpenter.sh/discovery" = local.cluster
+          }
+        }
+      ]
+
       blockDeviceMappings = [
         {
           deviceName = "/dev/xvda"
