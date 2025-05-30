@@ -54,6 +54,14 @@ module "karpenter" {
   tags = local.tags
 }
 
+# --- EC2 Spot Service-Linked Role ---
+resource "aws_iam_service_linked_role" "ec2_spot" {
+  aws_service_name = "spot.amazonaws.com"
+  description      = "Service-linked role for EC2 Spot Instances"
+
+  tags = local.tags
+}
+
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
   namespace        = "karpenter"
