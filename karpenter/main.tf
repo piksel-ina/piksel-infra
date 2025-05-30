@@ -13,11 +13,43 @@ module "karpenter" {
   cluster_name           = local.cluster
   irsa_oidc_provider_arn = local.oidc_provider
 
+  # Node IAM role policies (for EC2 instances)
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
     AmazonCNIPolicy              = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   }
+
+  # Karpenter controller additional IAM policy statements
+  iam_policy_statements = [
+    {
+      sid       = "CustomAllowRegionalReadActions"
+      effect    = "Allow"
+      resources = ["*"]
+      actions = [
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeImages",
+        "ec2:DescribeInstances",
+        "ec2:DescribeInstanceTypeOfferings",
+        "ec2:DescribeInstanceTypes",
+        "ec2:DescribeLaunchTemplates",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeSpotPriceHistory",
+        "ec2:DescribeSubnets"
+      ]
+      condition = {
+        StringEquals = {
+          "aws:RequestedRegion" = "ap-southeast-3"
+        }
+      }
+    },
+    {
+      sid       = "CustomAllowSSMReadActions"
+      effect    = "Allow"
+      resources = ["arn:aws:ssm:ap-southeast-3::parameter/aws/service/*"]
+      actions   = ["ssm:GetParameter"]
+    }
+  ]
 
   tags = local.tags
 }
@@ -69,7 +101,6 @@ resource "kubernetes_manifest" "karpenter_node_class" {
       name = "default"
       labels = {
         "app.kubernetes.io/managed-by" = "terraform"
-        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
       }
     }
     spec = {
@@ -127,7 +158,6 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
       name = "default"
       labels = {
         "app.kubernetes.io/managed-by" = "terraform"
-        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
       }
     }
     spec = {
@@ -195,7 +225,6 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
       name = "gpu"
       labels = {
         "app.kubernetes.io/managed-by" = "terraform"
-        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
       }
     }
     spec = {
