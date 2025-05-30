@@ -109,9 +109,7 @@ resource "kubernetes_manifest" "karpenter_node_class" {
 
       amiSelectorTerms = [
         {
-          tags = {
-            "karpenter.sh/discovery" = local.cluster
-          }
+          alias = "al2023@v20250505"
         }
       ]
 
