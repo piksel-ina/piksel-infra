@@ -143,15 +143,3 @@ variable "externaldns_crossaccount_role_arn" {
   description = "The ARN of the cross-account IAM role in Route53 account"
   type        = string
 }
-
-variable "public_repository_username" {
-  description = "Repository username generated from token"
-  type = string
-  default     = "AWS"
-}
-
-variable "public_repository_password" {
-  description = "Repository password generated from token"
-  type = string
-  default     = ""
-}

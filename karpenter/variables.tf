@@ -10,16 +10,6 @@ variable "cluster_endpoint" {
   description = "value"
 }
 
-variable "public_repository_username" {
-  description = "Repository username generated from token"
-  default     = "AWS"
-}
-
-variable "public_repository_password" {
-  description = "Repository password generated from token"
-  default     = null
-}
-
 variable "default_tags" {
   description = "value"
   default     = {}

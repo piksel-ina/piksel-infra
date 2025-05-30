@@ -24,13 +24,12 @@ module "karpenter" {
 
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
-  namespace           = "karpenter"
-  create_namespace    = true
-  name                = "karpenter"
-  repository          = "oci://public.ecr.aws/karpenter"
-  repository_username = var.public_repository_username
-  repository_password = var.public_repository_password
-  chart               = "karpenter"
+  namespace        = "karpenter"
+  create_namespace = true
+  name             = "karpenter"
+  repository       = "oci://public.ecr.aws/karpenter"
+  chart            = "karpenter"
+  description      = "Karpenter autoscaler for EKS cluster"
 
   # Ensure Helm waits for all resources including CRDs
   wait            = true
@@ -68,6 +67,10 @@ resource "kubernetes_manifest" "karpenter_node_class" {
     kind       = "EC2NodeClass"
     metadata = {
       name = "default"
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
+      }
     }
     spec = {
       amiFamily = "AL2023"
@@ -122,6 +125,10 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
     kind       = "NodePool"
     metadata = {
       name = "default"
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
+      }
     }
     spec = {
       template = {
@@ -177,7 +184,7 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
   ]
 }
 
-# --- GPU Intensive Nodepool --
+#--- GPU Intensive Nodepool --
 resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
   depends_on = [kubernetes_manifest.karpenter_node_class]
 
@@ -186,6 +193,10 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
     kind       = "NodePool"
     metadata = {
       name = "gpu"
+      labels = {
+        "app.kubernetes.io/managed-by" = "terraform"
+        "last-updated" = formatdate("YYYY-MM-DD", timestamp())
+      }
     }
     spec = {
       template = {

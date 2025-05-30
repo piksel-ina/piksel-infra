@@ -100,47 +100,16 @@ component "eks-cluster" {
   depends_on = [component.vpc]
 }
 
-# component "data" {
-#   source = "./utils"
-#   providers = {
-#     aws  = provider.aws.virginia
-#     null = provider.null.this
-#   }
-# }
-
-removed {
-  source = "./utils"
-
-  from = component.data[0]
-  providers = {
-    aws  = provider.aws.virginia
-    null = provider.null.this
-  }
-}
-
-# component "karpenter" {
-#   source = "./karpenter"
-
-#   inputs = {
-#     cluster_name               = var.cluster_name
-#     oidc_provider_arn          = component.eks-cluster.cluster_oidc_provider_arn
-#     cluster_endpoint           = component.eks-cluster.cluster_endpoint
-#     public_repository_password = var.public_repository_password
-#     public_repository_username = var.public_repository_username
-#     default_tags               = var.default_tags
-#   }
-
-#   providers = {
-#     aws        = provider.aws.configurations
-#     helm       = provider.helm.configurations
-#     kubernetes = provider.kubernetes.configurations
-#   }
-# }
-
-removed {
+component "karpenter" {
   source = "./karpenter"
 
-  from = component.karpenter[0]
+  inputs = {
+    cluster_name      = var.cluster_name
+    oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    cluster_endpoint  = component.eks-cluster.cluster_endpoint
+    default_tags      = var.default_tags
+  }
+
   providers = {
     aws        = provider.aws.configurations
     helm       = provider.helm.configurations
