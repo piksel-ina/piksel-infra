@@ -104,6 +104,7 @@ component "data" {
   source = "./utils"
   providers = {
     aws = provider.aws.virginia
+    null = provider.null.this
   }
 }
 
