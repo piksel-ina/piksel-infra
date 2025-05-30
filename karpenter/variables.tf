@@ -13,6 +13,7 @@ variable "cluster_endpoint" {
 variable "public_repository_username" {
   description = "Repository username generated from token"
 }
+
 variable "public_repository_passowrd" {
   description = "Repository password generated from token"
 }

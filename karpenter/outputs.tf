@@ -13,11 +13,6 @@ output "karpenter_interruption_queue_name" {
   value       = module.karpenter.queue_name
 }
 
-output "ubuntu_eks_ami_id" {
-  description = "The ID of the latest Ubuntu EKS AMI used for nodes"
-  value       = data.aws_ami.ubuntu_eks.id
-}
-
 output "karpenter_helm_release_status" {
   description = "The status of the Karpenter Helm release"
   value       = helm_release.karpenter.status

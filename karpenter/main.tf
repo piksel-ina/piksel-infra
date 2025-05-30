@@ -1,22 +1,3 @@
-# --- Select Ubuntu EKS AMIs Dynamically ---
-data "aws_ami" "ubuntu_eks" {
-  most_recent = true
-  owners      = ["099720109477"]
-
-  filter {
-    name   = "name"
-    values = ["ubuntu-eks/k8s_1.32/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
 locals {
   cluster          = var.cluster_name
   tags             = var.default_tags
@@ -32,7 +13,6 @@ module "karpenter" {
   cluster_name           = local.cluster
   irsa_oidc_provider_arn = local.oidc_provider
 
-  # Used to attach additional IAM policies to the Karpenter node IAM role
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     AmazonEBSCSIDriverPolicy     = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
@@ -42,7 +22,7 @@ module "karpenter" {
   tags = local.tags
 }
 
-# --- Karpenter Helm Chart ---
+# --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
   namespace           = "karpenter"
   create_namespace    = true
@@ -51,6 +31,12 @@ resource "helm_release" "karpenter" {
   repository_username = var.public_repository_username
   repository_password = var.public_repository_passowrd
   chart               = "karpenter"
+
+  # Ensure Helm waits for all resources including CRDs
+  wait            = true
+  wait_for_jobs   = true
+  timeout         = 300
+  cleanup_on_fail = true
 
   values = [
     <<-EOT
@@ -73,8 +59,10 @@ resource "helm_release" "karpenter" {
   ]
 }
 
-# --- Karpenter nodeclass and nodepool ---
+# --- Karpenter AL2023 NodeClass ---
 resource "kubernetes_manifest" "karpenter_node_class" {
+  depends_on = [helm_release.karpenter]
+
   manifest = {
     apiVersion = "karpenter.k8s.aws/v1"
     kind       = "EC2NodeClass"
@@ -82,15 +70,16 @@ resource "kubernetes_manifest" "karpenter_node_class" {
       name = "default"
     }
     spec = {
-      amiFamily        = "AL2"
-      amiSelectorTerms = [{ name = data.aws_ami.ubuntu_eks.id }]
-      role             = module.karpenter.node_iam_role_name
+      amiFamily = "AL2023"
+      role      = module.karpenter.node_iam_role_name
+
       blockDeviceMappings = [
         {
           deviceName = "/dev/xvda"
           ebs = {
             volumeSize = "120Gi"
             volumeType = "gp3"
+            encrypted  = true
           }
         }
       ]
@@ -108,19 +97,18 @@ resource "kubernetes_manifest" "karpenter_node_class" {
           }
         }
       ]
-      tags = {
+      tags = merge(local.tags, {
         "karpenter.sh/discovery" = local.cluster
-      }
+        "AMIFamily"              = "AL2023"
+      })
     }
   }
-
-  depends_on = [
-    helm_release.karpenter
-  ]
 }
 
-# --- Karpenter default nodepool ---
+# --- Default NodePool ---
 resource "kubernetes_manifest" "karpenter_node_pool" {
+  depends_on = [kubernetes_manifest.karpenter_node_class]
+
   manifest = {
     apiVersion = "karpenter.sh/v1"
     kind       = "NodePool"
@@ -139,7 +127,7 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
             {
               key      = "karpenter.k8s.aws/instance-category"
               operator = "In"
-              values   = ["c", "m", "r", "t", "z"]
+              values   = ["c", "m", "r", "t"]
             },
             {
               key      = "karpenter.k8s.aws/instance-cpu"
@@ -173,14 +161,18 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
       }
     }
   }
-
-  depends_on = [
-    kubernetes_manifest.karpenter_node_class
+  computed_fields = [
+    "spec.template.spec.nodeClassRef",
+    "spec.template.spec.requirements",
+    "spec.limits",
+    "spec.disruption"
   ]
 }
 
-# --- Karpenter nodepool for GPU instances ---
+# --- GPU Intensive Nodepool --
 resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
+  depends_on = [kubernetes_manifest.karpenter_node_class]
+
   manifest = {
     apiVersion = "karpenter.sh/v1"
     kind       = "NodePool"
@@ -220,8 +212,11 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
       }
     }
   }
-
-  depends_on = [
-    kubernetes_manifest.karpenter_node_class
+  computed_fields = [
+    "spec.template.spec.nodeClassRef",
+    "spec.template.spec.requirements",
+    "spec.template.spec.taints",
+    "spec.limits",
+    "spec.disruption"
   ]
 }

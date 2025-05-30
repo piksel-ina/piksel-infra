@@ -166,7 +166,6 @@ output "karpenter_metadata" {
     iam_role_arn            = string
     node_iam_role_name      = string
     interruption_queue_name = string
-    ubuntu_eks_ami_id       = string
     helm_release_status     = string
     node_class_name         = optional(string)
     node_pool_name          = optional(string)
@@ -177,7 +176,6 @@ output "karpenter_metadata" {
     iam_role_arn            = component.karpenter.karpenter_iam_role_arn
     node_iam_role_name      = component.karpenter.karpenter_node_iam_role_name
     interruption_queue_name = component.karpenter.karpenter_interruption_queue_name
-    ubuntu_eks_ami_id       = component.karpenter.ubuntu_eks_ami_id
     helm_release_status     = component.karpenter.karpenter_helm_release_status
     node_class_name         = component.karpenter.karpenter_node_class_name
     node_pool_name          = component.karpenter.karpenter_node_pool_name
