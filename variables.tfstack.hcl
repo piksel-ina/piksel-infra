@@ -143,3 +143,10 @@ variable "externaldns_crossaccount_role_arn" {
   description = "The ARN of the cross-account IAM role in Route53 account"
   type        = string
 }
+
+# --- Public ECR token ---
+variable "enable_token_refresh" {
+  description = "Whether to refresh the ECR public token automatically"
+  type        = bool
+  default     = true
+}

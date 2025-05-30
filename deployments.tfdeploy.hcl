@@ -37,6 +37,7 @@ deployment "development" {
     inbound_resolver_ip_addresses     = upstream_input.shared.inbound_resolver_ips
     sso-admin-role-arn                = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
     subdomains                        = ["dev.piksel.big.go.id", "dev.piksel.internal"]
+    enable_token_refresh              = true
     externaldns_crossaccount_role_arn = upstream_input.shared.externaldns_route53_policy_arns["dev"]
   }
 }

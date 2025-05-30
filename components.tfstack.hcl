@@ -102,6 +102,9 @@ component "eks-cluster" {
 
 component "data" {
   source = "./utils"
+  inputs = {
+    enable_token_refresh = var.enable_token_refresh
+  }
   providers = {
     aws  = provider.aws.virginia
     null = provider.null.this
