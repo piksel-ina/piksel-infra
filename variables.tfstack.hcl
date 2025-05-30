@@ -144,9 +144,14 @@ variable "externaldns_crossaccount_role_arn" {
   type        = string
 }
 
-# --- Public ECR token ---
-variable "enable_token_refresh" {
-  description = "Whether to refresh the ECR public token automatically"
-  type        = bool
-  default     = true
+variable "public_repository_username" {
+  description = "Repository username generated from token"
+  type = string
+  default     = "AWS"
+}
+
+variable "public_repository_password" {
+  description = "Repository password generated from token"
+  type = string
+  default     = ""
 }

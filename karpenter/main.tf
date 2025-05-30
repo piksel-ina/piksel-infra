@@ -29,7 +29,7 @@ resource "helm_release" "karpenter" {
   name                = "karpenter"
   repository          = "oci://public.ecr.aws/karpenter"
   repository_username = var.public_repository_username
-  repository_password = var.public_repository_passowrd
+  repository_password = var.public_repository_password
   chart               = "karpenter"
 
   # Ensure Helm waits for all resources including CRDs

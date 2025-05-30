@@ -102,14 +102,21 @@ component "eks-cluster" {
 
 component "data" {
   source = "./utils"
-  inputs = {
-    enable_token_refresh = var.enable_token_refresh
-  }
   providers = {
     aws  = provider.aws.virginia
     null = provider.null.this
   }
 }
+
+# removed {
+#   source = "./utils"
+
+#   from = component.data[0]
+#   providers = {
+#     aws  = provider.aws.virginia
+#     null = provider.null.this
+#   }
+# }
 
 component "karpenter" {
   source = "./karpenter"
@@ -118,8 +125,8 @@ component "karpenter" {
     cluster_name               = var.cluster_name
     oidc_provider_arn          = component.eks-cluster.cluster_oidc_provider_arn
     cluster_endpoint           = component.eks-cluster.cluster_endpoint
-    public_repository_username = component.data.repository_username
-    public_repository_passowrd = component.data.repository_password
+    public_repository_password = var.public_repository_password
+    public_repository_username = var.public_repository_username
     default_tags               = var.default_tags
   }
 
