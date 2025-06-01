@@ -208,3 +208,26 @@ output "database_metadata" {
     k8s_namespace    = component.database.db_namespace
   }
 }
+
+# --- Grafana Metadata ---
+output "grafana_metadata" {
+  description = "Output of Grafana configuration and resources"
+  type = object({
+    namespace               = string
+    admin_secret_name       = string
+    values_secret_name      = string
+    iam_role_arn            = string
+    cloudwatch_policy_arn   = string
+    db_password_secret_arn  = string
+    oauth_client_secret_arn = string
+  })
+  value = {
+    namespace               = component.grafana.grafana_namespace
+    admin_secret_name       = component.grafana.grafana_admin_secret_name
+    values_secret_name      = component.grafana.grafana_values_secret_name
+    iam_role_arn            = component.grafana.grafana_iam_role_arn
+    cloudwatch_policy_arn   = component.grafana.grafana_cloudwatch_policy_arn
+    db_password_secret_arn  = component.grafana.grafana_db_password_secret_arn
+    oauth_client_secret_arn = component.grafana.grafana_oauth_client_secret_arn
+  }
+}
