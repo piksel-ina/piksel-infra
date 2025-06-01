@@ -14,3 +14,8 @@ variable "vpc_cidr_shared" {
   description = "CIDR block for the hub VPCs"
   type        = string
 }
+
+variable "vpc_cidr_block" {
+  description = "CIDR block of the deployment vpc"
+  type        = string
+}

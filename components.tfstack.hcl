@@ -63,6 +63,7 @@ component "security_group" {
 
   inputs = {
     vpc_id          = component.vpc.vpc_id
+    vpc_cidr_block  = component.vpc.vpc_cidr_block
     vpc_cidr_shared = var.vpc_cidr_shared
     default_tags    = var.default_tags
   }
