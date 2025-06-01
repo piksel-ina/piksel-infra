@@ -5,120 +5,72 @@ output "account_id" {
   value       = component.vpc.account_id
 }
 
-# --- VPC Outputs ---
-output "vpc_id" {
-  type        = string
-  description = "ID of the VPC"
-  value       = component.vpc.vpc_id
-}
-
-output "vpc_cidr_block" {
-  type        = string
-  description = "CIDR block of the VPC"
-  value       = component.vpc.vpc_cidr_block
-}
-
-# --- Subnet Outputs ---
-output "public_subnets" {
-  type        = list(string)
-  description = "List of IDs of public subnets"
-  value       = component.vpc.public_subnets
-}
-
-output "public_subnets_cidr_blocks" {
-  type        = list(string)
-  description = "List of CIDR blocks of public subnets"
-  value       = component.vpc.public_subnets_cidr_blocks
-}
-
-output "private_subnets" {
-  type        = list(string)
-  description = "List of IDs of private subnets"
-  value       = component.vpc.private_subnets
-}
-
-output "private_subnets_cidr_blocks" {
-  type        = list(string)
-  description = "List of CIDR blocks of private subnets"
-  value       = component.vpc.private_subnets_cidr_blocks
-}
-
-# --- NAT Gateway Outputs ---
-output "natgw_ids" {
-  type        = list(string)
-  description = "List of NAT Gateway IDs"
-  value       = component.vpc.natgw_ids
-}
-
-output "nat_public_ips" {
-  type        = list(string)
-  description = "List of NAT Gateway IDs"
-  value       = component.vpc.nat_public_ips
-}
-
-# --- Route Table Outputs ---
-output "public_route_table_ids" {
-  type        = list(string)
-  description = "List of IDs of public route tables"
-  value       = component.vpc.public_route_table_ids
-}
-
-output "private_route_table_ids" {
-  type        = list(string)
-  description = "List of IDs of private route tables"
-  value       = component.vpc.private_route_table_ids
-}
-
-# --- Flow Logs Output ---
-output "vpc_flow_log_id" {
-  type        = string
-  description = "ID of the VPC Flow Log (if enabled)"
-  value       = component.vpc.vpc_flow_log_id
-}
-
-output "vpc_flow_log_cloudwatch_iam_role_arn" {
-  type        = string
-  description = "ARN of the CloudWatch Log Group for Flow Logs (if enabled)"
-  value       = component.vpc.vpc_flow_log_cloudwatch_iam_role_arn
-}
-
-# --- Route53 Zone Association Outputs ---
-output "private_zone_association_id" {
-  type        = list(string)
-  description = "The account ID of the account that created the hosted zone"
-  value       = component.phz_association.private_zone_association_id
-}
-
-# --- Transit Gateway Attachment Outputs ---
-output "tgw_attachment_arn" {
-  description = "The ARN of the Transit Gateway attachment"
-  type        = string
-  value       = component.tgw-spoke.tgw_attachment_arn
-}
-
-output "tgw_attachment_id" {
-  description = "The ID of the Transit Gateway attachment"
-  type        = string
-  value       = component.tgw-spoke.tgw_attachment_id
-}
-
-output "tgw_vpc_owner_id" {
-  description = "The owner ID of the Transit Gateway attachment"
-  type        = string
-  value       = component.tgw-spoke.tgw_vpc_owner_id
-
-}
-
-# --- Route Table Outputs ---
-output "spoke_to_shared_vpc_via_tgw_route_id" {
-  description = "The ID of the route to the shared VPC via Transit Gateway"
-  type        = list(string)
-  value       = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_id
-}
-output "spoke_to_shared_vpc_via_tgw_route_state" {
-  description = "The state of the route to the shared VPC via Transit Gateway"
-  type        = list(string)
-  value       = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_state
+output "network_metadata" {
+  description = "Grouped network and connectivity metadata"
+  type = object({
+    vpc = object({
+      id                               = string
+      cidr_block                       = string
+      flow_log_id                      = string
+      flow_log_cloudwatch_iam_role_arn = string
+    })
+    subnets = object({
+      public_ids          = list(string)
+      public_cidr_blocks  = list(string)
+      private_ids         = list(string)
+      private_cidr_blocks = list(string)
+    })
+    nat = object({
+      ids        = list(string)
+      public_ips = list(string)
+    })
+    route_tables = object({
+      public_ids  = list(string)
+      private_ids = list(string)
+    })
+    route53 = object({
+      private_zone_association_id = list(string)
+    })
+    transit_gateway = object({
+      attachment_arn                          = string
+      attachment_id                           = string
+      vpc_owner_id                            = string
+      spoke_to_shared_vpc_via_tgw_route_id    = list(string)
+      spoke_to_shared_vpc_via_tgw_route_state = list(string)
+    })
+  })
+  value = {
+    vpc = {
+      id                               = component.vpc.vpc_id
+      cidr_block                       = component.vpc.vpc_cidr_block
+      flow_log_id                      = component.vpc.vpc_flow_log_id
+      flow_log_cloudwatch_iam_role_arn = component.vpc.vpc_flow_log_cloudwatch_iam_role_arn
+    }
+    subnets = {
+      public_ids          = component.vpc.public_subnets
+      public_cidr_blocks  = component.vpc.public_subnets_cidr_blocks
+      private_ids         = component.vpc.private_subnets
+      private_cidr_blocks = component.vpc.private_subnets_cidr_blocks
+    }
+    nat = {
+      ids        = component.vpc.natgw_ids
+      public_ips = component.vpc.nat_public_ips
+    }
+    route_tables = {
+      public_ids  = component.vpc.public_route_table_ids
+      private_ids = component.vpc.private_route_table_ids
+    }
+    route53 = {
+      private_zone_association_id = component.phz_association.private_zone_association_id
+    }
+    transit_gateway = {
+      attachment_arn                          = component.tgw-spoke.tgw_attachment_arn
+      attachment_id                           = component.tgw-spoke.tgw_attachment_id
+      vpc_owner_id                            = component.tgw-spoke.tgw_vpc_owner_id
+      spoke_to_shared_vpc_via_tgw_route_id    = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_id
+      spoke_to_shared_vpc_via_tgw_route_state = component.tgw-spoke.spoke_to_shared_vpc_via_tgw_route_state
+    }
+  }
 }
 
 # --- Security Group Outputs ---
@@ -239,13 +191,10 @@ output "s3_public_metadata" {
 # --- RDS Output ---
 output "database_metadata" {
   description = "Output of RDS database configuration and resources"
-  sensitive   = true
   type = object({
     endpoint         = string
     address          = string
     port             = number
-    db_name          = string
-    db_username      = string
     instance_id      = string
     k8s_service_fqdn = string
     k8s_namespace    = string
@@ -254,8 +203,6 @@ output "database_metadata" {
     endpoint         = component.database.db_endpoint
     address          = component.database.db_address
     port             = component.database.db_port
-    db_name          = component.database.db_name
-    db_username      = component.database.db_username
     instance_id      = component.database.db_instance_id
     k8s_service_fqdn = component.database.k8s_db_service
     k8s_namespace    = component.database.db_namespace
