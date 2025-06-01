@@ -1,0 +1,84 @@
+variable "default_tags" {
+  description = "Default tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "private_subnets_ids" {
+  description = "List of private subnets ID"
+  type        = list(string)
+}
+
+variable "cluster_name" {
+  description = "Name of the EKS cluster for tagging subnets"
+  type        = string
+  default     = "piksel-eks-cluster"
+}
+
+variable "project" {
+  description = "The name of the project"
+  type        = string
+}
+
+variable "environment" {
+  description = "The name of the environment"
+  type        = string
+}
+
+variable "db_instance_class" {
+  description = "Database instance class (e.g., db.t3.micro, db.t3.small)"
+  type        = string
+  default     = "db.t3.micro"
+
+  validation {
+    condition     = can(regex("^db\\.", var.db_instance_class))
+    error_message = "Database instance class must start with 'db.'"
+  }
+}
+
+variable "db_allocated_storage" {
+  description = "The allocated storage in gibibytes for the RDS instance"
+  type        = number
+  default     = 20
+
+  validation {
+    condition     = var.db_allocated_storage >= 20 && var.db_allocated_storage <= 65536
+    error_message = "Allocated storage must be between 20 and 65536 GiB."
+  }
+}
+
+variable "db_security_group" {
+  description = "Security group ID(s) to associate with the RDS instance"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for sg in var.db_security_group : can(regex("^sg-", sg))
+    ])
+    error_message = "Security group IDs must start with 'sg-'."
+  }
+}
+
+variable "psql_family" {
+  description = "Postrgress Database family"
+  type        = string
+  default     = "postgres16"
+}
+
+variable "psql_major_engine_version" {
+  description = "Postrgress Database engine version"
+  type        = string
+  default     = "16"
+}
+
+variable "backup_retention_period" {
+  description = "Number of days to retain backups"
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.backup_retention_period >= 0 && var.backup_retention_period <= 35
+    error_message = "Backup retention period must be between 0 and 35 days."
+  }
+}
