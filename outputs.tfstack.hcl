@@ -235,3 +235,29 @@ output "s3_public_metadata" {
     arn  = component.s3_bucket.public_bucket_arn
   }
 }
+
+# --- RDS Output ---
+output "database_metadata" {
+  description = "Output of RDS database configuration and resources"
+  sensitive   = true
+  type = object({
+    endpoint         = string
+    address          = string
+    port             = number
+    db_name          = string
+    db_username      = string
+    instance_id      = string
+    k8s_service_fqdn = string
+    k8s_namespace    = string
+  })
+  value = {
+    endpoint         = component.database.db_endpoint
+    address          = component.database.db_address
+    port             = component.database.db_port
+    db_name          = component.database.db_name
+    db_username      = component.database.db_username
+    instance_id      = component.database.db_instance_id
+    k8s_service_fqdn = component.database.k8s_db_service
+    k8s_namespace    = component.database.db_namespace
+  }
+}
