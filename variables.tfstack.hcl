@@ -161,3 +161,8 @@ variable "backup_retention_period" {
   description = "Number of days to retain backups"
   type        = number
 }
+
+variable "auth0_tenant" {
+  description = "The Auth0 tenant URL"
+  type        = string
+}

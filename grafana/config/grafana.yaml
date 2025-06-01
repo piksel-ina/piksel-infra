@@ -4,12 +4,12 @@ grafana:
       name: auth0
       enabled: true
       allow_sign_up: true
-      client_id: ${client-id}
-      client_secret: ${client-secret}
+      client_id: ${client_id}
+      client_secret: ${client_secret}
       scopes: openid profile email groups
-      auth_url: ${auth0-tenant}/authorize
-      token_url: ${auth0-tenant}/oauth/token
-      api_url: ${auth0-tenant}/userinfo
+      auth_url: ${auth0_tenant}/authorize
+      token_url: ${auth0_tenant}/oauth/token
+      api_url: ${auth0_tenant}/userinfo
       use_pkce: true
       allowed_groups: "Argo Users"
       # We only have one tier of users.`Viewer`is the other possible value
