@@ -143,3 +143,21 @@ variable "externaldns_crossaccount_role_arn" {
   description = "The ARN of the cross-account IAM role in Route53 account"
   type        = string
 }
+
+# --- Database Variables ---
+variable "db_instance_class" {
+  description = "Database instance class (e.g., db.t3.micro, db.t3.small)"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "The allocated storage in gibibytes for the RDS instance"
+  type        = number
+  default     = 20
+}
+
+variable "backup_retention_period" {
+  description = "Number of days to retain backups"
+  type        = number
+}

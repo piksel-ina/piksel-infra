@@ -3,7 +3,7 @@ locals {
   private_subnets = var.private_subnets_ids
   cluster_name    = var.cluster_name
   project         = lower(var.project)
-  db_username     = "${local.project}-${lower(var.environment)}}"
+  db_username     = replace("${local.project}_${lower(var.environment)}", "/[^a-zA-Z0-9_]/", "")
 }
 
 # --- Generates 32-character random password with special characters ---
@@ -58,7 +58,7 @@ module "db" {
   create_db_subnet_group = true
   subnet_ids             = local.private_subnets
 
-  vpc_security_group_ids = [var.db_security_group]
+  vpc_security_group_ids = var.db_security_group
 
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
@@ -92,21 +92,4 @@ resource "kubernetes_service" "db_endpoint" {
     }
   }
   wait_for_load_balancer = false
-}
-
-# --- Creates a secret in the Argo namespace containing DB credentials ---
-resource "kubernetes_secret" "db_admin_argo" {
-  metadata {
-    name      = "db-admin"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
-  }
-
-  data = {
-    postgres-username = local.db_username
-    postgres-password = aws_secretsmanager_secret_version.db_password.secret_string
-    username          = local.db_username
-    password          = aws_secretsmanager_secret_version.db_password.secret_string
-  }
-
-  type = "Opaque"
 }
