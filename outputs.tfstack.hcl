@@ -170,7 +170,7 @@ output "karpenter_metadata" {
     node_class_name         = optional(string)
     node_pool_name          = optional(string)
     # node_pool_gpu_name      = optional(string)
-    node_class_status       = optional(map(string))
+    node_class_status = optional(map(string))
   })
   value = {
     iam_role_arn            = component.karpenter.karpenter_iam_role_arn
@@ -180,7 +180,7 @@ output "karpenter_metadata" {
     node_class_name         = component.karpenter.karpenter_node_class_name
     node_pool_name          = component.karpenter.karpenter_node_pool_name
     # node_pool_gpu_name      = component.karpenter.karpenter_node_pool_gpu_name
-    node_class_status       = component.karpenter.karpenter_node_class_status
+    node_class_status = component.karpenter.karpenter_node_class_status
   }
 }
 
@@ -204,5 +204,18 @@ output "external_dns_metadata" {
     helm_release_namespace = component.addons.external_dns_helm_release_namespace
     helm_release_status    = component.addons.external_dns_helm_release_status
     helm_chart_version     = component.addons.external_dns_helm_chart_version
+  }
+}
+
+# --- Public S3 Bucket ---
+output "s3_public_metadata" {
+  description = "Output of S3 bucket"
+  type = object({
+    name = string
+    arn  = string
+  })
+  value = {
+    name = component.s3_bucket.public_bucket_name
+    arn  = component.s3_bucket.public_bucket_arn
   }
 }

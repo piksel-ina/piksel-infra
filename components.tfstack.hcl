@@ -138,3 +138,18 @@ component "addons" {
   }
 
 }
+
+component "s3_bucket" {
+  source = "./aws-s3-bucket"
+
+  inputs = {
+    project      = var.project
+    environment  = var.environment
+    default_tags = var.default_tags
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}
