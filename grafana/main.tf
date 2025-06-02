@@ -28,7 +28,7 @@ resource "random_password" "grafana_random_string" {
 # --- Store database password in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "grafana_password" {
   name        = "${local.prefix}-grafana-password"
-  description = "Database password for Grafana"
+  description = "Password for Grafana database connection"
 
   tags = local.tags
 }

@@ -15,7 +15,10 @@ resource "random_password" "db_random_string" {
 
 # --- Creates a secret in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "db_password" {
-  name = "db-password"
+  name        = "db-password"
+  description = "Password to access database"
+
+  tags = local.tags
 }
 
 # --- Stores the generated password in that secret ---
