@@ -41,7 +41,7 @@ deployment "development" {
     db_instance_class                 = "db.t3.micro"
     db_allocated_storage              = 20
     backup_retention_period           = 14
-    auth0_tenant                      = "dev-gbkuo5ma2mtfkm2i.us.auth0.com"
+    auth0_tenant                      = "dev-fkw62b73v5emomm7.us.auth0.com"
   }
 }
 

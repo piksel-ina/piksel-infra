@@ -1,5 +1,5 @@
 locals {
-  prefix      = "${lower(var.project)}_${lower(var.environment)}"
+  prefix      = "${lower(var.project)}-${lower(var.environment)}"
   tags        = var.default_tags
   eks_cluster = var.cluster_name
 }
@@ -39,9 +39,9 @@ resource "aws_secretsmanager_secret_version" "grafana_password" {
 
 }
 
-# --- This secret is issued by external services ---
+# --- This secret was issued through AWS CLI ---
 data "aws_secretsmanager_secret_version" "grafana_client_secret" {
-  secret_id = "grafana-client-and-secret"
+  secret_id = "grafana-auth0-client-secret"
 }
 
 # --- Generate secure password for Grafana admin user ---
