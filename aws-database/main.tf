@@ -15,7 +15,7 @@ resource "random_password" "db_random_string" {
 
 # --- Creates a secret in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "db_password" {
-  name        = "db-password"
+  name        = "database-password"
   description = "Password to access database"
 
   tags = local.tags
@@ -29,7 +29,7 @@ resource "aws_secretsmanager_secret_version" "db_password" {
 
 # --- Defines a group of private subnets where RDS instance will reside ---
 resource "aws_db_subnet_group" "default" {
-  name       = "db"
+  name       = "database"
   subnet_ids = local.private_subnets
 }
 
@@ -76,7 +76,7 @@ module "db" {
 # --- Creates a Kubernetes namespace ---
 resource "kubernetes_namespace" "db" {
   metadata {
-    name = "db"
+    name = "database"
   }
 }
 
