@@ -40,6 +40,11 @@ variable "auth0_tenant" {
   description = "The Auth0 tenant URL"
 }
 
+variable "k8s_db_service" {
+  description = "Kubernetes database service FQDN"
+  type        = string
+}
+
 variable "aws_region" {
   type    = string
   default = "ap-southeast-3"

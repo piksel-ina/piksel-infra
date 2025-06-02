@@ -94,7 +94,7 @@ resource "kubernetes_secret" "jupyterhub" {
       jhub_db_name     = "jupyterhub"
       jhub_db_username = "jupyterhub"
       jhub_db_password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
-      jhub_db_hostname = "db-endpoint.db.svc.cluster.local"
+      jhub_db_hostname = var.k8s_db_service
 
       # Secrets
       jhub_hub_cookie_secret_token = random_id.jhub_hub_cookie_secret_token.hex
