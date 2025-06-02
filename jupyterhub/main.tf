@@ -81,7 +81,7 @@ resource "kubernetes_secret" "jupyterhub" {
   data = {
     "values.yaml" = templatefile("${path.module}/config/jupyterhub.yaml", {
       region    = var.aws_region
-      host_name = var.jhub_subdomain
+      host_name = local.jhub_subdomain
 
       # auth
       jhub_auth_client_id     = split(":", data.aws_secretsmanager_secret_version.hub_client_secret.secret_string)[0]
@@ -162,7 +162,7 @@ module "iam_eks_role_hub_reader" {
 
   oidc_providers = {
     main = {
-      provider_arn               = module.eks.oidc_provider_arn
+      provider_arn               = var.eks_oidc_provider_arn
       namespace_service_accounts = ["${kubernetes_namespace.hub.metadata[0].name}:user-read"]
     }
   }

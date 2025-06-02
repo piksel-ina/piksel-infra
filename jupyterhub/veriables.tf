@@ -20,9 +20,10 @@ variable "default_tags" {
   default     = {}
 }
 
-variable "jhub_subdomain" {
-  description = "Subdomain for JupyterHub"
-  type        = string
+variable "subdomains" {
+    description = "Subdomains for the EKS cluster"
+    type        = list(string)
+    default     = []
 }
 
 variable "eks_oidc_provider_arn" {
