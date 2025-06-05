@@ -42,6 +42,12 @@ deployment "development" {
     db_allocated_storage              = 20
     backup_retention_period           = 14
     auth0_tenant                      = "dev-fkw62b73v5emomm7.us.auth0.com"
+    public_hosted_zone_id             = upstream_input.shared.zone_ids["dev.piksel.big.go.id"]
+    read_external_buckets = [
+      "usgs-landsat",
+      "copernicus-dem-30m",
+      "e84-earth-search-sentinel-data"
+    ]
   }
 }
 

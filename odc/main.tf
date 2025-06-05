@@ -4,7 +4,7 @@ locals {
   odc_namespace        = "open-datacube"
   read_buckets         = concat(var.read_external_buckets, var.internal_buckets)
   service_account_name = "odc-data-reader"
-  subdomain            = local.subdomains[0] # The public domain must be the first in the list
+  subdomain            = var.subdomains[0] # The public domain must be the first in the list
 }
 
 # --- Creates Kubernetes namespace for ODC ---

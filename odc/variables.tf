@@ -14,6 +14,12 @@ variable "default_tags" {
   default     = {}
 }
 
+variable "subdomains" {
+  description = "List of subdomains for the project"
+  type        = list(string)
+  default     = []
+}
+
 variable "eks_oidc_provider_arn" {
   description = "The OIDC issuer ARN for the EKS cluster"
   type        = string

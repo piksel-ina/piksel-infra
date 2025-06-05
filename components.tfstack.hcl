@@ -235,3 +235,27 @@ component "odc-stac" {
     random     = provider.random.this
   }
 }
+
+component "odc" {
+  source = "./odc"
+
+  inputs = {
+    project               = var.project
+    environment           = var.environment
+    default_tags          = var.default_tags
+    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    subdomains            = var.subdomains
+    public_hosted_zone_id = var.public_hosted_zone_id
+    internal_buckets      = [component.s3_bucket.public_bucket_name]
+    read_external_buckets = var.read_external_buckets
+  }
+
+  providers = {
+    aws          = provider.aws.configurations
+    aws.virginia = provider.aws.virginia
+    kubernetes   = provider.kubernetes.configurations
+    random       = provider.random.this
+  }
+
+}
+
