@@ -118,6 +118,20 @@ module "iam_eks_role_bucket" {
 }
 
 # --- Set up a cloudfront cache for the `ows` endpoint ---
+# Create a custom certificate
+resource "aws_acm_certificate" "ows_cache" {
+  provider          = aws.virginia
+  domain_name       = "ows.${local.subdomain}"
+  validation_method = "DNS"
+
+  tags = merge(
+    local.tags,
+    {
+      Purpose = "ows-cache"
+    }
+  )
+}
+
 # --- Create Role to assume the cross-account role in the shared account ---
 resource "aws_iam_role" "odc_cloudfront_role" {
   name = "odc-cloudfront-role"
@@ -128,7 +142,7 @@ resource "aws_iam_role" "odc_cloudfront_role" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::<your-spoke-account-id>:root"
+          AWS = "arn:aws:iam::${var.account_id}:root"
         }
         Action = "sts:AssumeRole"
       }
@@ -152,22 +166,9 @@ resource "aws_iam_role_policy" "odc_cloudfront_assume_crossaccount" {
   })
 }
 
-# Create a custom certificate
-resource "aws_acm_certificate" "ows_cache" {
-  provider          = aws.virginia
-  domain_name       = "ows.${local.subdomain}"
-  validation_method = "DNS"
-
-  tags = merge(
-    local.tags,
-    {
-      Purpose = "ows-cache"
-    }
-  )
-}
-
 # Validation of the certificate
 resource "aws_route53_record" "ows_certificate" {
+  provider = aws.cross_account
   for_each = {
     for dvo in aws_acm_certificate.ows_cache.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -283,12 +284,12 @@ resource "aws_cloudfront_distribution" "ows_cache" {
   )
 }
 
-
-# Set up DNS for the cloudfront distribution
+# --- Set up DNS records for the cloudfront distribution ---
 resource "aws_route53_record" "ows_cache" {
-  zone_id = var.public_hosted_zone_id
-  name    = "ows"
-  type    = "A"
+  provider = aws.cross_account
+  zone_id  = var.public_hosted_zone_id
+  name     = "ows"
+  type     = "A"
 
   alias {
     name                   = aws_cloudfront_distribution.ows_cache.domain_name

@@ -32,17 +32,18 @@ deployment "development" {
       "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
       "dev.piksel.internal" = upstream_input.shared.zone_ids["dev.piksel.internal"]
     }
-    transit_gateway_id                = upstream_input.shared.transit_gateway_id
-    vpc_cidr_shared                   = "10.0.0.0/16"
-    inbound_resolver_ip_addresses     = upstream_input.shared.inbound_resolver_ips
-    sso-admin-role-arn                = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
-    subdomains                        = ["dev.piksel.big.go.id", "dev.piksel.internal"]
-    externaldns_crossaccount_role_arn = upstream_input.shared.externaldns_route53_policy_arns["dev"]
-    db_instance_class                 = "db.t3.micro"
-    db_allocated_storage              = 20
-    backup_retention_period           = 14
-    auth0_tenant                      = "dev-fkw62b73v5emomm7.us.auth0.com"
-    public_hosted_zone_id             = upstream_input.shared.zone_ids["dev.piksel.big.go.id"]
+    transit_gateway_id                   = upstream_input.shared.transit_gateway_id
+    vpc_cidr_shared                      = "10.0.0.0/16"
+    inbound_resolver_ip_addresses        = upstream_input.shared.inbound_resolver_ips
+    sso-admin-role-arn                   = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
+    subdomains                           = ["dev.piksel.big.go.id", "dev.piksel.internal"]
+    externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
+    db_instance_class                    = "db.t3.micro"
+    db_allocated_storage                 = 20
+    backup_retention_period              = 14
+    auth0_tenant                         = "dev-fkw62b73v5emomm7.us.auth0.com"
+    public_hosted_zone_id                = upstream_input.shared.zone_ids["dev.piksel.big.go.id"]
+    odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
     read_external_buckets = [
       "usgs-landsat",
       "copernicus-dem-30m",
@@ -51,11 +52,11 @@ deployment "development" {
   }
 }
 
-# --- Auto-approve plans for shared and dev---
+# --- Auto-approve plans for dev ---
 orchestrate "auto_approve" "safe_plan_dev" {
   check {
     condition = context.plan.deployment == deployment.development
-    reason    = "Only automatically approved plans that are for the shared or dev deployment."
+    reason    = "Only automatically approved plans that are for the dev deployment."
   }
   check {
     condition = context.success

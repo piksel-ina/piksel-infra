@@ -240,21 +240,24 @@ component "odc" {
   source = "./odc"
 
   inputs = {
-    project               = var.project
-    environment           = var.environment
-    default_tags          = var.default_tags
-    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
-    subdomains            = var.subdomains
-    public_hosted_zone_id = var.public_hosted_zone_id
-    internal_buckets      = [component.s3_bucket.public_bucket_name]
-    read_external_buckets = var.read_external_buckets
+    account_id                           = component.vpc.account_id
+    project                              = var.project
+    environment                          = var.environment
+    default_tags                         = var.default_tags
+    eks_oidc_provider_arn                = component.eks-cluster.cluster_oidc_provider_arn
+    subdomains                           = var.subdomains
+    public_hosted_zone_id                = var.public_hosted_zone_id
+    internal_buckets                     = [component.s3_bucket.public_bucket_name]
+    read_external_buckets                = var.read_external_buckets
+    odc_cloudfront_crossaccount_role_arn = var.odc_cloudfront_crossaccount_role_arn
   }
 
   providers = {
-    aws          = provider.aws.configurations
-    aws.virginia = provider.aws.virginia
-    kubernetes   = provider.kubernetes.configurations
-    random       = provider.random.this
+    aws               = provider.aws.configurations
+    aws.virginia      = provider.aws.virginia
+    aws.cross_account = provider.aws.cross_account
+    kubernetes        = provider.kubernetes.configurations
+    random            = provider.random.this
   }
 
 }

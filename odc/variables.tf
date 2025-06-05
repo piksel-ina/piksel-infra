@@ -14,6 +14,11 @@ variable "default_tags" {
   default     = {}
 }
 
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}
+
 variable "subdomains" {
   description = "List of subdomains for the project"
   type        = list(string)
