@@ -219,3 +219,19 @@ component "jupyterhub" {
     random     = provider.random.this
   }
 }
+
+component "odc-stac" {
+  source = "./odc-stac"
+
+  inputs = {
+    project      = var.project
+    environment  = var.environment
+    default_tags = var.default_tags
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+    random     = provider.random.this
+  }
+}

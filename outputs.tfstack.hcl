@@ -231,3 +231,20 @@ output "grafana_metadata" {
     oauth_client_secret_arn = component.grafana.grafana_oauth_client_secret_arn
   }
 }
+
+# --- STAC Outputs ---
+output "stac_metadata" {
+  description = "Output of STAC configuration and resources"
+  type = object({
+    namespace            = string
+    write_secret_arn     = string
+    read_secret_arn      = string
+    read_k8s_secret_name = string
+  })
+  value = {
+    namespace            = component.odc-stac.stac_namespace
+    write_secret_arn     = component.odc-stac.stac_write_secret_arn
+    read_secret_arn      = component.odc-stac.stac_read_secret_arn
+    read_k8s_secret_name = component.odc-stac.stacread_k8s_secret_name
+  }
+}

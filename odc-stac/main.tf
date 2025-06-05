@@ -1,7 +1,7 @@
 locals {
   prefix         = "${lower(var.project)}-${lower(var.environment)}"
   tags           = var.default_tags
-  stac_namespace = "odc_stac"
+  stac_namespace = "odc-stac"
 }
 
 # --- Creates Kubernetes namespace for ODC SpatioTemporal Asset Catalog  ---
