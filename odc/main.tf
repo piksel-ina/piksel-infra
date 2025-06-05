@@ -118,6 +118,40 @@ module "iam_eks_role_bucket" {
 }
 
 # --- Set up a cloudfront cache for the `ows` endpoint ---
+# --- Create Role to assume the cross-account role in the shared account ---
+resource "aws_iam_role" "odc_cloudfront_role" {
+  name = "odc-cloudfront-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::<your-spoke-account-id>:root"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# --- Attach the policy to the role ---
+resource "aws_iam_role_policy" "odc_cloudfront_assume_crossaccount" {
+  role = aws_iam_role.odc_cloudfront_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = var.odc_cloudfront_crossaccount_role_arn
+      }
+    ]
+  })
+}
+
 # Create a custom certificate
 resource "aws_acm_certificate" "ows_cache" {
   provider          = aws.virginia
