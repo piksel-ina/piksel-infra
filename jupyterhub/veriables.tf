@@ -21,9 +21,9 @@ variable "default_tags" {
 }
 
 variable "subdomains" {
-    description = "Subdomains for the EKS cluster"
-    type        = list(string)
-    default     = []
+  description = "Subdomains for the EKS cluster"
+  type        = list(string)
+  default     = []
 }
 
 variable "eks_oidc_provider_arn" {
