@@ -286,3 +286,18 @@ component "argo-workflow" {
     random     = provider.random.this
   }
 }
+
+component "terria" {
+  source = "./terria"
+
+  inputs = {
+    project      = var.project
+    environment  = var.environment
+    default_tags = var.default_tags
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}

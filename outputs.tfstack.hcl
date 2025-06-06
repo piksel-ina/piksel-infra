@@ -301,3 +301,20 @@ output "flux_metadata" {
     webhook_secret_name = component.addons.slack_webhook_secret_name
   }
 }
+
+# --- Terria Outputs ---
+output "terria_metadata" {
+  description = "Output of Terria configuration and resources"
+  type = object({
+    bucket_name     = string
+    iam_user_name   = string
+    k8s_secret_name = string
+    k8s_namespace   = string
+  })
+  value = {
+    bucket_name     = component.terria.bucket_name
+    iam_user_name   = component.terria.iam_user_name
+    k8s_secret_name = component.terria.k8s_secret_name
+    k8s_namespace   = component.terria.k8s_namespace
+  }
+}
