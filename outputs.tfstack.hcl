@@ -265,3 +265,26 @@ output "odc_metadata" {
     data_reader_role_arn      = component.odc.odc_data_reader_role_arn
   }
 }
+
+# --- Argo Workflow Outputs ---
+output "argo_workflow_metadata" {
+  description = "Output of Argo Workflow configuration and resources"
+  type = object({
+    artifact_bucket_name          = string
+    namespace                     = string
+    artifact_iam_role_arn         = string
+    artifact_service_account_name = string
+    artifact_iam_policy_arn       = string
+    db_password_secret_arn        = string
+    k8s_secret_name               = string
+  })
+  value = {
+    artifact_bucket_name          = component.argo-workflow.argo_artifact_bucket_name
+    namespace                     = component.argo-workflow.argo_workflow_namespace
+    artifact_iam_role_arn         = component.argo-workflow.argo_artifact_iam_role_arn
+    artifact_service_account_name = component.argo-workflow.argo_artifact_service_account_name
+    artifact_iam_policy_arn       = component.argo-workflow.argo_artifact_iam_policy_arn
+    db_password_secret_arn        = component.argo-workflow.argo_db_password_secret_arn
+    k8s_secret_name               = component.argo-workflow.argo_k8s_secret_name
+  }
+}
