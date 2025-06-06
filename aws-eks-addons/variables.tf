@@ -39,3 +39,13 @@ variable "aws_region" {
 variable "default_tags" {
   description = "Default tags"
 }
+
+variable "project" {
+  description = "The name of the project"
+  type        = string
+}
+
+variable "environment" {
+  description = "The name of the environment"
+  type        = string
+}

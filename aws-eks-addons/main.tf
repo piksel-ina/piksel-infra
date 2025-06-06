@@ -179,3 +179,35 @@ resource "helm_release" "external_dns" {
   force_update  = false
   recreate_pods = false
 }
+
+# --- Flux CD Configuration ---
+locals {
+  flux_namespace      = "flux-system"
+  webhook_secret_name = "flux-notification-slack-webhook-secret"
+}
+
+resource "kubernetes_namespace" "flux_system" {
+  metadata {
+    name = local.flux_namespace
+    labels = {
+      project     = var.project
+      environment = var.environment
+      name        = local.flux_namespace
+    }
+  }
+}
+
+# --- Fetch Slack Webhook URL from AWS Secrets Manager, created using AWS CLI ---
+data "aws_secretsmanager_secret_version" "slack_webhook" {
+  secret_id = local.webhook_secret_name
+}
+
+resource "kubernetes_secret" "slack_webhook" {
+  metadata {
+    name      = "slack-webhook"
+    namespace = kubernetes_namespace.flux_system.metadata[0].name
+  }
+  data = {
+    "address" = data.aws_secretsmanager_secret_version.slack_webhook.secret_string
+  }
+}
