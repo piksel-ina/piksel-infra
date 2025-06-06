@@ -185,115 +185,116 @@ resource "aws_route53_record" "ows_certificate" {
   zone_id         = var.public_hosted_zone_id
 }
 
-resource "aws_acm_certificate_validation" "ows_certificate" {
-  provider                = aws.virginia
-  certificate_arn         = aws_acm_certificate.ows_cache.arn
-  validation_record_fqdns = [for record in aws_route53_record.ows_certificate : record.fqdn]
-}
+# --- Need to wait for the subdomain delegation to finish ---
+# resource "aws_acm_certificate_validation" "ows_certificate" {
+#   provider                = aws.virginia
+#   certificate_arn         = aws_acm_certificate.ows_cache.arn
+#   validation_record_fqdns = [for record in aws_route53_record.ows_certificate : record.fqdn]
+# }
 
-# Create a CloudFront distribution
-resource "aws_cloudfront_distribution" "ows_cache" {
-  depends_on = [aws_acm_certificate_validation.ows_certificate]
-  origin {
-    domain_name = "ows-uncached.${local.subdomain}"
-    origin_id   = "owsOrigin"
+# # Create a CloudFront distribution
+# resource "aws_cloudfront_distribution" "ows_cache" {
+#   depends_on = [aws_acm_certificate_validation.ows_certificate]
+#   origin {
+#     domain_name = "ows-uncached.${local.subdomain}"
+#     origin_id   = "owsOrigin"
 
-    custom_origin_config {
-      http_port                = 80
-      https_port               = 443
-      origin_protocol_policy   = "https-only"
-      origin_ssl_protocols     = ["TLSv1.2"]
-      origin_keepalive_timeout = 60
-      origin_read_timeout      = 60
-    }
+#     custom_origin_config {
+#       http_port                = 80
+#       https_port               = 443
+#       origin_protocol_policy   = "https-only"
+#       origin_ssl_protocols     = ["TLSv1.2"]
+#       origin_keepalive_timeout = 60
+#       origin_read_timeout      = 60
+#     }
 
-    # Here is the custom header definition
-    custom_header {
-      name  = "X-Public-Host"
-      value = "ows.${local.subdomain}"
-    }
-  }
+#     # Here is the custom header definition
+#     custom_header {
+#       name  = "X-Public-Host"
+#       value = "ows.${local.subdomain}"
+#     }
+#   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = ""
-  aliases = [
-    "ows.${local.subdomain}"
-  ]
+#   enabled             = true
+#   is_ipv6_enabled     = true
+#   default_root_object = ""
+#   aliases = [
+#     "ows.${local.subdomain}"
+#   ]
 
-  default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = "owsOrigin"
+#   default_cache_behavior {
+#     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+#     cached_methods   = ["GET", "HEAD", "OPTIONS"]
+#     target_origin_id = "owsOrigin"
 
-    forwarded_values {
-      query_string = true
-      headers = [
-        "Origin",
-        "Access-Control-Request-Headers",
-        "Access-Control-Request-Method",
-      ]
-      cookies {
-        forward = "none"
-      }
-    }
+#     forwarded_values {
+#       query_string = true
+#       headers = [
+#         "Origin",
+#         "Access-Control-Request-Headers",
+#         "Access-Control-Request-Method",
+#       ]
+#       cookies {
+#         forward = "none"
+#       }
+#     }
 
-    viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-  }
+#     viewer_protocol_policy = "redirect-to-https"
+#     min_ttl                = 0
+#     default_ttl            = 3600
+#     max_ttl                = 86400
+#   }
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
+#   restrictions {
+#     geo_restriction {
+#       restriction_type = "none"
+#     }
+#   }
 
-  viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.ows_cache.arn
-    ssl_support_method  = "sni-only"
-  }
+#   viewer_certificate {
+#     acm_certificate_arn = aws_acm_certificate.ows_cache.arn
+#     ssl_support_method  = "sni-only"
+#   }
 
-  # Don't cache 500, 502, 503 or 504 errors
-  custom_error_response {
-    error_caching_min_ttl = 0
-    error_code            = 500
-  }
+#   # Don't cache 500, 502, 503 or 504 errors
+#   custom_error_response {
+#     error_caching_min_ttl = 0
+#     error_code            = 500
+#   }
 
-  custom_error_response {
-    error_caching_min_ttl = 0
-    error_code            = 502
-  }
+#   custom_error_response {
+#     error_caching_min_ttl = 0
+#     error_code            = 502
+#   }
 
-  custom_error_response {
-    error_caching_min_ttl = 0
-    error_code            = 503
-  }
+#   custom_error_response {
+#     error_caching_min_ttl = 0
+#     error_code            = 503
+#   }
 
-  custom_error_response {
-    error_caching_min_ttl = 0
-    error_code            = 504
-  }
+#   custom_error_response {
+#     error_caching_min_ttl = 0
+#     error_code            = 504
+#   }
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "ows-cache"
-    }
-  )
-}
+#   tags = merge(
+#     local.tags,
+#     {
+#       Name = "ows-cache"
+#     }
+#   )
+# }
 
-# --- Set up DNS records for the cloudfront distribution ---
-resource "aws_route53_record" "ows_cache" {
-  provider = aws.cross_account
-  zone_id  = var.public_hosted_zone_id
-  name     = "ows"
-  type     = "A"
+# # --- Set up DNS records for the cloudfront distribution ---
+# resource "aws_route53_record" "ows_cache" {
+#   provider = aws.cross_account
+#   zone_id  = var.public_hosted_zone_id
+#   name     = "ows"
+#   type     = "A"
 
-  alias {
-    name                   = aws_cloudfront_distribution.ows_cache.domain_name
-    zone_id                = aws_cloudfront_distribution.ows_cache.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = aws_cloudfront_distribution.ows_cache.domain_name
+#     zone_id                = aws_cloudfront_distribution.ows_cache.hosted_zone_id
+#     evaluate_target_health = false
+#   }
+# }
