@@ -32,3 +32,28 @@ output "argo_k8s_secret_name" {
   description = "The name of the Kubernetes secret containing the Auth0 client secret."
   value       = kubernetes_secret.argo_server_sso.metadata[0].name
 }
+
+output "argo_artifact_policy_arn_for_user" {
+  description = "The ARN of the policy that allows read/write access to the Argo artifact bucket."
+  value       = aws_iam_policy.argo_artifact_read_write_policy_more.arn
+}
+
+output "argo_artifact_role_name_for_user" {
+  description = "The IAM role name for Argo artifact read/write."
+  value       = aws_iam_role.argo_artifact_read_write_role_more.name
+}
+
+output "argo_artifact_role_arn_for_user" {
+  description = "The IAM role ARN for Argo artifact read/write."
+  value       = aws_iam_role.argo_artifact_read_write_role_more.arn
+}
+
+output "argo_artifact_user_name" {
+  description = "The IAM user name for Argo artifact read/write."
+  value       = aws_iam_user.argo_artifact_read_write_user.name
+}
+
+output "argo_artifact_k8s_secret_name" {
+  description = "Kubernetes secret containing Argo artifact user credentials."
+  value       = kubernetes_secret.argo_artifact_read_write.metadata[0].name
+}

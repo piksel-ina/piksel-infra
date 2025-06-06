@@ -277,6 +277,10 @@ output "argo_workflow_metadata" {
     artifact_iam_policy_arn       = string
     db_password_secret_arn        = string
     k8s_secret_name               = string
+    user_artifact_policy_arn      = string
+    user_artifact_role_name       = string
+    user_artifact_role_arn        = string
+    user_name                     = string
   })
   value = {
     artifact_bucket_name          = component.argo-workflow.argo_artifact_bucket_name
@@ -286,6 +290,10 @@ output "argo_workflow_metadata" {
     artifact_iam_policy_arn       = component.argo-workflow.argo_artifact_iam_policy_arn
     db_password_secret_arn        = component.argo-workflow.argo_db_password_secret_arn
     k8s_secret_name               = component.argo-workflow.argo_k8s_secret_name
+    user_artifact_policy_arn      = component.argo-workflow.argo_artifact_policy_arn_for_user
+    user_artifact_role_name       = component.argo-workflow.argo_artifact_role_name_for_user
+    user_artifact_role_arn        = component.argo-workflow.argo_artifact_role_arn_for_user
+    user_name                     = component.argo-workflow.argo_artifact_user_name
   }
 }
 
