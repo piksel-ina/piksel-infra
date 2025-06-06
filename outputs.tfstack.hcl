@@ -248,3 +248,20 @@ output "stac_metadata" {
     read_k8s_secret_name = component.odc-stac.stacread_k8s_secret_name
   }
 }
+
+# --- ODC Outputs ---
+output "odc_metadata" {
+  description = "Output of ODC configuration and resources"
+  type = object({
+    namespace                 = string
+    write_password_secret_arn = string
+    read_password_secret_arn  = string
+    data_reader_role_arn      = string
+  })
+  value = {
+    namespace                 = component.odc.odc_namespace
+    write_password_secret_arn = component.odc.odc_write_password_secret_arn
+    read_password_secret_arn  = component.odc.odc_read_password_secret_arn
+    data_reader_role_arn      = component.odc.data_reader_role_arn
+  }
+}
