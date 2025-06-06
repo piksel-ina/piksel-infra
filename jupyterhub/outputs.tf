@@ -13,6 +13,12 @@ output "jupyterhub_db_secret_arn" {
   value       = aws_secretsmanager_secret.jupyterhub_password.arn
 }
 
+output "jupyterhub_db_password" {
+  description = "The JupyterHub database password"
+  value       = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+  sensitive   = true
+}
+
 output "jupyterhub_irsa_arn" {
   description = "IAM Role ARN for JupyterHub user-read service account (IRSA)"
   value       = module.iam_eks_role_hub_reader.iam_role_arn

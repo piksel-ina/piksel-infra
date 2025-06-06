@@ -28,6 +28,12 @@ output "grafana_db_password_secret_arn" {
   value       = aws_secretsmanager_secret.grafana_password.arn
 }
 
+output "grafana_db_password" {
+  description = "The Grafana database password."
+  value       = aws_secretsmanager_secret_version.grafana_password.secret_string
+  sensitive   = true
+}
+
 output "grafana_oauth_client_secret_arn" {
   description = "The ARN of the AWS Secrets Manager secret for the Grafana OAuth client/secret."
   value       = data.aws_secretsmanager_secret_version.grafana_client_secret.arn

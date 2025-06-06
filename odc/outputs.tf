@@ -13,6 +13,18 @@ output "odc_read_password_secret_arn" {
   description = "Secrets Manager ARN for ODC read password"
 }
 
+output "odc_write_db_password" {
+  value       = aws_secretsmanager_secret_version.odc_write_password.secret_string
+  description = "ODC write database password"
+  sensitive   = true
+}
+
+output "odc_read_db_password" {
+  value       = aws_secretsmanager_secret_version.odc_read_password.secret_string
+  description = "ODC read database password"
+  sensitive   = true
+}
+
 # output "ows_cache_cloudfront_domain_name" {
 #   value       = aws_cloudfront_distribution.ows_cache.domain_name
 #   description = "CloudFront distribution domain name for ows cache"
