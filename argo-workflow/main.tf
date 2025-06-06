@@ -7,7 +7,7 @@ locals {
 }
 
 # --- Dedicated namespace for all Argo resources ---
-resource "kubernetes_namespace" "argo-workflow" {
+resource "kubernetes_namespace" "argo_workflow" {
   metadata {
     name = "argo-workflow"
     labels = {
@@ -47,7 +47,7 @@ data "aws_secretsmanager_secret_version" "argo_client_secret" {
 resource "kubernetes_secret" "argo_server_sso" {
   metadata {
     name      = "argo-client-secret"
-    namespace = kubernetes_namespace.argo.metadata[0].name
+    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     client-id     = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[0]
@@ -108,7 +108,7 @@ module "iam_eks_role_bucket" {
   oidc_providers = {
     main = {
       provider_arn               = var.eks_oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.argo.metadata[0].name}:${local.service_account_name}"]
+      namespace_service_accounts = ["${kubernetes_namespace.argo_workflow.metadata[0].name}:${local.service_account_name}"]
     }
   }
 
@@ -121,7 +121,7 @@ module "iam_eks_role_bucket" {
 resource "kubernetes_service_account" "argo_artifact" {
   metadata {
     name      = local.service_account_name
-    namespace = kubernetes_namespace.argo.metadata[0].name
+    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_eks_role_bucket.iam_role_arn
     }
@@ -133,7 +133,7 @@ resource "kubernetes_service_account" "argo_artifact" {
 resource "kubernetes_role_binding" "argo_artifact" {
   metadata {
     name      = "${local.service_account_name}-binding"
-    namespace = kubernetes_namespace.argo.metadata[0].name
+    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
   }
   role_ref {
     api_group = "rbac.authorization.k8s.io"
@@ -143,7 +143,7 @@ resource "kubernetes_role_binding" "argo_artifact" {
   subject {
     kind      = "ServiceAccount"
     name      = local.service_account_name
-    namespace = kubernetes_namespace.argo-workflow.metadata[0].name
+    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
   }
 }
 
@@ -151,7 +151,7 @@ resource "kubernetes_role_binding" "argo_artifact" {
 resource "kubernetes_secret" "argo_secret" {
   metadata {
     name      = "argo"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "argo"
@@ -164,7 +164,7 @@ resource "kubernetes_secret" "argo_secret" {
 resource "kubernetes_secret" "jupyterhub_secret" {
   metadata {
     name      = "jupyterhub"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "jupyterhub"
@@ -176,7 +176,7 @@ resource "kubernetes_secret" "jupyterhub_secret" {
 resource "kubernetes_secret" "grafana_secret" {
   metadata {
     name      = "grafana"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "grafana"
@@ -188,7 +188,7 @@ resource "kubernetes_secret" "grafana_secret" {
 resource "kubernetes_secret" "stacread_secret" {
   metadata {
     name      = "stacread"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "stacread"
@@ -200,7 +200,7 @@ resource "kubernetes_secret" "stacread_secret" {
 resource "kubernetes_secret" "stac_secret" {
   metadata {
     name      = "stac"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "stac"
@@ -212,7 +212,7 @@ resource "kubernetes_secret" "stac_secret" {
 resource "kubernetes_secret" "odcread_secret" {
   metadata {
     name      = "odcread"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "odcread"
@@ -224,7 +224,7 @@ resource "kubernetes_secret" "odcread_secret" {
 resource "kubernetes_secret" "odc_secret" {
   metadata {
     name      = "odc"
-    namespace = resource.kubernetes_namespace.argo.metadata[0].name
+    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
   }
   data = {
     username = "odc"
@@ -300,7 +300,7 @@ resource "kubernetes_secret" "odc_secret" {
 # resource "kubernetes_secret" "argo_artifact_read_write" {
 #   metadata {
 #     name      = "argo-artifact-read-write"
-#     namespace = kubernetes_namespace.argo.metadata[0].name
+#     namespace = kubernetes_namespace.argo_workflow.metadata[0].name
 #   }
 #   data = {
 #     access-key = aws_iam_access_key.argo_artifact_read_write_access_key.id

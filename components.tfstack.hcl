@@ -259,6 +259,28 @@ component "odc" {
     kubernetes        = provider.kubernetes.configurations
     random            = provider.random.this
   }
-
 }
 
+component "argo-workflow" {
+  source = "./argo-workflow"
+
+  inputs = {
+    project               = var.project
+    environment           = var.environment
+    cluster_name          = var.cluster_name
+    default_tags          = var.default_tags
+    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    jupyterhub_secret     = component.jupyterhub.jupyterhub_db_password
+    grafana_secret        = component.grafana.grafana_db_password
+    stacread_secret       = component.odc-stac.stac_read_db_password
+    stac_secret           = component.odc-stac.stac_write_db_password
+    odc_secret            = component.odc.odc_write_db_password
+    odcread_secret        = component.odc.odc_read_db_password
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+    random     = provider.random.this
+  }
+}

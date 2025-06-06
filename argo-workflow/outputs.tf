@@ -5,7 +5,7 @@ output "argo_artifact_bucket_name" {
 
 output "argo_workflow_namespace" {
   description = "The namespace for all Argo resources."
-  value       = kubernetes_namespace.argo-workflow.metadata[0].name
+  value       = kubernetes_namespace.argo_workflow.metadata[0].name
 }
 
 output "argo_artifact_iam_role_arn" {

@@ -236,18 +236,16 @@ output "grafana_metadata" {
 output "stac_metadata" {
   description = "Output of STAC configuration and resources"
   type = object({
-    namespace             = string
-    write_secret_arn      = string
-    read_secret_arn       = string
-    write_k8s_secret_name = string
-    read_k8s_secret_name  = string
+    namespace            = string
+    write_secret_arn     = string
+    read_secret_arn      = string
+    read_k8s_secret_name = string
   })
   value = {
-    namespace             = component.odc-stac.stac_namespace
-    write_secret_arn      = component.odc-stac.stac_write_secret_arn
-    read_secret_arn       = component.odc-stac.stac_read_secret_arn
-    write_k8s_secret_name = component.odc-stac.stacwrite_k8s_secret_name
-    read_k8s_secret_name  = component.odc-stac.stacread_k8s_secret_name
+    namespace            = component.odc-stac.stac_namespace
+    write_secret_arn     = component.odc-stac.stac_write_secret_arn
+    read_secret_arn      = component.odc-stac.stac_read_secret_arn
+    read_k8s_secret_name = component.odc-stac.stacread_k8s_secret_name
   }
 }
 
@@ -264,6 +262,6 @@ output "odc_metadata" {
     namespace                 = component.odc.odc_namespace
     write_password_secret_arn = component.odc.odc_write_password_secret_arn
     read_password_secret_arn  = component.odc.odc_read_password_secret_arn
-    data_reader_role_arn      = component.odc.data_reader_role_arn
+    data_reader_role_arn      = component.odc.odc_data_reader_role_arn
   }
 }
