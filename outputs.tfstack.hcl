@@ -288,3 +288,16 @@ output "argo_workflow_metadata" {
     k8s_secret_name               = component.argo-workflow.argo_k8s_secret_name
   }
 }
+
+# --- Flux Outputs ---
+output "flux_metadata" {
+  description = "Output of Flux configuration and resources"
+  type = object({
+    namespace           = string
+    webhook_secret_name = string
+  })
+  value = {
+    namespace           = component.addons.flux_namespace
+    webhook_secret_name = component.addons.slack_webhook_secret_name
+  }
+}

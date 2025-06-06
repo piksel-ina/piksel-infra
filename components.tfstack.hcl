@@ -123,6 +123,8 @@ component "addons" {
 
   inputs = {
     aws_region                        = var.aws_region
+    project                           = var.project
+    environment                       = var.environment
     cluster_name                      = var.cluster_name
     subdomains                        = var.subdomains
     oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
