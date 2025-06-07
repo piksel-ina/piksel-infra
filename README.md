@@ -2,9 +2,25 @@
 
 This repository contains the Infrastructure as Code (IaC) definitions, managed by [Terraform](https://www.terraform.io/), for the Piksel project's AWS infrastructure. It follows GitOps principles for managing deployments across different environments.
 
-## Developer Access
+## 1. Infrastructure Design
 
-### Add Secret to AWS Secrets Manager
+### 1.1. Network
+
+Piksel’s AWS infrastructure uses a hub-and-spoke network architecture, where a central “hub” account manages shared services like DNS, ECR, and network routing, while isolated “spoke” accounts (for environments such as dev, staging, and prod) run workloads. This design leverages AWS Transit Gateway to enable private, secure connectivity between accounts—especially for pulling container images from a centralized ECR—ensuring that traffic stays off the public internet.
+
+**Network Diagram:**
+
+<img src=".images/spoke-network.png" width="700" height="auto">
+
+For more details, see:
+
+[**🔗 Piksel Spoke Network Design**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/spoke-network-design.md)
+
+### 1.2. EKS Cluster
+
+## 2. Developer Access
+
+### 2.1. Add Secret to AWS Secrets Manager
 
 1. **Authenticate with AWS SSO**
    If you haven't configure any sso session, please follow this guide - [Configure SSO with Piksel URL](https://github.com/piksel-ina/piksel-document/blob/main/operations/02-AWS-identity-center-guide.md#aws-cli-setup-and-access)
