@@ -24,6 +24,13 @@ module "spoke_sg" {
       protocol    = "tcp"
       description = "Allow DNS TCP response from hub VPC"
       cidr_blocks = var.vpc_cidr_shared
+    },
+    {
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      description = "Allow HTTPS to ECR/S3 endpoints in hub VPC"
+      cidr_blocks = var.vpc_cidr_shared
     }
   ]
 
