@@ -16,7 +16,25 @@ For more details, see:
 
 [**🔗 Piksel Spoke Network Design**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/spoke-network-design.md)
 
-### 1.2. EKS Cluster
+### 1.2. EKS Cluster Design
+
+The Piksel EKS clusters are designed for scalability, security, and efficient operations within the spoke account VPCs. Key design aspects include:
+
+- **Managed Control Plane:** Utilizes AWS EKS for a managed, highly available Kubernetes control plane.
+- **Dynamic Node Provisioning:** Employs [Karpenter](https://karpenter.sh/) for efficient, just-in-time provisioning of EC2 nodes based on workload requirements, optimizing for cost and performance.
+- **Serverless Compute:** Leverages [AWS Fargate](https://aws.amazon.com/fargate/) profiles for running specific stateless workloads without managing underlying EC2 instances.
+- **Secure Pod Permissions:** Implements IAM Roles for Service Accounts (IRSA) to grant fine-grained AWS permissions directly to Kubernetes service accounts.
+- **Secrets Management:** Integrates securely with AWS Secrets Manager for managing sensitive information like API keys and database credentials.
+- **GitOps Application Deployment:** Cluster state and application deployments are managed declaratively via GitOps tooling (Flux CD) configured in the [piksel-gitops](https://github.com/piksel-ina/piksel-gitops) repository.
+- **Provisioning:** The Terraform code within _this repository_ is responsible for provisioning and managing the lifecycle of this EKS cluster design and its core AWS dependencies (VPC, IAM, RDS, S3, etc.).
+
+**EKS Cluster Diagram:**
+
+<img src=".images/eks-cluster-overview.png" width="700" height="auto">
+
+For a comprehensive overview of the cluster architecture, component interactions, security considerations, and detailed explanations, please refer to:
+
+**[🔗 EKS Cluster Design](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-cluster-design.md)** in the central documentation repository ([piksel-document](https://github.com/piksel-ina/piksel-document/tree/main)).
 
 ## 2. Developer Access
 
