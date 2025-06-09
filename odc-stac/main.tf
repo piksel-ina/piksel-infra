@@ -68,4 +68,3 @@ resource "kubernetes_secret" "stacread_namespace_secret" {
   }
   type = "Opaque"
 }
-

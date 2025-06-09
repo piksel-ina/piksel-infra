@@ -9,21 +9,17 @@ repos:
       - id: trailing-whitespace
         name: Remove trailing whitespace
 
-  # - repo: https://github.com/antonbabenko/pre-commit-terraform
-  #   rev: v1.99.0
-  #   hooks:
-  #     # - id: terraform_fmt
-  #     #   name: Format Terraform code
-  #     # - id: terraform_validate
-  #     #   name: Validate Terraform code
-  #     # - id: terraform_tflint
-  #     #   name: Lint Terraform code
-  #     # - id: terraform_docs
-  #     #   name: "Generate Documentation: Dev-env Documentation"
-  #     #   args:
-  #     #     - --hook-config=--path-to-file=README.md
-  #     #     - --hook-config=--add-to-existing-file=true
-  #     #   files: ^dev/.*\.tf$
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.99.0
+    hooks:
+      - id: terraform_fmt
+        name: Format Terraform code
+      - id: terraform_docs
+        name: "Generate Auto-Documentation"
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+        files: ^(aws-eks-cluster|aws-eks-addons)/.*\.tf$
   #     # - id: terraform_docs
   #     #   name: "Generate Documentation: Shared-env Documentation"
   #     #   args:
