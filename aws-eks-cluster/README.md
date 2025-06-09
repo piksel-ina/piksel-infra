@@ -66,55 +66,53 @@ For more detailed documentation, please refer to this documents:
 - [kube-system](https://github.com/piksel-ina/piksel-document/blob/main/architecture/kube-system.md)
 
 <!-- BEGIN_TF_DOCS -->
-
 ## Requirements
 
 No requirements.
 
 ## Providers
 
-| Name                                             | Version |
-| ------------------------------------------------ | ------- |
-| <a name="provider_aws"></a> [aws](#provider_aws) | n/a     |
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
 ## Modules
 
-| Name                                                                                   | Source                                                                   | Version  |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | -------- |
-| <a name="module_ebs_csi_irsa_role"></a> [ebs_csi_irsa_role](#module_ebs_csi_irsa_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0   |
-| <a name="module_eks"></a> [eks](#module_eks)                                           | terraform-aws-modules/eks/aws                                            | ~> 20.33 |
-| <a name="module_vpc_cni_irsa_role"></a> [vpc_cni_irsa_role](#module_vpc_cni_irsa_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0   |
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 20.33 |
+| <a name="module_vpc_cni_irsa_role"></a> [vpc\_cni\_irsa\_role](#module\_vpc\_cni\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 
 ## Resources
 
-| Name                                                                                                                         | Type        |
-| ---------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Name | Type |
+|------|------|
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 
 ## Inputs
 
-| Name                                                                                       | Description                                    | Type           | Default                | Required |
-| ------------------------------------------------------------------------------------------ | ---------------------------------------------- | -------------- | ---------------------- | :------: |
-| <a name="input_cluster_name"></a> [cluster_name](#input_cluster_name)                      | Name of the EKS cluster for tagging subnets    | `string`       | `"piksel-eks-cluster"` |    no    |
-| <a name="input_coredns-version"></a> [coredns-version](#input_coredns-version)             | The version of CoreDNS for this environment    | `string`       | n/a                    |   yes    |
-| <a name="input_default_tags"></a> [default_tags](#input_default_tags)                      | Default tags to apply to all resources         | `map(string)`  | `{}`                   |    no    |
-| <a name="input_eks-version"></a> [eks-version](#input_eks-version)                         | The version of Kubernetes for this environment | `string`       | n/a                    |   yes    |
-| <a name="input_kube-proxy-version"></a> [kube-proxy-version](#input_kube-proxy-version)    | The version of kube-proxy for this environment | `string`       | n/a                    |   yes    |
-| <a name="input_private_subnets_ids"></a> [private_subnets_ids](#input_private_subnets_ids) | List of private subnets ID                     | `list(string)` | n/a                    |   yes    |
-| <a name="input_sso-admin-role-arn"></a> [sso-admin-role-arn](#input_sso-admin-role-arn)    | The ARN of SSO Admin group                     | `string`       | n/a                    |   yes    |
-| <a name="input_vpc-cni-version"></a> [vpc-cni-version](#input_vpc-cni-version)             | The version of VPC CNI for this environment    | `string`       | n/a                    |   yes    |
-| <a name="input_vpc_id"></a> [vpc_id](#input_vpc_id)                                        | VPC ID value                                   | `string`       | n/a                    |   yes    |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster for tagging subnets | `string` | `"piksel-eks-cluster"` | no |
+| <a name="input_coredns-version"></a> [coredns-version](#input\_coredns-version) | The version of CoreDNS for this environment | `string` | n/a | yes |
+| <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_eks-version"></a> [eks-version](#input\_eks-version) | The version of Kubernetes for this environment | `string` | n/a | yes |
+| <a name="input_kube-proxy-version"></a> [kube-proxy-version](#input\_kube-proxy-version) | The version of kube-proxy for this environment | `string` | n/a | yes |
+| <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |
+| <a name="input_sso-admin-role-arn"></a> [sso-admin-role-arn](#input\_sso-admin-role-arn) | The ARN of SSO Admin group | `string` | n/a | yes |
+| <a name="input_vpc-cni-version"></a> [vpc-cni-version](#input\_vpc-cni-version) | The version of VPC CNI for this environment | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID value | `string` | n/a | yes |
 
 ## Outputs
 
-| Name                                                                                                                                                        | Description                                   |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| <a name="output_authentication_token"></a> [authentication_token](#output_authentication_token)                                                             | Token to use to authenticate with the cluster |
-| <a name="output_cluster_certificate_authority_data"></a> [cluster_certificate_authority_data](#output_cluster_certificate_authority_data)                   | EKS Cluster Certificate Authority Data        |
-| <a name="output_cluster_endpoint"></a> [cluster_endpoint](#output_cluster_endpoint)                                                                         | EKS Cluster Endpoint                          |
-| <a name="output_cluster_name"></a> [cluster_name](#output_cluster_name)                                                                                     | EKS Cluster Name                              |
-| <a name="output_cluster_oidc_issuer_url"></a> [cluster_oidc_issuer_url](#output_cluster_oidc_issuer_url)                                                    | EKS Cluster OIDC Issuer URL                   |
-| <a name="output_cluster_oidc_provider_arn"></a> [cluster_oidc_provider_arn](#output_cluster_oidc_provider_arn)                                              | EKS Cluster OIDC Provider ARN                 |
-| <a name="output_cluster_tls_certificate_sha1_fingerprint"></a> [cluster_tls_certificate_sha1_fingerprint](#output_cluster_tls_certificate_sha1_fingerprint) | EKS Cluster TLS Certificate SHA1 Fingerprint  |
-
+| Name | Description |
+|------|-------------|
+| <a name="output_authentication_token"></a> [authentication\_token](#output\_authentication\_token) | Token to use to authenticate with the cluster |
+| <a name="output_cluster_certificate_authority_data"></a> [cluster\_certificate\_authority\_data](#output\_cluster\_certificate\_authority\_data) | EKS Cluster Certificate Authority Data |
+| <a name="output_cluster_endpoint"></a> [cluster\_endpoint](#output\_cluster\_endpoint) | EKS Cluster Endpoint |
+| <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | EKS Cluster Name |
+| <a name="output_cluster_oidc_issuer_url"></a> [cluster\_oidc\_issuer\_url](#output\_cluster\_oidc\_issuer\_url) | EKS Cluster OIDC Issuer URL |
+| <a name="output_cluster_oidc_provider_arn"></a> [cluster\_oidc\_provider\_arn](#output\_cluster\_oidc\_provider\_arn) | EKS Cluster OIDC Provider ARN |
+| <a name="output_cluster_tls_certificate_sha1_fingerprint"></a> [cluster\_tls\_certificate\_sha1\_fingerprint](#output\_cluster\_tls\_certificate\_sha1\_fingerprint) | EKS Cluster TLS Certificate SHA1 Fingerprint |
 <!-- END_TF_DOCS -->
