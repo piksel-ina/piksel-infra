@@ -35,7 +35,8 @@ The Piksel EKS clusters are designed for scalability, security, and efficient op
 For a comprehensive overview of the cluster architecture and each component, please refer to:
 
 1. [**EKS Cluster Design**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-cluster-design.md),
-2. [**kube-system Configuration Explained**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/kube-system.md),
+2. [**EKS Add-ons Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-addons.md),
+3. [**Karpenter Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/karpenter.md)
 
 ## 2. Developer Access
 
