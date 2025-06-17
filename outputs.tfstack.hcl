@@ -266,6 +266,23 @@ output "odc_metadata" {
   }
 }
 
+# --- ODC OWS Cache Outputs ---
+output "odc_ows_cache_metadata" {
+  description = "Output of ODC OWS Cache configuration and resources"
+  type = object({
+    cloudfront_domain_name      = string
+    cloudfront_distribution_id  = string
+    certificate_arn             = string
+    dns_record                  = string
+  })
+  value = {
+    cloudfront_domain_name      = component.odc.ows_cache_cloudfront_domain_name
+    cloudfront_distribution_id  = component.odc.ows_cache_cloudfront_distribution_id
+    certificate_arn             = component.odc.ows_cache_certificate_arn
+    dns_record                  = component.odc.ows_cache_dns_record
+  }
+}
+
 # --- Argo Workflow Outputs ---
 output "argo_workflow_metadata" {
   description = "Output of Argo Workflow configuration and resources"
