@@ -29,7 +29,11 @@ deployment "development" {
     enable_flow_log        = false
     cluster_name           = "piksel-dev"
     zone_ids = {
-      "piksel.internal"     = upstream_input.shared.zone_ids["piksel.internal"]
+      "dev.pik-sel.id"  = upstream_input.shared.zone_ids["dev.pik-sel.id"]
+      "piksel.internal" = upstream_input.shared.zone_ids["piksel.internal"]
+    }
+    private_zone_ids = {
+      "piksel.internal" = upstream_input.shared.zone_ids["piksel.internal"]
     }
     transit_gateway_id                   = upstream_input.shared.transit_gateway_id
     vpc_cidr_shared                      = "10.0.0.0/16"

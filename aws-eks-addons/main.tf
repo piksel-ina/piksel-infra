@@ -154,6 +154,7 @@ resource "helm_release" "external_dns" {
         region          = var.aws_region
         assumeRoleArn   = var.externaldns_crossaccount_role_arn
         batchChangeSize = 1000
+        zoneIdFilters   = [var.public_hosted_zone_id]
       }
 
       # Resource limits for better stability

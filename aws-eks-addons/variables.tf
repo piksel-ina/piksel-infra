@@ -20,6 +20,11 @@ variable "zone_ids" {
   description = "Map of domain name to Route53 hosted zone IDs"
 }
 
+variable "public_hosted_zone_id" {
+  description = "The ID of the public hosted zone"
+  type        = string
+}
+
 variable "aws_partition" {
   description = "The AWS partition" // usually 'aws', but might be 'aws-idn' in the future, like china and us: 'aws-cn' or 'aws-us-gov'
   type        = string

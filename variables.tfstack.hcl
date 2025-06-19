@@ -182,3 +182,9 @@ variable "odc_cloudfront_crossaccount_role_arn" {
   description = "value of the cross-account IAM role in CloudFront account"
   type        = string
 }
+
+variable "private_zone_ids" {
+  description = "The ID of the private hosted zone"
+  type        = map(string)
+  default     = {}
+}
