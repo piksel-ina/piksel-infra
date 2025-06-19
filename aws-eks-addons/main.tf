@@ -183,7 +183,7 @@ resource "helm_release" "external_dns" {
 # --- Flux CD Configuration ---
 locals {
   flux_namespace      = "flux-system"
-  webhook_secret_name = "flux-notification-slack-webhook-secret"
+  webhook_secret_name = "flux-notification-slack-webhook-secret-${lower(var.environment)}"
 }
 
 resource "kubernetes_namespace" "flux_system" {
@@ -204,7 +204,7 @@ data "aws_secretsmanager_secret_version" "slack_webhook" {
 
 resource "kubernetes_secret" "slack_webhook" {
   metadata {
-    name      = "slack-webhook"
+    name      = "slack-webhook-${lower(var.environment)}"
     namespace = kubernetes_namespace.flux_system.metadata[0].name
   }
   data = {
