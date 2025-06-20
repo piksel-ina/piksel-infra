@@ -245,7 +245,7 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
             {
               key      = "node.kubernetes.io/instance-type"
               operator = "In"
-              values   = ["g5.xlarge", "g5.2xlarge", "g5.4xlarge"]
+              values   = ["g5.xlarge", "g5.2xlarge", "g5.4xlarge", "g5.8xlarge", "g5.12xlarge"]
             }
           ]
           taints = [
