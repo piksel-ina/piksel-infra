@@ -85,6 +85,35 @@ For a comprehensive overview of the cluster architecture and each component, ple
     --region ap-southeast-3
   ```
 
+### 2.2. AWS Service Quotas for GPU Nodes (Karpenter)
+
+Before running GPU workloads with Karpenter, ensure that the AWS account has sufficient EC2 service quotas for the required GPU instance families. By default, new AWS accounts have a vCPU limit of `0` for GPU instance families (such as G, P, or Inf), which prevents Karpenter from provisioning GPU nodes.
+
+**Requesting GPU Instance Quota Increases:**
+
+Quota increases are required for both On-Demand and Spot vCPUs for each GPU instance family that will be used.
+
+**Steps:**
+
+1. Log in to the AWS Console for the target account and region.
+2. Navigate to [Service Quotas > EC2](https://console.aws.amazon.com/servicequotas/home/services/ec2/quotas).
+3. Search for the following quotas:
+   - **Running On-Demand G and VT instances**
+   - **Running On-Demand P instances** (for NVIDIA A100, V100, etc.)
+   - **Spot Instance Requests** for all relevant GPU families (e.g., g5, g4dn, p3, p4d).
+4. For each relevant quota, select “Request quota increase.”
+   - A recommended minimum is 8 vCPUs for both On-Demand and Spot, but this should be adjusted based on anticipated GPU workload requirements.
+5. Enter the desired vCPU limit and submit the request.
+6. Wait for AWS to approve the quota increase. Approval notifications will be sent via email.
+
+> **Note:**  
+> If these quota increases are not in place, Karpenter will be unable to provision GPU nodes, and GPU workloads will remain unscheduled.
+
+**References:**
+
+- [AWS EC2 Service Quotas Documentation](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-resource-limits.html)
+- [Karpenter GPU Node Provisioning Guide](https://karpenter.sh/docs/concepts/instance-types/#gpu-instances)
+
 ## Maintainers
 
 This repository is maintained by the **Piksel DevOps Team**.
