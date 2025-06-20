@@ -66,7 +66,7 @@ resource "helm_release" "external_dns" {
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  version    = "1.14.3"
+  version    = "1.17.0"
 
   # Ensure proper dependency order
   depends_on = [
@@ -77,7 +77,7 @@ resource "helm_release" "external_dns" {
   values = [
     yamlencode({
       # Logging configuration
-      logLevel  = "error"
+      logLevel  = "debug"
       logFormat = "json"
 
       # Provider configuration
@@ -118,14 +118,20 @@ resource "helm_release" "external_dns" {
         "cluster-autoscaler.kubernetes.io/safe-to-evict" = "true"
       }
 
-      # AWS specific configuration
-      aws = {
-        region          = var.aws_region
-        assumeRoleArn   = var.externaldns_crossaccount_role_arn
-        externalId      = "external-dns-${lower(var.environment)}"
-        batchChangeSize = 1000
-        zoneIdFilters   = [var.public_hosted_zone_id]
+      # Use extraArgs to explicitly pass the assume role parameter
+      extraArgs = {
+        "aws-assume-role"             = var.externaldns_crossaccount_role_arn
+        "aws-assume-role-external-id" = "external-dns-${lower(var.environment)}"
+        "aws-zone-id-filter"          = var.public_hosted_zone_id
       }
+
+      # Environment variables for AWS
+      env = [
+        {
+          name  = "AWS_DEFAULT_REGION"
+          value = var.aws_region
+        }
+      ]
 
       # Resource limits for better stability
       resources = {
