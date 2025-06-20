@@ -147,14 +147,29 @@ resource "helm_release" "external_dns" {
     })
   ]
 
-  timeout         = 300
-  wait            = true
-  wait_for_jobs   = true
-  cleanup_on_fail = true
+  timeout           = 600
+  wait              = true
+  wait_for_jobs     = true
+  cleanup_on_fail   = true
+  atomic            = true  # Rollback on failure
+  create_namespace  = false # We create namespace separately
+  dependency_update = true  # Update dependencies
+  disable_webhooks  = false
+  replace           = false # Don't replace on conflict
+  reset_values      = false # Keep existing values
+  reuse_values      = false # Don't reuse values from previous install
+  skip_crds         = false
+  verify            = false # Skip signature verification for speed
 
-  # Handle upgrades gracefully
-  force_update  = false
-  recreate_pods = false
+  # Lifecycle management
+  lifecycle {
+    ignore_changes = [
+      # Ignore changes to these to prevent unnecessary updates
+      metadata,
+      repository_password,
+      repository_username,
+    ]
+  }
 }
 
 # --- Flux CD Configuration ---
