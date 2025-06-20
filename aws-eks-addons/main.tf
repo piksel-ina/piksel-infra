@@ -1,28 +1,15 @@
 # --- IAM Policy Documents ---
-// allows ExternalDNS to change records only in specific hosted zones
-// allows listing all zones and records
+// Allow ExternalDNS to assume a cross-account role for managing Route53 records
 data "aws_iam_policy_document" "external_dns" {
   statement {
-    sid    = "ChangeResourceRecordSets"
+    sid    = "AssumeExternalDNSCrossAccountRole"
     effect = "Allow"
     actions = [
-      "route53:ChangeResourceRecordSets",
+      "sts:AssumeRole",
     ]
     resources = [
-      for zone_id in values(var.zone_ids) :
-      "arn:${var.aws_partition}:route53:::hostedzone/${zone_id}"
+      var.externaldns_crossaccount_role_arn
     ]
-  }
-
-  statement {
-    sid    = "ListResourceRecordSets"
-    effect = "Allow"
-    actions = [
-      "route53:ListHostedZones",
-      "route53:ListResourceRecordSets",
-      "route53:ListTagsForResource",
-    ]
-    resources = ["*"]
   }
 }
 
@@ -61,23 +48,6 @@ resource "aws_iam_role_policy" "external_dns" {
   policy = data.aws_iam_policy_document.external_dns.json
 }
 
-# --- Assume the cross-account role // created at Shared Account ---
-resource "aws_iam_role_policy" "external_dns_assume_crossaccount" {
-  name = "external-dns-assume-crossaccount"
-  role = aws_iam_role.external_dns.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect   = "Allow"
-        Action   = "sts:AssumeRole"
-        Resource = var.externaldns_crossaccount_role_arn
-      }
-    ]
-  })
-}
-
 # --- Create Namespace ---
 resource "kubernetes_namespace" "external_dns" {
   metadata {
@@ -101,8 +71,7 @@ resource "helm_release" "external_dns" {
   # Ensure proper dependency order
   depends_on = [
     kubernetes_namespace.external_dns,
-    aws_iam_role_policy.external_dns,
-    aws_iam_role_policy.external_dns_assume_crossaccount
+    aws_iam_role_policy.external_dns
   ]
 
   values = [
@@ -153,6 +122,7 @@ resource "helm_release" "external_dns" {
       aws = {
         region          = var.aws_region
         assumeRoleArn   = var.externaldns_crossaccount_role_arn
+        externalId      = "external-dns-${lower(var.environment)}"
         batchChangeSize = 1000
         zoneIdFilters   = [var.public_hosted_zone_id]
       }
