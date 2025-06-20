@@ -207,8 +207,8 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
         cpu = 10000
       }
       disruption = {
-        consolidationPolicy = "WhenEmpty"
-        consolidateAfter    = "30s"
+        consolidationPolicy = "WhenEmptyOrUnderutilized"
+        consolidateAfter    = "20m"
       }
     }
   }
@@ -262,7 +262,7 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
       }
       disruption = {
         consolidationPolicy = "WhenEmptyOrUnderutilized"
-        consolidateAfter    = "Never"
+        consolidateAfter    = "20m"
       }
     }
   }
