@@ -66,7 +66,7 @@ resource "helm_release" "external_dns" {
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  version    = "1.17.0"
+  version    = "1.14.3"
 
   # Ensure proper dependency order
   depends_on = [
@@ -119,11 +119,11 @@ resource "helm_release" "external_dns" {
       }
 
       # Use extraArgs to explicitly pass the assume role parameter
-      extraArgs = {
-        "aws-assume-role"             = var.externaldns_crossaccount_role_arn
-        "aws-assume-role-external-id" = "external-dns-${lower(var.environment)}"
-        "aws-zone-id-filter"          = var.public_hosted_zone_id
-      }
+      extraArgs = [
+        "--aws-assume-role=${var.externaldns_crossaccount_role_arn}",
+        "--aws-assume-role-external-id=external-dns-${lower(var.environment)}",
+        "--aws-zone-id-filter=${var.public_hosted_zone_id}"
+      ]
 
       # Environment variables for AWS
       env = [
@@ -147,29 +147,14 @@ resource "helm_release" "external_dns" {
     })
   ]
 
-  timeout           = 600
-  wait              = true
-  wait_for_jobs     = true
-  cleanup_on_fail   = true
-  atomic            = true  # Rollback on failure
-  create_namespace  = false # We create namespace separately
-  dependency_update = true  # Update dependencies
-  disable_webhooks  = false
-  replace           = false # Don't replace on conflict
-  reset_values      = false # Keep existing values
-  reuse_values      = false # Don't reuse values from previous install
-  skip_crds         = false
-  verify            = false # Skip signature verification for speed
+  timeout         = 300
+  wait            = true
+  wait_for_jobs   = true
+  cleanup_on_fail = true
 
-  # Lifecycle management
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to these to prevent unnecessary updates
-      metadata,
-      repository_password,
-      repository_username,
-    ]
-  }
+  # Handle upgrades gracefully
+  force_update  = false
+  recreate_pods = false
 }
 
 # --- Flux CD Configuration ---
