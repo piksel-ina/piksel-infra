@@ -66,9 +66,8 @@ resource "helm_release" "external_dns" {
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
-  version    = "1.14.3"
+  version    = "1.17.0"
 
-  # Ensure proper dependency order
   depends_on = [
     kubernetes_namespace.external_dns,
     aws_iam_role_policy.external_dns
@@ -118,12 +117,12 @@ resource "helm_release" "external_dns" {
         "cluster-autoscaler.kubernetes.io/safe-to-evict" = "true"
       }
 
-      # Use extraArgs to explicitly pass the assume role parameter
-      extraArgs = [
-        "--aws-assume-role=${var.externaldns_crossaccount_role_arn}",
-        "--aws-assume-role-external-id=external-dns-${lower(var.environment)}",
-        "--aws-zone-id-filter=${var.public_hosted_zone_id}"
-      ]
+      # Use extraArgs for cross-account role assumption
+      extraArgs = {
+        "aws-assume-role"             = var.externaldns_crossaccount_role_arn
+        "aws-assume-role-external-id" = "external-dns-${lower(var.environment)}"
+        "zone-id-filter"          = var.public_hosted_zone_id
+      }
 
       # Environment variables for AWS
       env = [
@@ -133,7 +132,7 @@ resource "helm_release" "external_dns" {
         }
       ]
 
-      # Resource limits for better stability
+      # Resource limits
       resources = {
         limits = {
           memory = "256Mi"
@@ -147,15 +146,18 @@ resource "helm_release" "external_dns" {
     })
   ]
 
-  timeout         = 300
-  wait            = true
-  wait_for_jobs   = true
-  cleanup_on_fail = true
+  # error handling and upgrade management
+  timeout               = 300
+  wait                  = true
+  wait_for_jobs         = true
+  cleanup_on_fail       = true
 
   # Handle upgrades gracefully
   force_update  = false
   recreate_pods = false
+  
 }
+
 
 # --- Flux CD Configuration ---
 locals {
@@ -171,6 +173,12 @@ resource "kubernetes_namespace" "flux_system" {
       environment = var.environment
       name        = local.flux_namespace
     }
+  }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels,
+      metadata[0].annotations
+    ]
   }
 }
 
