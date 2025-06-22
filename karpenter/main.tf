@@ -231,12 +231,12 @@ resource "kubernetes_manifest" "karpenter_gpu_node_class" {
       name = "gpu"
     }
     spec = {
-      amiFamily = "AL2023"
+      amiFamily = "Custom"
       role      = module.karpenter.node_iam_role_name
 
       amiSelectorTerms = [
         {
-          alias = "al2023@v20250505"
+          name = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
         }
       ]
 
