@@ -121,7 +121,7 @@ resource "helm_release" "external_dns" {
       extraArgs = {
         "aws-assume-role"             = var.externaldns_crossaccount_role_arn
         "aws-assume-role-external-id" = "external-dns-${lower(var.environment)}"
-        "zone-id-filter"          = var.public_hosted_zone_id
+        "zone-id-filter"              = var.public_hosted_zone_id
       }
 
       # Environment variables for AWS
@@ -147,15 +147,15 @@ resource "helm_release" "external_dns" {
   ]
 
   # error handling and upgrade management
-  timeout               = 300
-  wait                  = true
-  wait_for_jobs         = true
-  cleanup_on_fail       = true
+  timeout         = 300
+  wait            = true
+  wait_for_jobs   = true
+  cleanup_on_fail = true
 
   # Handle upgrades gracefully
   force_update  = false
   recreate_pods = false
-  
+
 }
 
 

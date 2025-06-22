@@ -63,55 +63,56 @@ This configuration will create and manage the following key resources:
 6.  Consolidation policies in `NodePools` help optimize cluster utilization by removing empty or underutilized nodes.
 
 <!-- BEGIN_TF_DOCS -->
-
 ## Requirements
 
 No requirements.
 
 ## Providers
 
-| Name                                                                  | Version |
-| --------------------------------------------------------------------- | ------- |
-| <a name="provider_aws"></a> [aws](#provider_aws)                      | n/a     |
-| <a name="provider_helm"></a> [helm](#provider_helm)                   | n/a     |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider_kubernetes) | n/a     |
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | n/a |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | n/a |
 
 ## Modules
 
-| Name                                                           | Source                                           | Version |
-| -------------------------------------------------------------- | ------------------------------------------------ | ------- |
-| <a name="module_karpenter"></a> [karpenter](#module_karpenter) | terraform-aws-modules/eks/aws//modules/karpenter | n/a     |
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_karpenter"></a> [karpenter](#module\_karpenter) | terraform-aws-modules/eks/aws//modules/karpenter | n/a |
 
 ## Resources
 
-| Name                                                                                                                                        | Type     |
-| ------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| Name | Type |
+|------|------|
 | [aws_iam_service_linked_role.ec2_spot](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_service_linked_role) | resource |
-| [helm_release.karpenter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)                              | resource |
-| [kubernetes_manifest.karpenter_node_class](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest)     | resource |
-| [kubernetes_manifest.karpenter_node_pool](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest)      | resource |
-| [kubernetes_manifest.karpenter_node_pool_gpu](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest)  | resource |
+| [helm_release.karpenter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [kubernetes_manifest.karpenter_gpu_node_class](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.karpenter_node_class](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.karpenter_node_pool](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
+| [kubernetes_manifest.karpenter_node_pool_gpu](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest) | resource |
 
 ## Inputs
 
-| Name                                                                                 | Description         | Type  | Default | Required |
-| ------------------------------------------------------------------------------------ | ------------------- | ----- | ------- | :------: |
-| <a name="input_cluster_endpoint"></a> [cluster_endpoint](#input_cluster_endpoint)    | value               | `any` | n/a     |   yes    |
-| <a name="input_cluster_name"></a> [cluster_name](#input_cluster_name)                | Name of EKS Cluster | `any` | n/a     |   yes    |
-| <a name="input_default_tags"></a> [default_tags](#input_default_tags)                | value               | `map` | `{}`    |    no    |
-| <a name="input_oidc_provider_arn"></a> [oidc_provider_arn](#input_oidc_provider_arn) | value               | `any` | n/a     |   yes    |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_cluster_endpoint"></a> [cluster\_endpoint](#input\_cluster\_endpoint) | value | `any` | n/a | yes |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of EKS Cluster | `any` | n/a | yes |
+| <a name="input_default_nodepool_node_limit"></a> [default\_nodepool\_node\_limit](#input\_default\_nodepool\_node\_limit) | Default node limit for node pools | `number` | `10000` | no |
+| <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | value | `map` | `{}` | no |
+| <a name="input_gpu_nodepool_node_limit"></a> [gpu\_nodepool\_node\_limit](#input\_gpu\_nodepool\_node\_limit) | Default GPU node limit for GPU node pools | `number` | `20` | no |
+| <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | value | `any` | n/a | yes |
 
 ## Outputs
 
-| Name                                                                                                                                   | Description                                      |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| <a name="output_karpenter_helm_release_status"></a> [karpenter_helm_release_status](#output_karpenter_helm_release_status)             | The status of the Karpenter Helm release         |
-| <a name="output_karpenter_iam_role_arn"></a> [karpenter_iam_role_arn](#output_karpenter_iam_role_arn)                                  | The ARN of the Karpenter IAM role                |
-| <a name="output_karpenter_interruption_queue_name"></a> [karpenter_interruption_queue_name](#output_karpenter_interruption_queue_name) | The name of the Karpenter interruption SQS queue |
-| <a name="output_karpenter_node_class_name"></a> [karpenter_node_class_name](#output_karpenter_node_class_name)                         | The name of the Karpenter EC2NodeClass.          |
-| <a name="output_karpenter_node_class_status"></a> [karpenter_node_class_status](#output_karpenter_node_class_status)                   | Status of the Karpenter EC2NodeClass.            |
-| <a name="output_karpenter_node_iam_role_name"></a> [karpenter_node_iam_role_name](#output_karpenter_node_iam_role_name)                | The name of the Karpenter node IAM role          |
-| <a name="output_karpenter_node_pool_gpu_name"></a> [karpenter_node_pool_gpu_name](#output_karpenter_node_pool_gpu_name)                | The name of the GPU Karpenter NodePool.          |
-| <a name="output_karpenter_node_pool_name"></a> [karpenter_node_pool_name](#output_karpenter_node_pool_name)                            | The name of the default Karpenter NodePool.      |
-
+| Name | Description |
+|------|-------------|
+| <a name="output_karpenter_helm_release_status"></a> [karpenter\_helm\_release\_status](#output\_karpenter\_helm\_release\_status) | The status of the Karpenter Helm release |
+| <a name="output_karpenter_iam_role_arn"></a> [karpenter\_iam\_role\_arn](#output\_karpenter\_iam\_role\_arn) | The ARN of the Karpenter IAM role |
+| <a name="output_karpenter_interruption_queue_name"></a> [karpenter\_interruption\_queue\_name](#output\_karpenter\_interruption\_queue\_name) | The name of the Karpenter interruption SQS queue |
+| <a name="output_karpenter_node_class_name"></a> [karpenter\_node\_class\_name](#output\_karpenter\_node\_class\_name) | The name of the Karpenter EC2NodeClass. |
+| <a name="output_karpenter_node_class_status"></a> [karpenter\_node\_class\_status](#output\_karpenter\_node\_class\_status) | Status of the Karpenter EC2NodeClass. |
+| <a name="output_karpenter_node_iam_role_name"></a> [karpenter\_node\_iam\_role\_name](#output\_karpenter\_node\_iam\_role\_name) | The name of the Karpenter node IAM role |
+| <a name="output_karpenter_node_pool_gpu_name"></a> [karpenter\_node\_pool\_gpu\_name](#output\_karpenter\_node\_pool\_gpu\_name) | The name of the GPU Karpenter NodePool. |
+| <a name="output_karpenter_node_pool_name"></a> [karpenter\_node\_pool\_name](#output\_karpenter\_node\_pool\_name) | The name of the default Karpenter NodePool. |
 <!-- END_TF_DOCS -->

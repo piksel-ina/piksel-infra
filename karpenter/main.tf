@@ -98,7 +98,7 @@ resource "helm_release" "karpenter" {
   ]
 }
 
-# --- Karpenter AL2023 NodeClass ---
+# --- Karpenter Default NodeClass ---
 resource "kubernetes_manifest" "karpenter_node_class" {
   depends_on = [helm_release.karpenter]
 
@@ -204,7 +204,7 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
         }
       }
       limits = {
-        cpu = 10000
+        cpu = var.default_nodepool_node_limit
       }
       disruption = {
         consolidationPolicy = "WhenEmptyOrUnderutilized"
@@ -220,9 +220,62 @@ resource "kubernetes_manifest" "karpenter_node_pool" {
   ]
 }
 
+# --- GPU NodeClass ---
+resource "kubernetes_manifest" "karpenter_gpu_node_class" {
+  depends_on = [helm_release.karpenter]
+
+  manifest = {
+    apiVersion = "karpenter.k8s.aws/v1"
+    kind       = "EC2NodeClass"
+    metadata = {
+      name = "gpu"
+    }
+    spec = {
+      amiFamily = "AL2023"
+      role      = module.karpenter.node_iam_role_name
+
+      amiSelectorTerms = [
+        {
+          alias = "al2023@v20250505"
+        }
+      ]
+
+      blockDeviceMappings = [
+        {
+          deviceName = "/dev/xvda"
+          ebs = {
+            volumeSize = "120Gi"
+            volumeType = "gp3"
+            encrypted  = true
+          }
+        }
+      ]
+      subnetSelectorTerms = [
+        {
+          tags = {
+            "karpenter.sh/discovery" = local.cluster
+          }
+        }
+      ]
+      securityGroupSelectorTerms = [
+        {
+          tags = {
+            "karpenter.sh/discovery" = local.cluster
+          }
+        }
+      ]
+      tags = merge(local.tags, {
+        "karpenter.sh/discovery" = local.cluster
+        "AMIFamily"              = "AL2023"
+        "accelerated"            = "nvidia"
+      })
+    }
+  }
+}
+
 #--- GPU Intensive Nodepool --
 resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
-  depends_on = [kubernetes_manifest.karpenter_node_class]
+  depends_on = [kubernetes_manifest.karpenter_gpu_node_class]
 
   manifest = {
     apiVersion = "karpenter.sh/v1"
@@ -239,7 +292,7 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
           nodeClassRef = {
             group = "karpenter.k8s.aws"
             kind  = "EC2NodeClass"
-            name  = "default"
+            name  = "gpu"
           }
           requirements = [
             {
@@ -258,7 +311,7 @@ resource "kubernetes_manifest" "karpenter_node_pool_gpu" {
         }
       }
       limits = {
-        gpu = 30
+        gpu = var.gpu_nodepool_node_limit
       }
       disruption = {
         consolidationPolicy = "WhenEmptyOrUnderutilized"

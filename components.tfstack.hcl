@@ -105,10 +105,12 @@ component "karpenter" {
   source = "./karpenter"
 
   inputs = {
-    cluster_name      = var.cluster_name
-    oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
-    cluster_endpoint  = component.eks-cluster.cluster_endpoint
-    default_tags      = var.default_tags
+    cluster_name                = var.cluster_name
+    oidc_provider_arn           = component.eks-cluster.cluster_oidc_provider_arn
+    cluster_endpoint            = component.eks-cluster.cluster_endpoint
+    default_tags                = var.default_tags
+    default_nodepool_node_limit = var.default_nodepool_node_limit
+    gpu_nodepool_node_limit     = var.gpu_nodepool_node_limit
   }
 
   providers = {

@@ -188,3 +188,15 @@ variable "private_zone_ids" {
   type        = map(string)
   default     = {}
 }
+
+variable "default_nodepool_node_limit" {
+  description = "Default node limit for node pools"
+  type        = number
+  default     = 10000
+}
+
+variable "gpu_nodepool_node_limit" {
+  description = "Default GPU node limit for GPU node pools"
+  type        = number
+  default     = 20
+}
