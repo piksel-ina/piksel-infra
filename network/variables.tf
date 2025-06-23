@@ -87,3 +87,26 @@ variable "default_tags" {
   type        = map(string)
   default     = {}
 }
+
+# --- Route53 Hosted Zone Association Variables ---
+variable "private_zone_ids" {
+  description = "The ID of the private hosted zone"
+  type        = map(string)
+  default     = {}
+}
+
+variable "inbound_resolver_ip_addresses" {
+  description = "List of inbound resolver ip addresses"
+}
+
+# --- Transit Gateway Spoke Variables ---
+variable "transit_gateway_id" {
+  description = "ID of the shared Transit Gateway from hub account"
+  type        = string
+}
+
+variable "vpc_cidr_shared" {
+  description = "CIDR block for the hub VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
