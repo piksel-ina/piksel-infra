@@ -1,7 +1,7 @@
 locals {
   prefix                   = "${lower(var.project)}-${lower(var.environment)}"
   tags                     = var.default_tags
-  auth0_client_secret_name = "grafana-auth0-client-secret"
+  auth0_client_secret_name = "grafana-oauth-${var.environment}"
   eks_cluster              = var.cluster_name
 }
 
@@ -28,7 +28,7 @@ resource "random_password" "grafana_random_string" {
 
 # --- Store database password in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "grafana_password" {
-  name        = "${local.prefix}-grafana-password"
+  name        = "${local.prefix}-grafana-db-password"
   description = "Password for Grafana database connection"
 
   tags = local.tags
@@ -37,7 +37,6 @@ resource "aws_secretsmanager_secret" "grafana_password" {
 resource "aws_secretsmanager_secret_version" "grafana_password" {
   secret_id     = aws_secretsmanager_secret.grafana_password.id
   secret_string = random_password.grafana_random_string.result
-
 }
 
 # --- This secret was issued through AWS CLI ---
