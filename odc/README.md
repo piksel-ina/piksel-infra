@@ -24,9 +24,12 @@ No requirements.
 | Name | Type |
 |------|------|
 | [aws_acm_certificate.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
+| [aws_acm_certificate_validation.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
+| [aws_cloudfront_distribution.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
 | [aws_iam_policy.read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.odc_cloudfront_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.odc_cloudfront_assume_crossaccount](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_route53_record.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_secretsmanager_secret.odc_read_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.odc_write_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
@@ -62,4 +65,8 @@ No requirements.
 | <a name="output_odc_read_password_secret_arn"></a> [odc\_read\_password\_secret\_arn](#output\_odc\_read\_password\_secret\_arn) | Secrets Manager ARN for ODC read password |
 | <a name="output_odc_write_db_password"></a> [odc\_write\_db\_password](#output\_odc\_write\_db\_password) | ODC write database password |
 | <a name="output_odc_write_password_secret_arn"></a> [odc\_write\_password\_secret\_arn](#output\_odc\_write\_password\_secret\_arn) | Secrets Manager ARN for ODC write password |
+| <a name="output_ows_cache_certificate_arn"></a> [ows\_cache\_certificate\_arn](#output\_ows\_cache\_certificate\_arn) | ARN of the ACM certificate for ows cache |
+| <a name="output_ows_cache_cloudfront_distribution_id"></a> [ows\_cache\_cloudfront\_distribution\_id](#output\_ows\_cache\_cloudfront\_distribution\_id) | CloudFront distribution ID |
+| <a name="output_ows_cache_cloudfront_domain_name"></a> [ows\_cache\_cloudfront\_domain\_name](#output\_ows\_cache\_cloudfront\_domain\_name) | CloudFront distribution domain name for ows cache |
+| <a name="output_ows_cache_dns_record"></a> [ows\_cache\_dns\_record](#output\_ows\_cache\_dns\_record) | FQDN of the Route53 record for ows cache |
 <!-- END_TF_DOCS -->
