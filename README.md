@@ -38,9 +38,58 @@ For a comprehensive overview of the cluster architecture and each component, ple
 2. [**EKS Add-ons Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-addons.md),
 3. [**Karpenter Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/karpenter.md)
 
-## 2. Developer Access
+## 2. Developer Guide
 
-### 2.1. Add Secret to AWS Secrets Manager
+### 2.1. Stack OIDC Setup
+
+The Stack OIDC configuration enables secure authentication between Terraform Cloud and AWS using OpenID Connect. This setup supports multi-environment deployments using different local backends/workspaces with the same configuration.
+
+**Prerequisites:**
+
+- Ensure AWS SSO profile matches the target environment where the OIDC role will be created
+- Verify you're authenticated to the correct AWS account using `aws sts get-caller-identity`
+
+**Setup Steps for Dev Environment:**
+
+1. **Create and switch to dev workspace:**
+
+   ```bash
+   terraform workspace new dev
+   ```
+
+2. **Initialize Terraform:**
+
+   ```bash
+   terraform init
+   ```
+
+3. **Plan and apply the OIDC configuration:**
+
+   ```bash
+   terraform plan
+   terraform apply
+   ```
+
+4. **Verify deployment:**
+   ```bash
+   terraform output
+   ```
+
+**Multi-Environment Support:**
+
+- For **staging**: Create `staging` workspace and repeat the process
+- For **production**: Create `prod` workspace and repeat the process
+- Each workspace maintains isolated state while using the same configuration
+
+**Important Notes:**
+
+- Ensure your AWS SSO profile corresponds to the target environment
+- Each workspace will create environment-specific OIDC resources
+- The generated role ARN will be used in Terraform Cloud for workload identity authentication
+
+**Reference:** [Terraform Stacks Authentication Guide](https://developer.hashicorp.com/terraform/language/stacks/deploy/authenticate)
+
+### 2.2. Add Secret to AWS Secrets Manager
 
 1. **Authenticate with AWS SSO**
    If you haven't configure any sso session, please follow this guide - [Configure SSO with Piksel URL](https://github.com/piksel-ina/piksel-document/blob/main/operations/02-AWS-identity-center-guide.md#aws-cli-setup-and-access)
@@ -85,7 +134,7 @@ For a comprehensive overview of the cluster architecture and each component, ple
     --region ap-southeast-3
   ```
 
-### 2.2. AWS Service Quotas for GPU Nodes (Karpenter)
+### 2.3. AWS Service Quotas for GPU Nodes (Karpenter)
 
 Before running GPU workloads with Karpenter, ensure that the AWS account has sufficient EC2 service quotas for the required GPU instance families. By default, new AWS accounts have a vCPU limit of `0` for GPU instance families (such as G, P, or Inf), which prevents Karpenter from provisioning GPU nodes.
 
@@ -106,7 +155,7 @@ Quota increases are required for both On-Demand and Spot vCPUs for each GPU inst
 5. Enter the desired vCPU limit and submit the request.
 6. Wait for AWS to approve the quota increase. Approval notifications will be sent via email.
 
-> **Note:**  
+> **Note:**
 > If these quota increases are not in place, Karpenter will be unable to provision GPU nodes, and GPU workloads will remain unscheduled.
 
 **References:**
