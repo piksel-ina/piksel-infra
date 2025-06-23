@@ -259,6 +259,41 @@ output "flux_metadata" {
   }
 }
 
+
+# --- ODC Outputs ---
+output "odc_metadata" {
+  description = "Output of ODC configuration and resources"
+  type = object({
+    namespace                 = string
+    write_password_secret_arn = string
+    read_password_secret_arn  = string
+    data_reader_role_arn      = string
+  })
+  value = {
+    namespace                 = component.applications.odc_namespace
+    write_password_secret_arn = component.applications.odc_write_password_secret_arn
+    read_password_secret_arn  = component.applications.odc_read_password_secret_arn
+    data_reader_role_arn      = component.applications.odc_data_reader_role_arn
+  }
+}
+
+# --- ODC OWS Cache Outputs ---
+output "odc_ows_cache_metadata" {
+  description = "Output of ODC OWS Cache configuration and resources"
+  type = object({
+    cloudfront_domain_name     = string
+    cloudfront_distribution_id = string
+    certificate_arn            = string
+    dns_record                 = string
+  })
+  value = {
+    cloudfront_domain_name     = component.applications.ows_cache_cloudfront_domain_name
+    cloudfront_distribution_id = component.applications.ows_cache_cloudfront_distribution_id
+    certificate_arn            = component.applications.ows_cache_certificate_arn
+    dns_record                 = component.applications.ows_cache_dns_record
+  }
+}
+
 # # --- STAC Outputs ---
 # output "stac_metadata" {
 #   description = "Output of STAC configuration and resources"
@@ -273,40 +308,6 @@ output "flux_metadata" {
 #     write_secret_arn     = component.odc-stac.stac_write_secret_arn
 #     read_secret_arn      = component.odc-stac.stac_read_secret_arn
 #     read_k8s_secret_name = component.odc-stac.stacread_k8s_secret_name
-#   }
-# }
-
-# # --- ODC Outputs ---
-# output "odc_metadata" {
-#   description = "Output of ODC configuration and resources"
-#   type = object({
-#     namespace                 = string
-#     write_password_secret_arn = string
-#     read_password_secret_arn  = string
-#     data_reader_role_arn      = string
-#   })
-#   value = {
-#     namespace                 = component.odc.odc_namespace
-#     write_password_secret_arn = component.odc.odc_write_password_secret_arn
-#     read_password_secret_arn  = component.odc.odc_read_password_secret_arn
-#     data_reader_role_arn      = component.odc.odc_data_reader_role_arn
-#   }
-# }
-
-# # --- ODC OWS Cache Outputs ---
-# output "odc_ows_cache_metadata" {
-#   description = "Output of ODC OWS Cache configuration and resources"
-#   type = object({
-#     cloudfront_domain_name     = string
-#     cloudfront_distribution_id = string
-#     certificate_arn            = string
-#     dns_record                 = string
-#   })
-#   value = {
-#     cloudfront_domain_name     = component.odc.ows_cache_cloudfront_domain_name
-#     cloudfront_distribution_id = component.odc.ows_cache_cloudfront_distribution_id
-#     certificate_arn            = component.odc.ows_cache_certificate_arn
-#     dns_record                 = component.odc.ows_cache_dns_record
 #   }
 # }
 

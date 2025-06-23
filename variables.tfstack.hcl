@@ -199,13 +199,13 @@ variable "auth0_tenant" {
   type        = string
 }
 
-# variable "read_external_buckets" {
-#   description = "List of external S3 bucket names"
-#   type        = list(string)
-#   default     = []
-# }
+variable "read_external_buckets" {
+  description = "List of external S3 bucket names"
+  type        = list(string)
+  default     = []
+}
 
-# variable "odc_cloudfront_crossaccount_role_arn" {
-#   description = "value of the cross-account IAM role in CloudFront account"
-#   type        = string
-# }
+variable "odc_cloudfront_crossaccount_role_arn" {
+  description = "value of the cross-account IAM role in CloudFront account"
+  type        = string
+}

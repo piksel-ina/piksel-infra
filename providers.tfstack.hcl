@@ -77,21 +77,21 @@ provider "helm" "configurations" {
   }
 }
 
-# provider "aws" "cross_account" {
-#   config {
-#     region = var.aws_region
-#     assume_role_with_web_identity {
-#       role_arn           = var.aws_role
-#       web_identity_token = var.aws_token
-#     }
-#     assume_role {
-#       role_arn = var.odc_cloudfront_crossaccount_role_arn
-#     }
-#     default_tags {
-#       tags = var.default_tags
-#     }
-#   }
-# }
+provider "aws" "cross_account" {
+  config {
+    region = var.aws_region
+    assume_role_with_web_identity {
+      role_arn           = var.aws_role
+      web_identity_token = var.aws_token
+    }
+    assume_role {
+      role_arn = var.odc_cloudfront_crossaccount_role_arn
+    }
+    default_tags {
+      tags = var.default_tags
+    }
+  }
+}
 
 provider "tls" "this" {}
 provider "time" "this" {}

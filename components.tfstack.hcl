@@ -137,21 +137,28 @@ component "applications" {
   source = "./applications"
 
   inputs = {
-    project               = var.project
-    environment           = var.environment
-    cluster_name          = component.eks-cluster.cluster_name
-    default_tags          = var.default_tags
-    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
-    oidc_issuer_url       = component.eks-cluster.cluster_oidc_issuer_url
-    k8s_db_service        = component.database.k8s_db_service
-    subdomains            = var.subdomains
-    auth0_tenant          = var.auth0_tenant
+    account_id                           = component.network.account_id
+    project                              = var.project
+    environment                          = var.environment
+    cluster_name                         = component.eks-cluster.cluster_name
+    default_tags                         = var.default_tags
+    eks_oidc_provider_arn                = component.eks-cluster.cluster_oidc_provider_arn
+    oidc_issuer_url                      = component.eks-cluster.cluster_oidc_issuer_url
+    k8s_db_service                       = component.database.k8s_db_service
+    subdomains                           = var.subdomains
+    public_hosted_zone_id                = var.public_hosted_zone_id
+    auth0_tenant                         = var.auth0_tenant
+    internal_buckets                     = [component.s3_bucket.public_bucket_name]
+    read_external_buckets                = var.read_external_buckets
+    odc_cloudfront_crossaccount_role_arn = var.odc_cloudfront_crossaccount_role_arn
   }
 
   providers = {
-    aws        = provider.aws.configurations
-    kubernetes = provider.kubernetes.configurations
-    random     = provider.random.this
+    aws               = provider.aws.configurations
+    kubernetes        = provider.kubernetes.configurations
+    random            = provider.random.this
+    aws.virginia      = provider.aws.virginia
+    aws.cross_account = provider.aws.cross_account
   }
 }
 

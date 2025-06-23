@@ -55,13 +55,13 @@ deployment "development" {
     db_allocated_storage    = 50
     backup_retention_period = 14
     # --- Application Setup ---
-    auth0_tenant = "dev-fkw62b73v5emomm7.us.auth0.com"
-    # odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
-    # read_external_buckets = [
-    #   "usgs-landsat",
-    #   "copernicus-dem-30m",
-    #   "e84-earth-search-sentinel-data"
-    # ]
+    auth0_tenant                         = "dev-fkw62b73v5emomm7.us.auth0.com"
+    odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
+    read_external_buckets = [
+      "usgs-landsat",
+      "copernicus-dem-30m",
+      "e84-earth-search-sentinel-data"
+    ]
   }
 }
 

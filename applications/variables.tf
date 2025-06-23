@@ -50,3 +50,30 @@ variable "subdomains" {
   type        = list(string)
   default     = []
 }
+
+variable "internal_buckets" {
+  description = "List of internal S3 bucket names"
+  type        = list(string)
+  default     = []
+}
+
+variable "read_external_buckets" {
+  description = "List of external S3 bucket names"
+  type        = list(string)
+  default     = []
+}
+
+variable "odc_cloudfront_crossaccount_role_arn" {
+  description = "value of the cross-account IAM role in CloudFront account"
+  type        = string
+}
+
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}
+
+variable "public_hosted_zone_id" {
+  description = "The ID of the public hosted zone"
+  type        = string
+}
