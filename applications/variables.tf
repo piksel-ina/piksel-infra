@@ -1,3 +1,8 @@
+variable "aws_region" {
+  type    = string
+  default = "ap-southeast-3"
+}
+
 variable "project" {
   description = "The name of the project"
   type        = string
@@ -7,6 +12,7 @@ variable "environment" {
   description = "The name of the environment"
   type        = string
 }
+
 variable "cluster_name" {
   description = "Name of the EKS cluster for tagging subnets"
   type        = string
@@ -34,7 +40,13 @@ variable "auth0_tenant" {
   description = "The Auth0 tenant URL"
 }
 
-variable "aws_region" {
-  type    = string
-  default = "ap-southeast-3"
+variable "k8s_db_service" {
+  description = "Kubernetes database service FQDN"
+  type        = string
+}
+
+variable "subdomains" {
+  description = "Subdomains for the EKS cluster"
+  type        = list(string)
+  default     = []
 }

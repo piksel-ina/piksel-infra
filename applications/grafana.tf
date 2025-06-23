@@ -1,8 +1,8 @@
 locals {
-  prefix                   = "${lower(var.project)}-${lower(var.environment)}"
-  tags                     = var.default_tags
-  auth0_client_secret_name = "grafana-oauth-${lower(var.environment)}"
-  eks_cluster              = var.cluster_name
+  prefix               = "${lower(var.project)}-${lower(var.environment)}"
+  tags                 = var.default_tags
+  oauth_secret_grafana = "grafana-oauth-${lower(var.environment)}"
+  eks_cluster          = var.cluster_name
 }
 
 # --- Creates Kubernetes namespace for monitoring ---
@@ -41,7 +41,7 @@ resource "aws_secretsmanager_secret_version" "grafana_password" {
 
 # --- This secret was issued through AWS CLI ---
 data "aws_secretsmanager_secret_version" "grafana_client_secret" {
-  secret_id = local.auth0_client_secret_name
+  secret_id = local.oauth_secret_grafana
 }
 
 # --- Generate secure password for Grafana admin user ---

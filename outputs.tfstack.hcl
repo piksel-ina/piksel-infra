@@ -224,6 +224,28 @@ output "grafana_metadata" {
   }
 }
 
+# --- JupyterHub Outputs ---
+output "jupyterhub_metadata" {
+  description = "Output of JupyterHub configuration and resources"
+  type = object({
+    namespace            = string
+    subdomain            = string
+    db_secret_arn        = string
+    db_password          = string
+    irsa_role_arn        = string
+    service_account_name = string
+
+  })
+  value = {
+    namespace            = component.applications.jupyterhub_namespace
+    subdomain            = component.applications.jupyterhub_subdomain
+    db_secret_arn        = component.applications.jupyterhub_db_secret_arn
+    db_password          = component.applications.jupyterhub_db_password
+    irsa_role_arn        = component.applications.jupyterhub_irsa_arn
+    service_account_name = component.applications.jupyterhub_service_account_name
+  }
+}
+
 # # --- STAC Outputs ---
 # output "stac_metadata" {
 #   description = "Output of STAC configuration and resources"
