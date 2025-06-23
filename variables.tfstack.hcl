@@ -194,10 +194,10 @@ variable "backup_retention_period" {
   type        = number
 }
 
-# variable "auth0_tenant" {
-#   description = "The Auth0 tenant URL"
-#   type        = string
-# }
+variable "auth0_tenant" {
+  description = "The Auth0 tenant URL"
+  type        = string
+}
 
 # variable "read_external_buckets" {
 #   description = "List of external S3 bucket names"

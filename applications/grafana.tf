@@ -1,7 +1,7 @@
 locals {
   prefix                   = "${lower(var.project)}-${lower(var.environment)}"
   tags                     = var.default_tags
-  auth0_client_secret_name = "grafana-oauth-${var.environment}"
+  auth0_client_secret_name = "grafana-oauth-${lower(var.environment)}"
   eks_cluster              = var.cluster_name
 }
 

@@ -133,25 +133,25 @@ component "database" {
   }
 }
 
-# component "grafana" {
-#   source = "./grafana"
+component "applications" {
+  source = "./applications"
 
-#   inputs = {
-#     project               = var.project
-#     environment           = var.environment
-#     cluster_name          = component.eks-cluster.cluster_name
-#     default_tags          = var.default_tags
-#     eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
-#     oidc_issuer_url       = component.eks-cluster.cluster_oidc_issuer_url
-#     auth0_tenant          = var.auth0_tenant
-#   }
+  inputs = {
+    project               = var.project
+    environment           = var.environment
+    cluster_name          = component.eks-cluster.cluster_name
+    default_tags          = var.default_tags
+    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    oidc_issuer_url       = component.eks-cluster.cluster_oidc_issuer_url
+    auth0_tenant          = var.auth0_tenant
+  }
 
-#   providers = {
-#     aws        = provider.aws.configurations
-#     kubernetes = provider.kubernetes.configurations
-#     random     = provider.random.this
-#   }
-# }
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+    random     = provider.random.this
+  }
+}
 
 # component "jupyterhub" {
 #   source = "./jupyterhub"
