@@ -61,7 +61,7 @@ module "db" {
   create_db_subnet_group = true
   subnet_ids             = local.private_subnets
 
-  vpc_security_group_ids = var.db_security_group
+  vpc_security_group_ids = [module.security_group.security_group_id]
 
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"

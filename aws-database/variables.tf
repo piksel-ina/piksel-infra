@@ -47,19 +47,6 @@ variable "db_allocated_storage" {
   }
 }
 
-variable "db_security_group" {
-  description = "Security group ID(s) to associate with the RDS instance"
-  type        = list(string)
-  default     = []
-
-  validation {
-    condition = alltrue([
-      for sg in var.db_security_group : can(regex("^sg-", sg))
-    ])
-    error_message = "Security group IDs must start with 'sg-'."
-  }
-}
-
 variable "psql_family" {
   description = "Postrgress Database family"
   type        = string
