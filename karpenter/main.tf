@@ -55,12 +55,12 @@ module "karpenter" {
 }
 
 # --- EC2 Spot Service-Linked Role ---
-resource "aws_iam_service_linked_role" "ec2_spot" {
-  aws_service_name = "spot.amazonaws.com"
-  description      = "Service-linked role for EC2 Spot Instances"
+# resource "aws_iam_service_linked_role" "ec2_spot" {
+#   aws_service_name = "spot.amazonaws.com"
+#   description      = "Service-linked role for EC2 Spot Instances"
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
@@ -68,6 +68,7 @@ resource "helm_release" "karpenter" {
   create_namespace = true
   name             = "karpenter"
   repository       = "oci://public.ecr.aws/karpenter"
+  version          = "1.5.1"
   chart            = "karpenter"
   description      = "Karpenter autoscaler for EKS cluster"
 
@@ -117,7 +118,7 @@ resource "kubernetes_manifest" "karpenter_node_class" {
 
       amiSelectorTerms = [
         {
-          alias = "al2023@v20250505"
+          alias = var.default_nodepool_ami_alias
         }
       ]
 
@@ -236,7 +237,7 @@ resource "kubernetes_manifest" "karpenter_gpu_node_class" {
 
       amiSelectorTerms = [
         {
-          name = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+          name = var.gpu_nodepool_ami
         }
       ]
 

@@ -42,11 +42,15 @@ deployment "development" {
     kube-proxy-version = "v1.32.0-eksbuild.2"
     sso-admin-role-arn = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
     # --- External DNS Setup ---
-    subdomains                           = ["dev.pik-sel.id"]
-    externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
-    public_hosted_zone_id                = upstream_input.shared.zone_ids["dev.pik-sel.id"]
-    # default_nodepool_node_limit          = 500
-    # gpu_nodepool_node_limit              = 5
+    subdomains                        = ["dev.pik-sel.id"]
+    externaldns_crossaccount_role_arn = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
+    public_hosted_zone_id             = upstream_input.shared.zone_ids["dev.pik-sel.id"]
+    # --- Karpenter Setup ---
+    default_nodepool_node_limit = 500
+    default_nodepool_ami_alias  = "al2023@v20250505"
+    gpu_nodepool_node_limit     = 5
+    gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+
     # db_instance_class                    = "db.t3.micro"
     # db_allocated_storage                 = 20
     # backup_retention_period              = 14

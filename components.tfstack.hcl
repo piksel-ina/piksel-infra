@@ -74,24 +74,26 @@ component "external-dns" {
 
 }
 
-# component "karpenter" {
-#   source = "./karpenter"
+component "karpenter" {
+  source = "./karpenter"
 
-#   inputs = {
-#     cluster_name                = var.cluster_name
-#     oidc_provider_arn           = component.eks-cluster.cluster_oidc_provider_arn
-#     cluster_endpoint            = component.eks-cluster.cluster_endpoint
-#     default_tags                = var.default_tags
-#     default_nodepool_node_limit = var.default_nodepool_node_limit
-#     gpu_nodepool_node_limit     = var.gpu_nodepool_node_limit
-#   }
+  inputs = {
+    cluster_name                = var.cluster_name
+    oidc_provider_arn           = component.eks-cluster.cluster_oidc_provider_arn
+    cluster_endpoint            = component.eks-cluster.cluster_endpoint
+    default_nodepool_ami_alias  = var.default_nodepool_ami_alias
+    default_nodepool_node_limit = var.default_nodepool_node_limit
+    gpu_nodepool_ami            = var.gpu_nodepool_ami
+    gpu_nodepool_node_limit     = var.gpu_nodepool_node_limit
+    default_tags                = var.default_tags
+  }
 
-#   providers = {
-#     aws        = provider.aws.configurations
-#     helm       = provider.helm.configurations
-#     kubernetes = provider.kubernetes.configurations
-#   }
-# }
+  providers = {
+    aws        = provider.aws.configurations
+    helm       = provider.helm.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}
 
 # component "s3_bucket" {
 #   source = "./aws-s3-bucket"

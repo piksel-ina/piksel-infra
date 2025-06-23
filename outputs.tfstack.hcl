@@ -146,30 +146,30 @@ output "external_dns_metadata" {
   }
 }
 
-# # --- Karpenter Outputs ---
-# output "karpenter_metadata" {
-#   description = "Output of Karpenter configuration and resources"
-#   type = object({
-#     iam_role_arn            = string
-#     node_iam_role_name      = string
-#     interruption_queue_name = string
-#     helm_release_status     = string
-#     node_class_name         = optional(string)
-#     node_pool_name          = optional(string)
-#     # node_pool_gpu_name      = optional(string)
-#     node_class_status = optional(map(string))
-#   })
-#   value = {
-#     iam_role_arn            = component.karpenter.karpenter_iam_role_arn
-#     node_iam_role_name      = component.karpenter.karpenter_node_iam_role_name
-#     interruption_queue_name = component.karpenter.karpenter_interruption_queue_name
-#     helm_release_status     = component.karpenter.karpenter_helm_release_status
-#     node_class_name         = component.karpenter.karpenter_node_class_name
-#     node_pool_name          = component.karpenter.karpenter_node_pool_name
-#     # node_pool_gpu_name      = component.karpenter.karpenter_node_pool_gpu_name
-#     node_class_status = component.karpenter.karpenter_node_class_status
-#   }
-# }
+# --- Karpenter Outputs ---
+output "karpenter_metadata" {
+  description = "Output of Karpenter configuration and resources"
+  type = object({
+    iam_role_arn            = string
+    node_iam_role_name      = string
+    interruption_queue_name = string
+    helm_release_status     = string
+    node_class_status       = optional(map(string))
+    node_pool_name          = optional(string)
+    node_class_gpu_status   = optional(map(string))
+    node_pool_gpu_name      = optional(string)
+  })
+  value = {
+    iam_role_arn            = component.karpenter.karpenter_iam_role_arn
+    node_iam_role_name      = component.karpenter.karpenter_node_iam_role_name
+    interruption_queue_name = component.karpenter.karpenter_interruption_queue_name
+    helm_release_status     = component.karpenter.karpenter_helm_release_status
+    node_class_status       = component.karpenter.karpenter_node_class_status
+    node_pool_name          = component.karpenter.karpenter_node_pool_name
+    node_class_gpu_status   = component.karpenter.karpenter_node_class_gpu_status
+    node_pool_gpu_name      = component.karpenter.karpenter_node_pool_gpu_name
+  }
+}
 
 
 # # --- Public S3 Bucket ---
