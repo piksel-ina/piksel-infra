@@ -246,6 +246,19 @@ output "jupyterhub_metadata" {
   }
 }
 
+# --- Flux Outputs ---
+output "flux_metadata" {
+  description = "Output of Flux configuration and resources"
+  type = object({
+    namespace           = string
+    webhook_secret_name = string
+  })
+  value = {
+    namespace           = component.applications.flux_namespace
+    webhook_secret_name = component.applications.slack_webhook_secret_name
+  }
+}
+
 # # --- STAC Outputs ---
 # output "stac_metadata" {
 #   description = "Output of STAC configuration and resources"
@@ -328,18 +341,7 @@ output "jupyterhub_metadata" {
 #   }
 # }
 
-# # --- Flux Outputs ---
-# output "flux_metadata" {
-#   description = "Output of Flux configuration and resources"
-#   type = object({
-#     namespace           = string
-#     webhook_secret_name = string
-#   })
-#   value = {
-#     namespace           = component.addons.flux_namespace
-#     webhook_secret_name = component.addons.slack_webhook_secret_name
-#   }
-# }
+
 
 # # --- Terria Outputs ---
 # output "terria_metadata" {
