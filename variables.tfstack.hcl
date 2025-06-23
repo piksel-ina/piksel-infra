@@ -105,34 +105,34 @@ variable "cluster_name" {
   type        = string
 }
 
-# variable "eks-version" {
-#   type        = string
-#   description = "The version of Kubernetes for this environment"
-#   default     = "1.32"
-# }
+variable "eks-version" {
+  type        = string
+  description = "The version of Kubernetes for this environment"
+  default     = "1.32"
+}
 
-# variable "coredns-version" {
-#   type        = string
-#   description = "The version of CoreDNS for this environment"
-#   default     = "v1.11.4-eksbuild.2"
-# }
+variable "coredns-version" {
+  type        = string
+  description = "The version of CoreDNS for this environment"
+  default     = "v1.11.4-eksbuild.2"
+}
 
-# variable "vpc-cni-version" {
-#   type        = string
-#   description = "The version of VPC CNI for this environment"
-#   default     = "v1.19.2-eksbuild.1"
-# }
+variable "vpc-cni-version" {
+  type        = string
+  description = "The version of VPC CNI for this environment"
+  default     = "v1.19.2-eksbuild.1"
+}
 
-# variable "kube-proxy-version" {
-#   type        = string
-#   description = "The version of kube-proxy for this environment"
-#   default     = "v1.32.0-eksbuild.2"
-# }
+variable "kube-proxy-version" {
+  type        = string
+  description = "The version of kube-proxy for this environment"
+  default     = "v1.32.0-eksbuild.2"
+}
 
-# variable "sso-admin-role-arn" {
-#   type        = string
-#   description = "The ARN of SSO Admin group"
-# }
+variable "sso-admin-role-arn" {
+  type        = string
+  description = "The ARN of SSO Admin group"
+}
 
 # variable "subdomains" {
 #   description = "List of domain filters for ExternalDNS"

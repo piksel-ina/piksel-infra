@@ -22,7 +22,6 @@ deployment "development" {
     default_tags = merge(local.common_tags, { "Environment" = "Development" })
     aws_role     = "arn:aws:iam::236122835646:role/stacks-piksel-ina-piksel-ina"
     aws_token    = identity_token.aws.jwt
-    cluster_name = "piksel-dev"
     # --- Network Setup ---
     vpc_cidr               = "10.1.0.0/16"
     vpc_cidr_shared        = "10.0.0.0/16"
@@ -35,7 +34,13 @@ deployment "development" {
     }
     transit_gateway_id            = upstream_input.shared.transit_gateway_id
     inbound_resolver_ip_addresses = upstream_input.shared.inbound_resolver_ips
-    # sso-admin-role-arn                   = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
+    # --- EKS Cluster Setup ---
+    cluster_name       = "piksel-dev"
+    eks-version        = "1.32"
+    coredns-version    = "v1.11.4-eksbuild.2"
+    vpc-cni-version    = "v1.19.2-eksbuild.1"
+    kube-proxy-version = "v1.32.0-eksbuild.2"
+    sso-admin-role-arn = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
     # subdomains                           = ["dev.pik-sel.id"]
     # externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
     # default_nodepool_node_limit          = 500

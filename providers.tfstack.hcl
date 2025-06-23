@@ -3,22 +3,22 @@ required_providers {
     source  = "hashicorp/aws"
     version = "= 5.95"
   }
-  # tls = {
-  #   source  = "hashicorp/tls"
-  #   version = ">= 4.0"
-  # }
-  # time = {
-  #   source  = "hashicorp/time"
-  #   version = ">= 0.9"
-  # }
-  # cloudinit = {
-  #   source  = "hashicorp/cloudinit"
-  #   version = ">= 2.0"
-  # }
-  # null = {
-  #   source  = "hashicorp/null"
-  #   version = ">= 3.0"
-  # }
+  tls = {
+    source  = "hashicorp/tls"
+    version = ">= 4.0"
+  }
+  time = {
+    source  = "hashicorp/time"
+    version = ">= 0.9"
+  }
+  cloudinit = {
+    source  = "hashicorp/cloudinit"
+    version = ">= 2.0"
+  }
+  null = {
+    source  = "hashicorp/null"
+    version = ">= 3.0"
+  }
   # kubernetes = {
   #   source  = "hashicorp/kubernetes"
   #   version = "~> 2.0"
@@ -93,8 +93,8 @@ provider "aws" "virginia" {
 #   }
 # }
 
-# provider "tls" "this" {}
-# provider "time" "this" {}
-# provider "cloudinit" "this" {}
-# provider "null" "this" {}
+provider "tls" "this" {}
+provider "time" "this" {}
+provider "cloudinit" "this" {}
+provider "null" "this" {}
 # provider "random" "this" {}

@@ -24,48 +24,31 @@ component "network" {
   }
 }
 
-# component "security_group" {
-#   source = "./aws-security-group"
+component "eks-cluster" {
+  source = "./aws-eks-cluster"
 
-#   inputs = {
-#     vpc_id          = component.vpc.vpc_id
-#     vpc_cidr_block  = component.vpc.vpc_cidr_block
-#     vpc_cidr_shared = var.vpc_cidr_shared
-#     default_tags    = var.default_tags
-#   }
+  inputs = {
+    cluster_name        = var.cluster_name
+    vpc_id              = component.network.vpc_id
+    private_subnets_ids = component.network.private_subnets
+    eks-version         = var.eks-version
+    coredns-version     = var.coredns-version
+    vpc-cni-version     = var.vpc-cni-version
+    kube-proxy-version  = var.kube-proxy-version
+    sso-admin-role-arn  = var.sso-admin-role-arn
+    default_tags        = var.default_tags
+  }
 
-#   providers = {
-#     aws = provider.aws.configurations
-#   }
+  providers = {
+    aws       = provider.aws.configurations
+    tls       = provider.tls.this
+    time      = provider.time.this
+    null      = provider.null.this
+    cloudinit = provider.cloudinit.this
+  }
 
-#   depends_on = [component.vpc]
-# }
-
-# component "eks-cluster" {
-#   source = "./aws-eks-cluster"
-
-#   inputs = {
-#     cluster_name        = var.cluster_name
-#     vpc_id              = component.vpc.vpc_id
-#     private_subnets_ids = component.vpc.private_subnets
-#     eks-version         = var.eks-version
-#     coredns-version     = var.coredns-version
-#     vpc-cni-version     = var.vpc-cni-version
-#     kube-proxy-version  = var.kube-proxy-version
-#     sso-admin-role-arn  = var.sso-admin-role-arn
-#     default_tags        = var.default_tags
-#   }
-
-#   providers = {
-#     aws       = provider.aws.configurations
-#     tls       = provider.tls.this
-#     time      = provider.time.this
-#     null      = provider.null.this
-#     cloudinit = provider.cloudinit.this
-#   }
-
-#   depends_on = [component.vpc]
-# }
+  depends_on = [component.network]
+}
 
 # component "karpenter" {
 #   source = "./karpenter"
