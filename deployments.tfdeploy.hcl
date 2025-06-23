@@ -16,16 +16,16 @@ identity_token "aws" {
 deployment "development" {
   inputs = {
     # --- General Setup ---
-    aws_region             = local.region
-    project                = local.project
-    environment            = "Dev"
-    default_tags           = merge(local.common_tags, { "Environment" = "Development" })
-    aws_role               = "arn:aws:iam::236122835646:role/stacks-piksel-ina-piksel-ina"
-    aws_token              = identity_token.aws.jwt
-    cluster_name           = "piksel-dev"
+    aws_region   = local.region
+    project      = local.project
+    environment  = "Dev"
+    default_tags = merge(local.common_tags, { "Environment" = "Development" })
+    aws_role     = "arn:aws:iam::236122835646:role/stacks-piksel-ina-piksel-ina"
+    aws_token    = identity_token.aws.jwt
+    cluster_name = "piksel-dev"
     # --- Network Setup ---
     vpc_cidr               = "10.1.0.0/16"
-    vpc_cidr_shared                      = "10.0.0.0/16"
+    vpc_cidr_shared        = "10.0.0.0/16"
     az_count               = "2"
     single_nat_gateway     = true
     one_nat_gateway_per_az = false
@@ -33,8 +33,8 @@ deployment "development" {
     private_zone_ids = {
       "piksel.internal" = upstream_input.shared.zone_ids["piksel.internal"]
     }
-    transit_gateway_id                   = upstream_input.shared.transit_gateway_id
-    inbound_resolver_ip_addresses        = upstream_input.shared.inbound_resolver_ips
+    transit_gateway_id            = upstream_input.shared.transit_gateway_id
+    inbound_resolver_ip_addresses = upstream_input.shared.inbound_resolver_ips
     # sso-admin-role-arn                   = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
     # subdomains                           = ["dev.pik-sel.id"]
     # externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]

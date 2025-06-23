@@ -126,3 +126,24 @@ output "spoke_to_shared_vpc_via_tgw_route_state" {
   description = "The state of the route to the shared VPC via Transit Gateway"
   value       = [for rtb in aws_route.spoke_to_shared_vpc_via_tgw : rtb.state]
 }
+
+# --- Security Group Outputs ---
+output "security_group_arn_hub_to_spoke" {
+  description = "The ARN of the security group"
+  value       = module.spoke_sg.security_group_arn
+}
+
+output "security_group_id_hub_to_spoke" {
+  description = "The ID of the security group"
+  value       = module.spoke_sg.security_group_id
+}
+
+output "security_group_name_hub_to_spoke" {
+  description = "The name of the security group"
+  value       = module.spoke_sg.security_group_name
+}
+
+output "security_group_description_hub_to_spoke" {
+  description = "The description of the security group"
+  value       = module.spoke_sg.security_group_description
+}

@@ -66,6 +66,10 @@ No requirements.
 | <a name="output_public_route_table_ids"></a> [public\_route\_table\_ids](#output\_public\_route\_table\_ids) | List of IDs of public route tables |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | List of IDs of public subnets |
 | <a name="output_public_subnets_cidr_blocks"></a> [public\_subnets\_cidr\_blocks](#output\_public\_subnets\_cidr\_blocks) | List of CIDR blocks of public subnets |
+| <a name="output_security_group_arn_hub_to_spoke"></a> [security\_group\_arn\_hub\_to\_spoke](#output\_security\_group\_arn\_hub\_to\_spoke) | The ARN of the security group |
+| <a name="output_security_group_description_hub_to_spoke"></a> [security\_group\_description\_hub\_to\_spoke](#output\_security\_group\_description\_hub\_to\_spoke) | The description of the security group |
+| <a name="output_security_group_id_hub_to_spoke"></a> [security\_group\_id\_hub\_to\_spoke](#output\_security\_group\_id\_hub\_to\_spoke) | The ID of the security group |
+| <a name="output_security_group_name_hub_to_spoke"></a> [security\_group\_name\_hub\_to\_spoke](#output\_security\_group\_name\_hub\_to\_spoke) | The name of the security group |
 | <a name="output_spoke_to_shared_vpc_via_tgw_route_id"></a> [spoke\_to\_shared\_vpc\_via\_tgw\_route\_id](#output\_spoke\_to\_shared\_vpc\_via\_tgw\_route\_id) | The ID of the route to the shared VPC via Transit Gateway |
 | <a name="output_spoke_to_shared_vpc_via_tgw_route_state"></a> [spoke\_to\_shared\_vpc\_via\_tgw\_route\_state](#output\_spoke\_to\_shared\_vpc\_via\_tgw\_route\_state) | The state of the route to the shared VPC via Transit Gateway |
 | <a name="output_tgw_attachment_arn"></a> [tgw\_attachment\_arn](#output\_tgw\_attachment\_arn) | The ARN of the Transit Gateway attachment |

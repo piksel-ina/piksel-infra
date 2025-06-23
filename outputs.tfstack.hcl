@@ -31,6 +31,12 @@ output "network_metadata" {
     route53 = object({
       private_zone_association_id = list(string)
     })
+    security_group = object({
+      arn         = string
+      id          = string
+      name        = string
+      description = string
+    })
     transit_gateway = object({
       attachment_arn                          = string
       attachment_id                           = string
@@ -62,6 +68,12 @@ output "network_metadata" {
     }
     route53 = {
       private_zone_association_id = component.network.private_zone_association_id
+    }
+    security_group = {
+      arn         = component.network.security_group_arn_hub_to_spoke
+      id          = component.network.security_group_id_hub_to_spoke
+      name        = component.network.security_group_name_hub_to_spoke
+      description = component.network.security_group_description_hub_to_spoke
     }
     transit_gateway = {
       attachment_arn                          = component.network.tgw_attachment_arn
