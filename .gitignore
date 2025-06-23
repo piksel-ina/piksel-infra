@@ -1,13 +1,16 @@
 # Local .terraform directories
 **/.terraform/*
+.terraform/
+*.tfvars
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
 *.tfstate.*
+*.tfplan
 
 # log files
 *.log
-
 
 # Local overrides
 local_override.tf

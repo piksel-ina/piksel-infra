@@ -103,36 +103,8 @@ The Stack OIDC configuration enables secure authentication between Terraform Clo
 
 3. **Add the Secret to AWS Secrets Manager**
 
-   _Note: Replace the placeholders (`<...>`) with the actual values._
-
-- Use the following command to create **Slack webhook** secret.
-  ```bash
-  aws secretsmanager create-secret \
-      --name <slack-secret-name> \
-      --secret-string <https://hooks.slack.com/services/EXAMPLELONGSTRIN> \
-      --description "<Secret description>" \
-      --tags \
-          Key=Project,Value=<projectname> \
-          Key=Service,Value=<servicename> \
-          Key=Environment,Value=<env name> \
-          Key=Owner,Value=Piksel-Devops-Team \
-          Key=Tenant,Value=Slack \
-      --region ap-southeast-3
-  ```
-- As for the OAuth Client Secret (**Grafana, JupyterHub, or Argo Workflow**):
-  ```bash
-  aws secretsmanager create-secret \
-    --name <secret-name> \
-    --secret-string <client_id_here>:<client_secret_here> \
-    --description "<description>" \
-    --tags \
-      Key=Project,Value=<projectname> \
-      Key=Service,Value=<servicename> \
-      Key=Environment,Value=<env name> \
-      Key=Owner,Value=Piksel-Devops-Team \
-      Key=Tenant,Value=Auth0 \
-    --region ap-southeast-3
-  ```
+   - Use Terraform with local backend to apply the configuration
+   - For more detail step-by-step guide, please refer to [**piksel-secret-management**](./secrets-management/README.md)
 
 ### 2.3. AWS Service Quotas for GPU Nodes (Karpenter)
 
