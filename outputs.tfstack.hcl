@@ -85,22 +85,6 @@ output "network_metadata" {
   }
 }
 
-# # --- Security Group Outputs ---
-# output security_group_metadata_database {
-#   description = "Output the security group"
-#   type = object({
-#     arn         = string
-#     id          = string
-#     name        = string
-#     description = string
-#   })
-#   value = {
-#     arn         = component.security_group.security_group_arn_database
-#     id          = component.security_group.security_group_id_database
-#     name        = component.security_group.security_group_name_database
-#     description = component.security_group.security_group_description_database
-#   }
-# }
 
 # --- EKS Cluster Outputs ---
 output "eks_cluster_metadata" {
@@ -171,40 +155,51 @@ output "karpenter_metadata" {
   }
 }
 
+# --- Public S3 Bucket ---
+output "s3_public_metadata" {
+  description = "Output of S3 bucket"
+  type = object({
+    name = string
+    arn  = string
+  })
+  value = {
+    name = component.s3_bucket.public_bucket_name
+    arn  = component.s3_bucket.public_bucket_arn
+  }
+}
 
-# # --- Public S3 Bucket ---
-# output "s3_public_metadata" {
-#   description = "Output of S3 bucket"
-#   type = object({
-#     name = string
-#     arn  = string
-#   })
-#   value = {
-#     name = component.s3_bucket.public_bucket_name
-#     arn  = component.s3_bucket.public_bucket_arn
-#   }
-# }
-
-# # --- RDS Output ---
-# output "database_metadata" {
-#   description = "Output of RDS database configuration and resources"
-#   type = object({
-#     endpoint         = string
-#     address          = string
-#     port             = number
-#     instance_id      = string
-#     k8s_service_fqdn = string
-#     k8s_namespace    = string
-#   })
-#   value = {
-#     endpoint         = component.database.db_endpoint
-#     address          = component.database.db_address
-#     port             = component.database.db_port
-#     instance_id      = component.database.db_instance_id
-#     k8s_service_fqdn = component.database.k8s_db_service
-#     k8s_namespace    = component.database.db_namespace
-#   }
-# }
+# --- RDS Output ---
+output "database_metadata" {
+  description = "Output of RDS database configuration and resources"
+  type = object({
+    endpoint         = string
+    address          = string
+    port             = number
+    instance_id      = string
+    k8s_service_fqdn = string
+    k8s_namespace    = string
+    security_group = object({
+      arn         = string
+      id          = string
+      name        = string
+      description = string
+    })
+  })
+  value = {
+    endpoint         = component.database.db_endpoint
+    address          = component.database.db_address
+    port             = component.database.db_port
+    instance_id      = component.database.db_instance_id
+    k8s_service_fqdn = component.database.k8s_db_service
+    k8s_namespace    = component.database.db_namespace
+    security_group = {
+      arn         = component.database.security_group_arn_database
+      id          = component.database.security_group_id_database
+      name        = component.database.security_group_name_database
+      description = component.database.security_group_description_database
+    }
+  }
+}
 
 # # --- Grafana Metadata ---
 # output "grafana_metadata" {

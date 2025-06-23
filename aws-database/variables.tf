@@ -82,3 +82,14 @@ variable "backup_retention_period" {
     error_message = "Backup retention period must be between 0 and 35 days."
   }
 }
+
+# --- Security Group Variables ---
+variable "vpc_id" {
+  description = "The ID of the VPC to associate with the security group"
+  type        = string
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR block of the deployment vpc"
+  type        = string
+}

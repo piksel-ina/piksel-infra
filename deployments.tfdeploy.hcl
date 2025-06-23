@@ -50,10 +50,10 @@ deployment "development" {
     default_nodepool_ami_alias  = "al2023@v20250505"
     gpu_nodepool_node_limit     = 5
     gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
-
-    # db_instance_class                    = "db.t3.micro"
-    # db_allocated_storage                 = 20
-    # backup_retention_period              = 14
+    # --- Database Setup ---
+    db_instance_class       = "db.t3.small"
+    db_allocated_storage    = 50
+    backup_retention_period = 14
     # auth0_tenant                         = "dev-fkw62b73v5emomm7.us.auth0.com"
     # odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
     # read_external_buckets = [

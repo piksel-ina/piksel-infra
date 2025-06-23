@@ -176,30 +176,28 @@ variable "gpu_nodepool_node_limit" {
   default     = 20
 }
 
-# # --- Database Variables ---
-# variable "db_instance_class" {
-#   description = "Database instance class (e.g., db.t3.micro, db.t3.small)"
-#   type        = string
-#   default     = "db.t3.micro"
-# }
+# --- Database Variables ---
+variable "db_instance_class" {
+  description = "Database instance class (e.g., db.t3.micro, db.t3.small)"
+  type        = string
+  default     = "db.t3.micro"
+}
 
-# variable "db_allocated_storage" {
-#   description = "The allocated storage in gibibytes for the RDS instance"
-#   type        = number
-#   default     = 20
-# }
+variable "db_allocated_storage" {
+  description = "The allocated storage in gibibytes for the RDS instance"
+  type        = number
+  default     = 20
+}
 
-# variable "backup_retention_period" {
-#   description = "Number of days to retain backups"
-#   type        = number
-# }
+variable "backup_retention_period" {
+  description = "Number of days to retain backups"
+  type        = number
+}
 
 # variable "auth0_tenant" {
 #   description = "The Auth0 tenant URL"
 #   type        = string
 # }
-
-
 
 # variable "read_external_buckets" {
 #   description = "List of external S3 bucket names"
@@ -210,18 +208,4 @@ variable "gpu_nodepool_node_limit" {
 # variable "odc_cloudfront_crossaccount_role_arn" {
 #   description = "value of the cross-account IAM role in CloudFront account"
 #   type        = string
-# }
-
-
-
-# variable "default_nodepool_node_limit" {
-#   description = "Default node limit for node pools"
-#   type        = number
-#   default     = 10000
-# }
-
-# variable "gpu_nodepool_node_limit" {
-#   description = "Default GPU node limit for GPU node pools"
-#   type        = number
-#   default     = 20
 # }

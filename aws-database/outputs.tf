@@ -40,3 +40,24 @@ output "db_namespace" {
   description = "Database Kubernetes namespace"
   value       = kubernetes_namespace.db.metadata[0].name
 }
+
+# --- Security Group Outputs ---
+output "security_group_arn_database" {
+  description = "The ARN of the security group"
+  value       = module.security_group.security_group_arn
+}
+
+output "security_group_id_database" {
+  description = "The ID of the security group"
+  value       = module.security_group.security_group_id
+}
+
+output "security_group_name_database" {
+  description = "The name of the security group"
+  value       = module.security_group.security_group_name
+}
+
+output "security_group_description_database" {
+  description = "The description of the security group"
+  value       = module.security_group.security_group_description
+}

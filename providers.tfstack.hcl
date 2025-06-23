@@ -27,10 +27,10 @@ required_providers {
     source  = "hashicorp/helm"
     version = "~> 2.0"
   }
-  # random = {
-  #   source  = "hashicorp/random"
-  #   version = "~> 3.0"
-  # }
+  random = {
+    source  = "hashicorp/random"
+    version = "~> 3.0"
+  }
 }
 
 provider "aws" "configurations" {
@@ -97,4 +97,4 @@ provider "tls" "this" {}
 provider "time" "this" {}
 provider "cloudinit" "this" {}
 provider "null" "this" {}
-# provider "random" "this" {}
+provider "random" "this" {}

@@ -95,43 +95,43 @@ component "karpenter" {
   }
 }
 
-# component "s3_bucket" {
-#   source = "./aws-s3-bucket"
+component "s3_bucket" {
+  source = "./aws-s3-bucket"
 
-#   inputs = {
-#     project      = var.project
-#     environment  = var.environment
-#     default_tags = var.default_tags
-#   }
+  inputs = {
+    project      = var.project
+    environment  = var.environment
+    default_tags = var.default_tags
+  }
 
-#   providers = {
-#     aws        = provider.aws.configurations
-#     kubernetes = provider.kubernetes.configurations
-#   }
-# }
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}
 
-# component "database" {
-#   source = "./aws-database"
+component "database" {
+  source = "./aws-database"
 
-#   inputs = {
-#     project                 = var.project
-#     environment             = var.environment
-#     vpc_id                  = component.vpc.vpc_id
-#     private_subnets_ids     = component.vpc.private_subnets
-#     cluster_name            = component.eks-cluster.cluster_name
-#     default_tags            = var.default_tags
-#     db_instance_class       = var.db_instance_class
-#     db_allocated_storage    = var.db_allocated_storage
-#     db_security_group       = [component.security_group.security_group_id_database]
-#     backup_retention_period = var.backup_retention_period
-#   }
+  inputs = {
+    project                 = var.project
+    environment             = var.environment
+    vpc_id                  = component.network.vpc_id
+    vpc_cidr_block          = component.network.vpc_cidr_block
+    private_subnets_ids     = component.network.private_subnets
+    cluster_name            = component.eks-cluster.cluster_name
+    default_tags            = var.default_tags
+    db_instance_class       = var.db_instance_class
+    db_allocated_storage    = var.db_allocated_storage
+    backup_retention_period = var.backup_retention_period
+  }
 
-#   providers = {
-#     aws        = provider.aws.configurations
-#     kubernetes = provider.kubernetes.configurations
-#     random     = provider.random.this
-#   }
-# }
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+    random     = provider.random.this
+  }
+}
 
 # component "grafana" {
 #   source = "./grafana"
@@ -195,7 +195,7 @@ component "karpenter" {
 #   source = "./odc"
 
 #   inputs = {
-#     account_id                           = component.vpc.account_id
+#     account_id                           = component.network.account_id
 #     project                              = var.project
 #     environment                          = var.environment
 #     default_tags                         = var.default_tags

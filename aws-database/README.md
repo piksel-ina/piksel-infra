@@ -16,6 +16,7 @@ No requirements.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_db"></a> [db](#module\_db) | terraform-aws-modules/rds/aws | 6.0.0 |
+| <a name="module_security_group"></a> [security\_group](#module\_security\_group) | terraform-aws-modules/security-group/aws | 5.3.0 |
 
 ## Resources
 
@@ -43,6 +44,8 @@ No requirements.
 | <a name="input_project"></a> [project](#input\_project) | The name of the project | `string` | n/a | yes |
 | <a name="input_psql_family"></a> [psql\_family](#input\_psql\_family) | Postrgress Database family | `string` | `"postgres16"` | no |
 | <a name="input_psql_major_engine_version"></a> [psql\_major\_engine\_version](#input\_psql\_major\_engine\_version) | Postrgress Database engine version | `string` | `"16"` | no |
+| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | CIDR block of the deployment vpc | `string` | n/a | yes |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | The ID of the VPC to associate with the security group | `string` | n/a | yes |
 
 ## Outputs
 
@@ -56,4 +59,8 @@ No requirements.
 | <a name="output_db_port"></a> [db\_port](#output\_db\_port) | RDS database port |
 | <a name="output_db_username"></a> [db\_username](#output\_db\_username) | Database username |
 | <a name="output_k8s_db_service"></a> [k8s\_db\_service](#output\_k8s\_db\_service) | Kubernetes database service FQDN |
+| <a name="output_security_group_arn_database"></a> [security\_group\_arn\_database](#output\_security\_group\_arn\_database) | The ARN of the security group |
+| <a name="output_security_group_description_database"></a> [security\_group\_description\_database](#output\_security\_group\_description\_database) | The description of the security group |
+| <a name="output_security_group_id_database"></a> [security\_group\_id\_database](#output\_security\_group\_id\_database) | The ID of the security group |
+| <a name="output_security_group_name_database"></a> [security\_group\_name\_database](#output\_security\_group\_name\_database) | The name of the security group |
 <!-- END_TF_DOCS -->
