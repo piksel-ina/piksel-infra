@@ -134,15 +134,21 @@ variable "sso-admin-role-arn" {
   description = "The ARN of SSO Admin group"
 }
 
-# variable "subdomains" {
-#   description = "List of domain filters for ExternalDNS"
-#   type        = list(string)
-# }
+# --- External DNS Variables ---
+variable "subdomains" {
+  description = "List of domain filters for ExternalDNS"
+  type        = list(string)
+}
 
-# variable "externaldns_crossaccount_role_arn" {
-#   description = "The ARN of the cross-account IAM role in Route53 account"
-#   type        = string
-# }
+variable "externaldns_crossaccount_role_arn" {
+  description = "The ARN of the cross-account IAM role in Route53 account"
+  type        = string
+}
+
+variable "public_hosted_zone_id" {
+  description = "The ID of the public hosted zone"
+  type        = string
+}
 
 # # --- Database Variables ---
 # variable "db_instance_class" {
@@ -167,10 +173,7 @@ variable "sso-admin-role-arn" {
 #   type        = string
 # }
 
-# variable "public_hosted_zone_id" {
-#   description = "The ID of the public hosted zone"
-#   type        = string
-# }
+
 
 # variable "read_external_buckets" {
 #   description = "List of external S3 bucket names"

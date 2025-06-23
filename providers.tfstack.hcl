@@ -19,14 +19,14 @@ required_providers {
     source  = "hashicorp/null"
     version = ">= 3.0"
   }
-  # kubernetes = {
-  #   source  = "hashicorp/kubernetes"
-  #   version = "~> 2.0"
-  # }
-  # helm = {
-  #   source  = "hashicorp/helm"
-  #   version = "~> 2.0"
-  # }
+  kubernetes = {
+    source  = "hashicorp/kubernetes"
+    version = "~> 2.0"
+  }
+  helm = {
+    source  = "hashicorp/helm"
+    version = "~> 2.0"
+  }
   # random = {
   #   source  = "hashicorp/random"
   #   version = "~> 3.0"
@@ -59,6 +59,24 @@ provider "aws" "virginia" {
   }
 }
 
+provider "kubernetes" "configurations" {
+  config {
+    host                   = component.eks-cluster.cluster_endpoint
+    cluster_ca_certificate = base64decode(component.eks-cluster.cluster_certificate_authority_data)
+    token                  = component.eks-cluster.authentication_token
+  }
+}
+
+provider "helm" "configurations" {
+  config {
+    kubernetes {
+      host                   = component.eks-cluster.cluster_endpoint
+      cluster_ca_certificate = base64decode(component.eks-cluster.cluster_certificate_authority_data)
+      token                  = component.eks-cluster.authentication_token
+    }
+  }
+}
+
 # provider "aws" "cross_account" {
 #   config {
 #     region = var.aws_region
@@ -71,24 +89,6 @@ provider "aws" "virginia" {
 #     }
 #     default_tags {
 #       tags = var.default_tags
-#     }
-#   }
-# }
-
-# provider "kubernetes" "configurations" {
-#   config {
-#     host                   = component.eks-cluster.cluster_endpoint
-#     cluster_ca_certificate = base64decode(component.eks-cluster.cluster_certificate_authority_data)
-#     token                  = component.eks-cluster.authentication_token
-#   }
-# }
-
-# provider "helm" "configurations" {
-#   config {
-#     kubernetes {
-#       host                   = component.eks-cluster.cluster_endpoint
-#       cluster_ca_certificate = base64decode(component.eks-cluster.cluster_certificate_authority_data)
-#       token                  = component.eks-cluster.authentication_token
 #     }
 #   }
 # }

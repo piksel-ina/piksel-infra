@@ -16,10 +16,6 @@ variable "oidc_provider_arn" {
   description = "EKS Cluster OIDC provider arn "
 }
 
-variable "zone_ids" {
-  description = "Map of domain name to Route53 hosted zone IDs"
-}
-
 variable "public_hosted_zone_id" {
   description = "The ID of the public hosted zone"
   type        = string

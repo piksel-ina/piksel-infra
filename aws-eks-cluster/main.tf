@@ -111,7 +111,7 @@ module "eks" {
     }
     external_dns = {
       selectors = [
-        { namespace = "aws-external-dns-helm" }
+        { namespace = "external-dns" }
       ]
     }
   }

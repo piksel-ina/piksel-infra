@@ -50,6 +50,30 @@ component "eks-cluster" {
   depends_on = [component.network]
 }
 
+component "external-dns" {
+  source = "./external-dns"
+
+  inputs = {
+    aws_region                        = var.aws_region
+    project                           = var.project
+    environment                       = var.environment
+    cluster_name                      = var.cluster_name
+    subdomains                        = var.subdomains
+    oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
+    oidc_provider_arn                 = component.eks-cluster.cluster_oidc_provider_arn
+    externaldns_crossaccount_role_arn = var.externaldns_crossaccount_role_arn
+    public_hosted_zone_id             = var.public_hosted_zone_id
+    default_tags                      = var.default_tags
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    helm       = provider.helm.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+
+}
+
 # component "karpenter" {
 #   source = "./karpenter"
 
@@ -67,31 +91,6 @@ component "eks-cluster" {
 #     helm       = provider.helm.configurations
 #     kubernetes = provider.kubernetes.configurations
 #   }
-# }
-
-# component "addons" {
-#   source = "./aws-eks-addons"
-
-#   inputs = {
-#     aws_region                        = var.aws_region
-#     project                           = var.project
-#     environment                       = var.environment
-#     cluster_name                      = var.cluster_name
-#     subdomains                        = var.subdomains
-#     oidc_provider                     = component.eks-cluster.cluster_oidc_issuer_url
-#     oidc_provider_arn                 = component.eks-cluster.cluster_oidc_provider_arn
-#     externaldns_crossaccount_role_arn = var.externaldns_crossaccount_role_arn
-#     public_hosted_zone_id             = var.public_hosted_zone_id
-#     zone_ids                          = var.zone_ids
-#     default_tags                      = var.default_tags
-#   }
-
-#   providers = {
-#     aws        = provider.aws.configurations
-#     helm       = provider.helm.configurations
-#     kubernetes = provider.kubernetes.configurations
-#   }
-
 # }
 
 # component "s3_bucket" {

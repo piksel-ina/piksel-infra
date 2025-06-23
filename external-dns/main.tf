@@ -27,7 +27,7 @@ resource "aws_iam_role" "external_dns" {
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${replace(var.oidc_provider, "https://", "")}:sub" = "system:serviceaccount:aws-external-dns-helm:external-dns"
+            "${replace(var.oidc_provider, "https://", "")}:sub" = "system:serviceaccount:external-dns:external-dns-sa"
             "${replace(var.oidc_provider, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
@@ -36,8 +36,7 @@ resource "aws_iam_role" "external_dns" {
   })
 
   tags = merge(var.default_tags, {
-    Name      = "external-dns-irsa"
-    Component = "external-dns"
+    Name = "external-dns-irsa"
   })
 }
 
@@ -51,10 +50,10 @@ resource "aws_iam_role_policy" "external_dns" {
 # --- Create Namespace ---
 resource "kubernetes_namespace" "external_dns" {
   metadata {
-    name = "aws-external-dns-helm"
+    name = "external-dns"
 
     labels = {
-      name      = "aws-external-dns-helm"
+      name      = "external-dns"
       component = "external-dns"
     }
   }
@@ -62,7 +61,7 @@ resource "kubernetes_namespace" "external_dns" {
 
 # --- Deploy ExternalDNS via Helm release (Let Helm manage the service account) ---
 resource "helm_release" "external_dns" {
-  name       = "aws-ext-dns-helm"
+  name       = "external-dns-helm"
   namespace  = kubernetes_namespace.external_dns.metadata[0].name
   repository = "https://kubernetes-sigs.github.io/external-dns/"
   chart      = "external-dns"
@@ -76,7 +75,7 @@ resource "helm_release" "external_dns" {
   values = [
     yamlencode({
       # Logging configuration
-      logLevel  = "debug"
+      logLevel  = "info"
       logFormat = "json"
 
       # Provider configuration
@@ -97,7 +96,7 @@ resource "helm_release" "external_dns" {
       # Service Account configuration
       serviceAccount = {
         create = true
-        name   = "external-dns"
+        name   = "external-dns-sa"
         annotations = {
           "eks.amazonaws.com/role-arn" = aws_iam_role.external_dns.arn
         }
@@ -156,43 +155,4 @@ resource "helm_release" "external_dns" {
   force_update  = false
   recreate_pods = false
 
-}
-
-
-# --- Flux CD Configuration ---
-locals {
-  flux_namespace      = "flux-system"
-  webhook_secret_name = "flux-notification-slack-webhook-secret-${lower(var.environment)}"
-}
-
-resource "kubernetes_namespace" "flux_system" {
-  metadata {
-    name = local.flux_namespace
-    labels = {
-      project     = var.project
-      environment = var.environment
-      name        = local.flux_namespace
-    }
-  }
-  lifecycle {
-    ignore_changes = [
-      metadata[0].labels,
-      metadata[0].annotations
-    ]
-  }
-}
-
-# --- Fetch Slack Webhook URL from AWS Secrets Manager, created using AWS CLI ---
-data "aws_secretsmanager_secret_version" "slack_webhook" {
-  secret_id = local.webhook_secret_name
-}
-
-resource "kubernetes_secret" "slack_webhook" {
-  metadata {
-    name      = "slack-webhook-${lower(var.environment)}"
-    namespace = kubernetes_namespace.flux_system.metadata[0].name
-  }
-  data = {
-    "address" = data.aws_secretsmanager_secret_version.slack_webhook.secret_string
-  }
 }

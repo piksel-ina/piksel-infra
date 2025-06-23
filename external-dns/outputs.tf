@@ -33,20 +33,3 @@ output "external_dns_helm_chart_version" {
   description = "Version of the External DNS Helm chart deployed"
   value       = helm_release.external_dns.version
 }
-
-# --- Flux outputs ---
-output "flux_namespace" {
-  description = "The namespace where Flux is deployed"
-  value       = kubernetes_namespace.flux_system.metadata[0].name
-}
-
-output "slack_webhook_secret_name" {
-  description = "Slack webhook secret name"
-  value       = kubernetes_secret.slack_webhook.metadata[0].name
-}
-
-output "slack_webhook_address" {
-  description = "The Slack webhook address used for notifications"
-  value       = data.aws_secretsmanager_secret_version.slack_webhook.secret_string
-  sensitive   = true
-}

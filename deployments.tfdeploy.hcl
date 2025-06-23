@@ -41,15 +41,16 @@ deployment "development" {
     vpc-cni-version    = "v1.19.2-eksbuild.1"
     kube-proxy-version = "v1.32.0-eksbuild.2"
     sso-admin-role-arn = "arn:aws:iam::236122835646:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_1e048c7b0fa4b3a8"
-    # subdomains                           = ["dev.pik-sel.id"]
-    # externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
+    # --- External DNS Setup ---
+    subdomains                           = ["dev.pik-sel.id"]
+    externaldns_crossaccount_role_arn    = upstream_input.shared.externaldns_crossaccount_role_arns["dev"]
+    public_hosted_zone_id                = upstream_input.shared.zone_ids["dev.pik-sel.id"]
     # default_nodepool_node_limit          = 500
     # gpu_nodepool_node_limit              = 5
     # db_instance_class                    = "db.t3.micro"
     # db_allocated_storage                 = 20
     # backup_retention_period              = 14
     # auth0_tenant                         = "dev-fkw62b73v5emomm7.us.auth0.com"
-    # public_hosted_zone_id                = upstream_input.shared.zone_ids["dev.pik-sel.id"]
     # odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
     # read_external_buckets = [
     #   "usgs-landsat",

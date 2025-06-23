@@ -27,11 +27,6 @@ This module automates the following:
 
 For more comprehensive explanation please refer to [**📑 ExternalDNS Detail Documentation**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-addons.md)
 
-2.  **FluxCD Notification Setup**:
-    - Creates the `flux-system` Kubernetes namespace if it doesn't exist.
-    - Fetches a Slack webhook URL from AWS Secrets Manager.
-    - Creates a Kubernetes secret (`slack-webhook`) in the `flux-system` namespace containing the webhook URL, enabling FluxCD to send notifications to Slack.
-
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
