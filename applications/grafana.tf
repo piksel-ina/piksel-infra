@@ -3,18 +3,18 @@ locals {
   tags                 = var.default_tags
   oauth_secret_grafana = "grafana-oauth-${lower(var.environment)}"
   eks_cluster          = var.cluster_name
+  grafana_namespace    = "monitoring"
 }
 
 # --- Creates Kubernetes namespace for monitoring ---
 resource "kubernetes_namespace" "monitoring" {
   metadata {
-    name = "monitoring"
+    name = local.grafana_namespace
 
     labels = {
       project     = var.project
       environment = var.environment
-      name        = "monitoring"
-      managed-by  = "terraform"
+      name        = local.grafana_namespace
     }
   }
 }

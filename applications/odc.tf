@@ -8,12 +8,11 @@ locals {
 # --- Creates Kubernetes namespace for ODC ---
 resource "kubernetes_namespace" "odc" {
   metadata {
-    name = "odc"
+    name = local.odc_namespace
     labels = {
       project     = var.project
       environment = var.environment
       name        = local.odc_namespace
-      managed-by  = "terraform"
     }
   }
 }

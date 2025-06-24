@@ -1,17 +1,17 @@
 locals {
   oauth_secret_jupyterhub = "jupyterhub-oauth-${lower(var.environment)}"
   jhub_subdomain          = "jupyter.${var.subdomains[0]}" # subdomain list pattern: [public, private]
+  jhub_namespace          = "jupyterhub"
 }
 
 # --- Dedicated namespace for all hub resources ---
 resource "kubernetes_namespace" "hub" {
   metadata {
-    name = "jupyterhub"
+    name = local.jhub_namespace
     labels = {
       project     = var.project
       environment = var.environment
-      name        = "jupyterhub"
-      managed-by  = "terraform"
+      name        = local.jhub_namespace
     }
   }
 }
