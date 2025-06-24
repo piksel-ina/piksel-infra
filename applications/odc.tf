@@ -1,8 +1,8 @@
 locals {
-  odc_namespace        = "open-datacube"
-  read_buckets         = concat(var.read_external_buckets, var.internal_buckets)
-  service_account_name = "odc-data-reader"
-  subdomain            = var.subdomains[0] # The public domain must be the first in the list
+  odc_namespace            = "open-datacube"
+  read_buckets             = concat(var.read_external_buckets, var.internal_buckets)
+  service_account_name_odc = "odc-data-reader"
+  subdomain                = var.subdomains[0] # The public domain must be the first in the list
 }
 
 # --- Creates Kubernetes namespace for ODC ---
@@ -78,8 +78,8 @@ resource "kubernetes_secret" "odcread_namespace_secret" {
 
 # --- Read-only IAM Policy ---
 resource "aws_iam_policy" "read_policy" {
-  name        = "svc-${local.service_account_name}-read-policy"
-  description = "Read-only policy for S3 buckets for ${local.service_account_name}"
+  name        = "svc-${local.service_account_name_odc}-read-policy"
+  description = "Read-only policy for S3 buckets for ${local.service_account_name_odc}"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -103,14 +103,14 @@ resource "aws_iam_policy" "read_policy" {
 }
 
 # --- IAM Role for Service Account (IRSA) ----
-module "iam_eks_role_bucket" {
+module "iam_eks_role_bucket_odc" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name = "svc-${local.service_account_name}"
+  role_name = "svc-${local.service_account_name_odc}"
 
   oidc_providers = {
     main = {
       provider_arn               = var.eks_oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.odc.metadata[0].name}:${local.service_account_name}"]
+      namespace_service_accounts = ["${kubernetes_namespace.odc.metadata[0].name}:${local.service_account_name_odc}"]
     }
   }
 

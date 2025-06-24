@@ -294,69 +294,67 @@ output "odc_ows_cache_metadata" {
   }
 }
 
-# # --- STAC Outputs ---
-# output "stac_metadata" {
-#   description = "Output of STAC configuration and resources"
-#   type = object({
-#     namespace            = string
-#     write_secret_arn     = string
-#     read_secret_arn      = string
-#     read_k8s_secret_name = string
-#   })
-#   value = {
-#     namespace            = component.odc-stac.stac_namespace
-#     write_secret_arn     = component.odc-stac.stac_write_secret_arn
-#     read_secret_arn      = component.odc-stac.stac_read_secret_arn
-#     read_k8s_secret_name = component.odc-stac.stacread_k8s_secret_name
-#   }
-# }
+# --- STAC Outputs ---
+output "stac_metadata" {
+  description = "Output of STAC configuration and resources"
+  type = object({
+    namespace            = string
+    write_secret_arn     = string
+    read_secret_arn      = string
+    read_k8s_secret_name = string
+  })
+  value = {
+    namespace            = component.applications.stac_namespace
+    write_secret_arn     = component.applications.stac_write_secret_arn
+    read_secret_arn      = component.applications.stac_read_secret_arn
+    read_k8s_secret_name = component.applications.stacread_k8s_secret_name
+  }
+}
 
-# # --- Argo Workflow Outputs ---
-# output "argo_workflow_metadata" {
-#   description = "Output of Argo Workflow configuration and resources"
-#   type = object({
-#     artifact_bucket_name          = string
-#     namespace                     = string
-#     artifact_iam_role_arn         = string
-#     artifact_service_account_name = string
-#     artifact_iam_policy_arn       = string
-#     db_password_secret_arn        = string
-#     k8s_secret_name               = string
-#     user_artifact_policy_arn      = string
-#     user_artifact_role_name       = string
-#     user_artifact_role_arn        = string
-#     user_name                     = string
-#   })
-#   value = {
-#     artifact_bucket_name          = component.argo-workflow.argo_artifact_bucket_name
-#     namespace                     = component.argo-workflow.argo_workflow_namespace
-#     artifact_iam_role_arn         = component.argo-workflow.argo_artifact_iam_role_arn
-#     artifact_service_account_name = component.argo-workflow.argo_artifact_service_account_name
-#     artifact_iam_policy_arn       = component.argo-workflow.argo_artifact_iam_policy_arn
-#     db_password_secret_arn        = component.argo-workflow.argo_db_password_secret_arn
-#     k8s_secret_name               = component.argo-workflow.argo_k8s_secret_name
-#     user_artifact_policy_arn      = component.argo-workflow.argo_artifact_policy_arn_for_user
-#     user_artifact_role_name       = component.argo-workflow.argo_artifact_role_name_for_user
-#     user_artifact_role_arn        = component.argo-workflow.argo_artifact_role_arn_for_user
-#     user_name                     = component.argo-workflow.argo_artifact_user_name
-#   }
-# }
+# --- Argo Workflow Outputs ---
+output "argo_workflow_metadata" {
+  description = "Output of Argo Workflow configuration and resources"
+  type = object({
+    artifact_bucket_name          = string
+    namespace                     = string
+    artifact_iam_role_arn         = string
+    artifact_service_account_name = string
+    artifact_iam_policy_arn       = string
+    db_password_secret_arn        = string
+    k8s_secret_name               = string
+    user_artifact_policy_arn      = string
+    user_artifact_role_name       = string
+    user_artifact_role_arn        = string
+    user_name                     = string
+  })
+  value = {
+    artifact_bucket_name          = component.applications.argo_artifact_bucket_name
+    namespace                     = component.applications.argo_workflow_namespace
+    artifact_iam_role_arn         = component.applications.argo_artifact_iam_role_arn
+    artifact_service_account_name = component.applications.argo_artifact_service_account_name
+    artifact_iam_policy_arn       = component.applications.argo_artifact_iam_policy_arn
+    db_password_secret_arn        = component.applications.argo_db_password_secret_arn
+    k8s_secret_name               = component.applications.argo_k8s_secret_name
+    user_artifact_policy_arn      = component.applications.argo_artifact_policy_arn_for_user
+    user_artifact_role_name       = component.applications.argo_artifact_role_name_for_user
+    user_artifact_role_arn        = component.applications.argo_artifact_role_arn_for_user
+    user_name                     = component.applications.argo_artifact_user_name
+  }
+}
 
-
-
-# # --- Terria Outputs ---
-# output "terria_metadata" {
-#   description = "Output of Terria configuration and resources"
-#   type = object({
-#     bucket_name     = string
-#     iam_user_name   = string
-#     k8s_secret_name = string
-#     k8s_namespace   = string
-#   })
-#   value = {
-#     bucket_name     = component.terria.bucket_name
-#     iam_user_name   = component.terria.iam_user_name
-#     k8s_secret_name = component.terria.k8s_secret_name
-#     k8s_namespace   = component.terria.k8s_namespace
-#   }
-# }
+# --- Terria Outputs ---
+output "terria_metadata" {
+  description = "Output of Terria configuration and resources"
+  type = object({
+    bucket_name     = string
+    iam_user_name   = string
+    k8s_secret_name = string
+    k8s_namespace   = string
+  })
+  value = {
+    bucket_name     = component.applications.terria_bucket_name
+    iam_user_name   = component.applications.terria_iam_user_name
+    k8s_secret_name = component.applications.terria_k8s_secret_name
+    k8s_namespace   = component.applications.terria_k8s_namespace
+  }
+}
