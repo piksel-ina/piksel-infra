@@ -12,6 +12,11 @@ resource "kubernetes_namespace" "stac" {
       name        = local.stac_namespace
     }
   }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels
+    ]
+  }
 }
 
 # --- Store database password in AWS Secrets Manager ---

@@ -17,6 +17,11 @@ resource "kubernetes_namespace" "monitoring" {
       name        = local.grafana_namespace
     }
   }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels
+    ]
+  }
 }
 
 # --- Generate secure password for Grafana database connection ---

@@ -14,6 +14,11 @@ resource "kubernetes_namespace" "hub" {
       name        = local.jhub_namespace
     }
   }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels
+    ]
+  }
 }
 
 

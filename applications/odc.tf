@@ -15,6 +15,11 @@ resource "kubernetes_namespace" "odc" {
       name        = local.odc_namespace
     }
   }
+  lifecycle {
+    ignore_changes = [
+      metadata[0].labels
+    ]
+  }
 }
 
 # --- Create password for the ODC database connection ---
