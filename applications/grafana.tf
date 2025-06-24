@@ -155,7 +155,22 @@ resource "aws_iam_role_policy_attachment" "grafana_cloudwatch" {
   policy_arn = aws_iam_policy.grafana_cloudwatch.arn
 }
 
-# --- Grafana configuration ---
+# --- Grafana OAuth Secret for Auth0 Credentials ---
+resource "kubernetes_secret" "grafana_oauth" {
+  metadata {
+    name      = "grafana-oauth-secret"
+    namespace = kubernetes_namespace.monitoring.metadata[0].name
+  }
+
+  data = {
+    client_id     = split(":", data.aws_secretsmanager_secret_version.grafana_client_secret.secret_string)[0]
+    client_secret = split(":", data.aws_secretsmanager_secret_version.grafana_client_secret.secret_string)[1]
+  }
+
+  type = "Opaque"
+}
+
+
 resource "kubernetes_secret" "grafana" {
   metadata {
     name      = "grafana-values"
@@ -168,9 +183,7 @@ resource "kubernetes_secret" "grafana" {
       service_account_role_arn = aws_iam_role.grafana.arn
 
       # Auth0
-      auth0_tenant  = var.auth0_tenant
-      client_id     = split(":", data.aws_secretsmanager_secret_version.grafana_client_secret.secret_string)[0]
-      client_secret = split(":", data.aws_secretsmanager_secret_version.grafana_client_secret.secret_string)[1]
+      auth0_tenant = var.auth0_tenant
 
       # AWS region for CloudWatch
       aws_region = var.aws_region

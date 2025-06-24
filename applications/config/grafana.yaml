@@ -4,8 +4,6 @@ grafana:
       name: auth0
       enabled: true
       allow_sign_up: true
-      client_id: ${client_id}
-      client_secret: ${client_secret}
       scopes: openid profile email groups
       auth_url: ${auth0_tenant}/authorize
       token_url: ${auth0_tenant}/oauth/token
@@ -14,3 +12,12 @@ grafana:
       allowed_groups: "Argo Users"
       # We only have one tier of users.`Viewer`is the other possible value
       role_attribute_path: contains(org-groups[*], 'Argo Users') && 'Editor' || 'Viewer'
+  envValueFrom:
+    GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
+      secretKeyRef:
+        name: grafana-oauth-secret
+        key: client_id
+    GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET:
+      secretKeyRef:
+        name: grafana-oauth-secret
+        key: client_secret
