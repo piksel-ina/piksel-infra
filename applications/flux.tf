@@ -35,13 +35,3 @@ resource "kubernetes_secret" "slack_webhook" {
   }
 }
 
-# --- Flux outputs ---
-output "flux_namespace" {
-  description = "The namespace where Flux is deployed"
-  value       = kubernetes_namespace.flux_system.metadata[0].name
-}
-
-output "slack_webhook_secret_name" {
-  description = "Slack webhook secret name"
-  value       = kubernetes_secret.slack_webhook.metadata[0].name
-}

@@ -166,6 +166,22 @@ output "terria_k8s_namespace" {
   value       = kubernetes_namespace.terria.metadata[0].name
 }
 
+# --- Flux outputs ---
+output "flux_namespace" {
+  description = "The namespace where Flux is deployed"
+  value       = kubernetes_namespace.flux_system.metadata[0].name
+}
+
+output "slack_webhook_secret_name" {
+  description = "Slack webhook secret name"
+  value       = kubernetes_secret.slack_webhook.metadata[0].name
+}
+
+output "slack_webhook_secret_arn" {
+  description = "The ARN of the AWS Secrets Manager secret for the Slack Webhook."
+  value       = data.aws_secretsmanager_secret_version.slack_webhook.arn
+}
+
 # --- Argo-workflow outputs ---
 output "argo_artifact_bucket_name" {
   description = "The name of the S3 bucket for Argo artifacts."

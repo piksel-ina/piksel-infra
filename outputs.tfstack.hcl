@@ -252,10 +252,12 @@ output "flux_metadata" {
   type = object({
     namespace           = string
     webhook_secret_name = string
+    webhook_secret_arn  = string
   })
   value = {
     namespace           = component.applications.flux_namespace
     webhook_secret_name = component.applications.slack_webhook_secret_name
+    webhook_secret_arn  = component.applications.slack_webhook_secret_arn
   }
 }
 
