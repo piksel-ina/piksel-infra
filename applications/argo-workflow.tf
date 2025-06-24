@@ -165,7 +165,7 @@ resource "kubernetes_secret" "jupyterhub_secret" {
   }
   data = {
     username = "jupyterhub"
-    password = aws_secretsmanager_secret.jupyterhub_password
+    password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
   }
   type = "Opaque"
 }
@@ -177,7 +177,7 @@ resource "kubernetes_secret" "grafana_secret" {
   }
   data = {
     username = "grafana"
-    password = aws_secretsmanager_secret.grafana_password
+    password = aws_secretsmanager_secret_version.grafana_password.secret_string
   }
   type = "Opaque"
 }
@@ -189,7 +189,7 @@ resource "kubernetes_secret" "stacread_secret" {
   }
   data = {
     username = "stacread"
-    password = aws_secretsmanager_secret.stacread_password
+    password = aws_secretsmanager_secret_version.stacread_password.secret_string
   }
   type = "Opaque"
 }
@@ -201,7 +201,7 @@ resource "kubernetes_secret" "stac_secret" {
   }
   data = {
     username = "stac"
-    password = aws_secretsmanager_secret.stac_write_password
+    password = aws_secretsmanager_secret_version.stac_write_password.secret_string
   }
   type = "Opaque"
 }
@@ -213,7 +213,7 @@ resource "kubernetes_secret" "odcread_secret" {
   }
   data = {
     username = "odcread"
-    password = aws_secretsmanager_secret.odc_read_password
+    password = aws_secretsmanager_secret_version.odc_read_password.secret_string
   }
   type = "Opaque"
 }
@@ -225,7 +225,7 @@ resource "kubernetes_secret" "odc_secret" {
   }
   data = {
     username = "odc"
-    password = aws_secretsmanager_secret.odc_write_password
+    password = aws_secretsmanager_secret_version.odc_write_password.secret_string
   }
   type = "Opaque"
 }
