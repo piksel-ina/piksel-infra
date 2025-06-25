@@ -13,7 +13,7 @@ grafana:
       # Groups configuration
       # groups_attribute_path: groups
       # allowed_groups: "Argo Users"
-      role_attribute_path: contains(roles[*], 'admin') && 'GrafanaAdmin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
+      role_attribute_path: contains(roles[*], 'admin') && 'GrafanaAdmin' # || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
       allow_assign_grafana_admin: true
   envValueFrom:
     GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
