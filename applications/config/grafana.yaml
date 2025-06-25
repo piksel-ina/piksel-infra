@@ -9,6 +9,8 @@ grafana:
       token_url: ${auth0_tenant}/oauth/token
       api_url: ${auth0_tenant}/userinfo
       use_pkce: true
+      # Groups configuration
+      groups_attribute_path: groups
       allowed_groups: "Argo Users"
       # We only have one tier of users.`Viewer`is the other possible value
       role_attribute_path: contains(org-groups[*], 'Argo Users') && 'Editor' || 'Viewer'
