@@ -28,7 +28,7 @@ deployment "development" {
     az_count               = "2"
     single_nat_gateway     = true
     one_nat_gateway_per_az = false
-    enable_flow_log        = false
+    enable_flow_log        = true
     private_zone_ids = {
       "piksel.internal" = upstream_input.shared.zone_ids["piksel.internal"]
     }
