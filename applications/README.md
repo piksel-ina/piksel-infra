@@ -76,6 +76,7 @@ No requirements.
 | [kubernetes_secret.argo_server_sso](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.grafana](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.grafana_admin_credentials](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
+| [kubernetes_secret.grafana_oauth](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.grafana_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.hub-dask-token](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.hub_db_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
@@ -168,6 +169,7 @@ No requirements.
 | <a name="output_ows_cache_cloudfront_distribution_id"></a> [ows\_cache\_cloudfront\_distribution\_id](#output\_ows\_cache\_cloudfront\_distribution\_id) | CloudFront distribution ID |
 | <a name="output_ows_cache_cloudfront_domain_name"></a> [ows\_cache\_cloudfront\_domain\_name](#output\_ows\_cache\_cloudfront\_domain\_name) | CloudFront distribution domain name for ows cache |
 | <a name="output_ows_cache_dns_record"></a> [ows\_cache\_dns\_record](#output\_ows\_cache\_dns\_record) | FQDN of the Route53 record for ows cache |
+| <a name="output_slack_webhook_secret_arn"></a> [slack\_webhook\_secret\_arn](#output\_slack\_webhook\_secret\_arn) | The ARN of the AWS Secrets Manager secret for the Slack Webhook. |
 | <a name="output_slack_webhook_secret_name"></a> [slack\_webhook\_secret\_name](#output\_slack\_webhook\_secret\_name) | Slack webhook secret name |
 | <a name="output_stac_namespace"></a> [stac\_namespace](#output\_stac\_namespace) | Kubernetes namespace where STAC is deployed. |
 | <a name="output_stac_read_db_password"></a> [stac\_read\_db\_password](#output\_stac\_read\_db\_password) | STAC read database password. |

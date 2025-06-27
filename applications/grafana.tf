@@ -185,6 +185,9 @@ resource "kubernetes_secret" "grafana" {
       # Auth0
       auth0_tenant = var.auth0_tenant
 
+      # Grafana Subdomain
+      grafana_subdomain = "grafana.${var.subdomains[0]}"
+
       # AWS region for CloudWatch
       aws_region = var.aws_region
     })
