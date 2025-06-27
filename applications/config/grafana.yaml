@@ -10,8 +10,8 @@ grafana:
       api_url: https://${auth0_tenant}/userinfo
       use_pkce: true
       use_refresh_token: true
-      groups_attribute_path: https://${grafana_subdomain}/groups[*]
-      role_attribute_path: contains(groups[*], 'grafana-admin') && 'GrafanaAdmin' || contains(groups[*], 'grafana-editor') && 'Editor' || 'Viewer'
+      groups_attribute_path: '"https://${grafana_subdomain}/groups"'
+      role_attribute_path: 'contains("https://${grafana_subdomain}/groups"[*], ''grafana-admin'') && ''GrafanaAdmin'' || contains("https://${grafana_subdomain}/groups"[*], ''grafana-editor'') && ''Editor'' || ''Viewer'''
       allow_assign_grafana_admin: true
   envValueFrom:
     GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
