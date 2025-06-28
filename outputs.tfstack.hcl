@@ -317,30 +317,22 @@ output "stac_metadata" {
 output "argo_workflow_metadata" {
   description = "Output of Argo Workflow configuration and resources"
   type = object({
-    artifact_bucket_name          = string
-    namespace                     = string
-    artifact_iam_role_arn         = string
-    artifact_service_account_name = string
-    artifact_iam_policy_arn       = string
-    db_password_secret_arn        = string
-    k8s_secret_name               = string
-    user_artifact_policy_arn      = string
-    user_artifact_role_name       = string
-    user_artifact_role_arn        = string
-    user_name                     = string
+    artifact_bucket_name   = string
+    namespace              = string
+    iam_role_arn           = string
+    service_account_name   = string
+    iam_policy_arn         = string
+    db_password_secret_arn = string
+    k8s_secret_name        = string
   })
   value = {
-    artifact_bucket_name          = component.applications.argo_artifact_bucket_name
-    namespace                     = component.applications.argo_workflow_namespace
-    artifact_iam_role_arn         = component.applications.argo_artifact_iam_role_arn
-    artifact_service_account_name = component.applications.argo_artifact_service_account_name
-    artifact_iam_policy_arn       = component.applications.argo_artifact_iam_policy_arn
-    db_password_secret_arn        = component.applications.argo_db_password_secret_arn
-    k8s_secret_name               = component.applications.argo_k8s_secret_name
-    user_artifact_policy_arn      = component.applications.argo_artifact_policy_arn_for_user
-    user_artifact_role_name       = component.applications.argo_artifact_role_name_for_user
-    user_artifact_role_arn        = component.applications.argo_artifact_role_arn_for_user
-    user_name                     = component.applications.argo_artifact_user_name
+    artifact_bucket_name   = component.applications.argo_artifact_bucket_name
+    namespace              = component.applications.argo_workflow_namespace
+    iam_role_arn           = component.applications.argo_artifact_iam_role_arn
+    service_account_name   = component.applications.argo_artifact_service_account_name
+    iam_policy_arn         = component.applications.argo_artifact_iam_policy_arn
+    db_password_secret_arn = component.applications.argo_db_password_secret_arn
+    k8s_secret_name        = component.applications.argo_k8s_secret_name
   }
 }
 

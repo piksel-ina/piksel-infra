@@ -17,7 +17,6 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_iam_eks_role_bucket_argo"></a> [iam\_eks\_role\_bucket\_argo](#module\_iam\_eks\_role\_bucket\_argo) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | n/a |
 | <a name="module_iam_eks_role_bucket_odc"></a> [iam\_eks\_role\_bucket\_odc](#module\_iam\_eks\_role\_bucket\_odc) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | n/a |
 | <a name="module_iam_eks_role_hub_reader"></a> [iam\_eks\_role\_hub\_reader](#module\_iam\_eks\_role\_hub\_reader) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | n/a |
 
@@ -28,23 +27,19 @@ No requirements.
 | [aws_acm_certificate.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudfront_distribution.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
-| [aws_iam_access_key.argo_artifact_read_write_access_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_access_key.terria](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_policy.argo_artifact_read_write_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.argo_artifact_read_write_policy_more](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.hub_user_read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_role.argo_artifact_read_write_role_more](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.argo_workflow_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.grafana](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.odc_cloudfront_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.odc_cloudfront_assume_crossaccount](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
-| [aws_iam_role_policy_attachment.argo_artifact_read_write_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.argo_workflow_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_user.argo_artifact_read_write_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user.terria_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.terria_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
-| [aws_iam_user_policy_attachment.argo_artifact_read_write_user_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy_attachment) | resource |
 | [aws_route53_record.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_s3_bucket.argo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
@@ -70,7 +65,6 @@ No requirements.
 | [kubernetes_namespace.odc](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.stac](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.terria](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
-| [kubernetes_secret.argo_artifact_read_write](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.argo_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.argo_server_sso](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.grafana](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
@@ -89,7 +83,6 @@ No requirements.
 | [kubernetes_secret.stacread_namespace_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stacread_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.terria_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
-| [kubernetes_service_account.argo_artifact](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [kubernetes_service_account.hub_user_read](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [random_bytes.grafana_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/bytes) | resource |
 | [random_id.jhub_hub_cookie_secret_token](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -136,12 +129,7 @@ No requirements.
 | <a name="output_argo_artifact_bucket_name"></a> [argo\_artifact\_bucket\_name](#output\_argo\_artifact\_bucket\_name) | The name of the S3 bucket for Argo artifacts. |
 | <a name="output_argo_artifact_iam_policy_arn"></a> [argo\_artifact\_iam\_policy\_arn](#output\_argo\_artifact\_iam\_policy\_arn) | The ARN of the IAM policy for S3 read/write access. |
 | <a name="output_argo_artifact_iam_role_arn"></a> [argo\_artifact\_iam\_role\_arn](#output\_argo\_artifact\_iam\_role\_arn) | The ARN of the IAM role assumed by the Argo artifact service account (IRSA). |
-| <a name="output_argo_artifact_k8s_secret_name"></a> [argo\_artifact\_k8s\_secret\_name](#output\_argo\_artifact\_k8s\_secret\_name) | Kubernetes secret containing Argo artifact user credentials. |
-| <a name="output_argo_artifact_policy_arn_for_user"></a> [argo\_artifact\_policy\_arn\_for\_user](#output\_argo\_artifact\_policy\_arn\_for\_user) | The ARN of the policy that allows read/write access to the Argo artifact bucket. |
-| <a name="output_argo_artifact_role_arn_for_user"></a> [argo\_artifact\_role\_arn\_for\_user](#output\_argo\_artifact\_role\_arn\_for\_user) | The IAM role ARN for Argo artifact read/write. |
-| <a name="output_argo_artifact_role_name_for_user"></a> [argo\_artifact\_role\_name\_for\_user](#output\_argo\_artifact\_role\_name\_for\_user) | The IAM role name for Argo artifact read/write. |
-| <a name="output_argo_artifact_service_account_name"></a> [argo\_artifact\_service\_account\_name](#output\_argo\_artifact\_service\_account\_name) | The name of the Kubernetes service account used by Argo for artifact access. |
-| <a name="output_argo_artifact_user_name"></a> [argo\_artifact\_user\_name](#output\_argo\_artifact\_user\_name) | The IAM user name for Argo artifact read/write. |
+| <a name="output_argo_artifact_service_account_name"></a> [argo\_artifact\_service\_account\_name](#output\_argo\_artifact\_service\_account\_name) | Kubernetes secret containing Argo artifact user credentials. |
 | <a name="output_argo_db_password_secret_arn"></a> [argo\_db\_password\_secret\_arn](#output\_argo\_db\_password\_secret\_arn) | The ARN of the AWS Secrets Manager secret storing the Argo DB password. |
 | <a name="output_argo_k8s_secret_name"></a> [argo\_k8s\_secret\_name](#output\_argo\_k8s\_secret\_name) | The name of the Kubernetes secret containing the Auth0 client secret. |
 | <a name="output_argo_workflow_namespace"></a> [argo\_workflow\_namespace](#output\_argo\_workflow\_namespace) | The namespace for all Argo resources. |

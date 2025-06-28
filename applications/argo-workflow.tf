@@ -1,7 +1,7 @@
 locals {
   oauth_secret_argo         = "argo-oauth-${lower(var.environment)}"
   argo_namespace            = "argo-workflows"
-  service_account_name_argo = "${local.prefix}-argo-artifact-read-write-sa"
+  service_account_name_argo = "argo-workflows-executor"
 }
 
 # --- Dedicated namespace for all Argo resources ---
@@ -96,34 +96,34 @@ resource "aws_iam_policy" "argo_artifact_read_write_policy" {
   })
 }
 
-# --- IAM Role for Service Account (IRSA) ---
-module "iam_eks_role_bucket_argo" {
-  source               = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  role_name            = "svc-${local.service_account_name_argo}-role"
-  max_session_duration = 10800
+# --- Create a role for the service account ---
+resource "aws_iam_role" "argo_workflow_role" {
+  name = "iam-role-for-argo-workflow-service-account"
 
-  oidc_providers = {
-    main = {
-      provider_arn               = var.eks_oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.argo_workflow.metadata[0].name}:${local.service_account_name_argo}"]
-    }
-  }
-
-  role_policy_arns = {
-    ReadWritePolicy = aws_iam_policy.argo_artifact_read_write_policy.arn
-  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = var.eks_oidc_provider_arn
+        }
+        Condition = {
+          StringEquals = {
+            "${replace(var.oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:${kubernetes_namespace.argo_workflow.metadata[0].name}:${local.service_account_name_argo}"
+            "${replace(var.oidc_issuer_url, "https://", "")}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
 }
 
-# --- Kubernetes Service Account ---
-resource "kubernetes_service_account" "argo_artifact" {
-  metadata {
-    name      = local.service_account_name_argo
-    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
-    annotations = {
-      "eks.amazonaws.com/role-arn" = module.iam_eks_role_bucket_argo.iam_role_arn
-    }
-  }
-  automount_service_account_token = true
+# --- Attach S3 policy ---
+resource "aws_iam_role_policy_attachment" "argo_workflow_s3" {
+  role       = aws_iam_role.argo_workflow_role.name
+  policy_arn = aws_iam_policy.argo_artifact_read_write_policy.arn
 }
 
 # --- Add Argo secret to the namespace ---
@@ -212,80 +212,80 @@ resource "kubernetes_secret" "odc_secret" {
   type = "Opaque"
 }
 
-# --- Add IAM user and access keys for Argo artifact storage ---
-# --- Temporary Solution ---
+# # --- Add IAM user and access keys for Argo artifact storage ---
+# # --- Temporary Solution ---
 
-# --- Create a policy to read/write the bucket ---
-resource "aws_iam_policy" "argo_artifact_read_write_policy_more" {
-  name        = "${local.prefix}-argo-artifact-read-write-more"
-  description = "Policy to read/write Argo artifacts"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:ListBucket",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-        ],
-        Resource = [
-          aws_s3_bucket.argo.arn,
-          "${aws_s3_bucket.argo.arn}/*",
-        ],
-      },
-    ],
-  })
-}
+# # --- Create a policy to read/write the bucket ---
+# resource "aws_iam_policy" "argo_artifact_read_write_policy_more" {
+#   name        = "${local.prefix}-argo-artifact-read-write-more"
+#   description = "Policy to read/write Argo artifacts"
+#   policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Action = [
+#           "s3:ListBucket",
+#           "s3:GetObject",
+#           "s3:PutObject",
+#           "s3:DeleteObject",
+#         ],
+#         Resource = [
+#           aws_s3_bucket.argo.arn,
+#           "${aws_s3_bucket.argo.arn}/*",
+#         ],
+#       },
+#     ],
+#   })
+# }
 
-# --- Create a role for the policy ---
-resource "aws_iam_role" "argo_artifact_read_write_role_more" {
-  name = "${local.prefix}-argo-artifact-read-write-more"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "eks.amazonaws.com",
-        },
-        Action = "sts:AssumeRole",
-      },
-    ],
-  })
-}
+# # --- Create a role for the policy ---
+# resource "aws_iam_role" "argo_artifact_read_write_role_more" {
+#   name = "${local.prefix}-argo-artifact-read-write-more"
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17",
+#     Statement = [
+#       {
+#         Effect = "Allow",
+#         Principal = {
+#           Service = "eks.amazonaws.com",
+#         },
+#         Action = "sts:AssumeRole",
+#       },
+#     ],
+#   })
+# }
 
-# --- Create a user for the policy ---
-resource "aws_iam_user" "argo_artifact_read_write_user" {
-  name = "${local.prefix}-argo-artifact-read-write"
-}
+# # --- Create a user for the policy ---
+# resource "aws_iam_user" "argo_artifact_read_write_user" {
+#   name = "${local.prefix}-argo-artifact-read-write"
+# }
 
-# --- Attach the policy to the role ---
-resource "aws_iam_role_policy_attachment" "argo_artifact_read_write_policy_attachment" {
-  role       = aws_iam_role.argo_artifact_read_write_role_more.name
-  policy_arn = aws_iam_policy.argo_artifact_read_write_policy_more.arn
-}
+# # --- Attach the policy to the role ---
+# resource "aws_iam_role_policy_attachment" "argo_artifact_read_write_policy_attachment" {
+#   role       = aws_iam_role.argo_artifact_read_write_role_more.name
+#   policy_arn = aws_iam_policy.argo_artifact_read_write_policy_more.arn
+# }
 
-# --- Attach the policy to the user ---
-resource "aws_iam_user_policy_attachment" "argo_artifact_read_write_user_policy_attachment" {
-  user       = aws_iam_user.argo_artifact_read_write_user.name
-  policy_arn = aws_iam_policy.argo_artifact_read_write_policy_more.arn
-}
+# # --- Attach the policy to the user ---
+# resource "aws_iam_user_policy_attachment" "argo_artifact_read_write_user_policy_attachment" {
+#   user       = aws_iam_user.argo_artifact_read_write_user.name
+#   policy_arn = aws_iam_policy.argo_artifact_read_write_policy_more.arn
+# }
 
-# --- Create access keys for the user ---
-resource "aws_iam_access_key" "argo_artifact_read_write_access_key" {
-  user = aws_iam_user.argo_artifact_read_write_user.name
-}
+# # --- Create access keys for the user ---
+# resource "aws_iam_access_key" "argo_artifact_read_write_access_key" {
+#   user = aws_iam_user.argo_artifact_read_write_user.name
+# }
 
-# --- Create a secret for the access keys ---
-resource "kubernetes_secret" "argo_artifact_read_write" {
-  metadata {
-    name      = "argo-artifact-read-write"
-    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
-  }
-  data = {
-    access-key = aws_iam_access_key.argo_artifact_read_write_access_key.id
-    secret-key = aws_iam_access_key.argo_artifact_read_write_access_key.secret
-  }
-}
+# # --- Create a secret for the access keys ---
+# resource "kubernetes_secret" "argo_artifact_read_write" {
+#   metadata {
+#     name      = "argo-artifact-read-write"
+#     namespace = kubernetes_namespace.argo_workflow.metadata[0].name
+#   }
+#   data = {
+#     access-key = aws_iam_access_key.argo_artifact_read_write_access_key.id
+#     secret-key = aws_iam_access_key.argo_artifact_read_write_access_key.secret
+#   }
+# }
