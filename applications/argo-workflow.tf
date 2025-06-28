@@ -1,6 +1,6 @@
 locals {
   oauth_secret_argo         = "argo-oauth-${lower(var.environment)}"
-  argo_namespace            = "argo-workflow"
+  argo_namespace            = "argo-workflows"
   service_account_name_argo = "${local.prefix}-argo-artifact-read-write-sa"
 }
 
@@ -124,24 +124,6 @@ resource "kubernetes_service_account" "argo_artifact" {
     }
   }
   automount_service_account_token = true
-}
-
-# --- Kubernetes Role Binding (optional, for Argo namespace) ---
-resource "kubernetes_role_binding" "argo_artifact" {
-  metadata {
-    name      = "${local.service_account_name_argo}-binding"
-    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
-  }
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = "argo-workflows-workflow"
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = local.service_account_name_argo
-    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
-  }
 }
 
 # --- Add Argo secret to the namespace ---
