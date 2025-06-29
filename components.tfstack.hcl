@@ -144,6 +144,7 @@ component "applications" {
     default_tags                         = var.default_tags
     eks_oidc_provider_arn                = component.eks-cluster.cluster_oidc_provider_arn
     oidc_issuer_url                      = component.eks-cluster.cluster_oidc_issuer_url
+    db_namespace                         = component.database.db_namespace
     k8s_db_service                       = component.database.k8s_db_service
     subdomains                           = var.subdomains
     public_hosted_zone_id                = var.public_hosted_zone_id

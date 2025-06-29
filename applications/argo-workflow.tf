@@ -120,17 +120,12 @@ resource "aws_iam_role" "argo_workflow_role" {
   })
 }
 
-# --- Attach S3 policy ---
-resource "aws_iam_role_policy_attachment" "argo_workflow_s3" {
-  role       = aws_iam_role.argo_workflow_role.name
-  policy_arn = aws_iam_policy.argo_artifact_read_write_policy.arn
-}
-
-# --- Add Argo secret to the namespace ---
+# --- Add Secret to Argo and database namespace ---
 resource "kubernetes_secret" "argo_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "argo"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "argo"
@@ -139,11 +134,11 @@ resource "kubernetes_secret" "argo_secret" {
   type = "Opaque"
 }
 
-# --- Add other service secrets to Argo namespace ---
 resource "kubernetes_secret" "jupyterhub_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "jupyterhub"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "jupyterhub"
@@ -153,9 +148,10 @@ resource "kubernetes_secret" "jupyterhub_secret" {
 }
 
 resource "kubernetes_secret" "grafana_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "grafana"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "grafana"
@@ -165,9 +161,10 @@ resource "kubernetes_secret" "grafana_secret" {
 }
 
 resource "kubernetes_secret" "stacread_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "stacread"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "stacread"
@@ -177,9 +174,10 @@ resource "kubernetes_secret" "stacread_secret" {
 }
 
 resource "kubernetes_secret" "stac_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "stac"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "stac"
@@ -189,9 +187,10 @@ resource "kubernetes_secret" "stac_secret" {
 }
 
 resource "kubernetes_secret" "odcread_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "odcread"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "odcread"
@@ -201,15 +200,22 @@ resource "kubernetes_secret" "odcread_secret" {
 }
 
 resource "kubernetes_secret" "odc_secret" {
+  for_each = toset([local.argo_namespace, var.db_namespace])
   metadata {
     name      = "odc"
-    namespace = resource.kubernetes_namespace.argo_workflow.metadata[0].name
+    namespace = each.value
   }
   data = {
     username = "odc"
     password = aws_secretsmanager_secret_version.odc_write_password.secret_string
   }
   type = "Opaque"
+}
+
+# --- Attach S3 policy ---
+resource "aws_iam_role_policy_attachment" "argo_workflow_s3" {
+  role       = aws_iam_role.argo_workflow_role.name
+  policy_arn = aws_iam_policy.argo_artifact_read_write_policy.arn
 }
 
 # # --- Add IAM user and access keys for Argo artifact storage ---

@@ -40,6 +40,12 @@ variable "auth0_tenant" {
   description = "The Auth0 tenant URL"
 }
 
+variable "db_namespace" {
+  description = "Kubernetes namespace for the database"
+  type        = string
+  default     = "database"
+}
+
 variable "k8s_db_service" {
   description = "Kubernetes database service FQDN"
   type        = string
