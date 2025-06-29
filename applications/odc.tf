@@ -27,7 +27,7 @@ resource "kubernetes_namespace" "odc" {
 resource "random_password" "odc_write" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "odc_write_password" {
@@ -47,7 +47,7 @@ resource "aws_secretsmanager_secret_version" "odc_write_password" {
 resource "random_password" "odc_read" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "odc_read_password" {

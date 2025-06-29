@@ -24,8 +24,9 @@ resource "kubernetes_namespace" "hub" {
 
 # --- Generate random password and store it securely in AWS ---
 resource "random_password" "jupyterhub_random_string" {
-  length  = 32
-  special = false
+  length           = 32
+  special          = false
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "jupyterhub_password" {

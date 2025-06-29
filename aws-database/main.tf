@@ -10,7 +10,7 @@ locals {
 resource "random_password" "db_random_string" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 # --- Creates a secret in AWS Secrets Manager ---

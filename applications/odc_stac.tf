@@ -24,7 +24,7 @@ resource "kubernetes_namespace" "stac" {
 resource "random_password" "stac_write" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "stac_write_password" {
@@ -43,7 +43,7 @@ resource "aws_secretsmanager_secret_version" "stac_write_password" {
 resource "random_password" "stac_read" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "stacread_password" {

@@ -28,7 +28,7 @@ resource "kubernetes_namespace" "monitoring" {
 resource "random_password" "grafana_random_string" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 # --- Store database password in AWS Secrets Manager ---

@@ -20,7 +20,7 @@ resource "kubernetes_namespace" "argo_workflow" {
 resource "random_password" "argo_random_string" {
   length           = 32
   special          = true
-  override_special = "_!%^"
+  override_special = "@#$&*+-="
 }
 
 resource "aws_secretsmanager_secret" "argo_password" {
