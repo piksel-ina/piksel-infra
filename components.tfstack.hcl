@@ -159,5 +159,6 @@ component "applications" {
     random            = provider.random.this
     aws.virginia      = provider.aws.virginia
     aws.cross_account = provider.aws.cross_account
+    postgresql        = provider.postgresql.configurations
   }
 }

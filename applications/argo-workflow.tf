@@ -60,6 +60,13 @@ resource "aws_s3_bucket" "argo" {
   tags   = local.tags
 }
 
+resource "postgresql_role" "argo_user" {
+  provider = postgresql
+  name     = "argo"
+  login    = true
+  password = aws_secretsmanager_secret_version.argo_password.secret_string
+}
+
 # --- IAM Policy for Read/Write ---
 resource "aws_iam_policy" "argo_artifact_read_write_policy" {
   name        = "svc-${local.service_account_name_argo}-policy"

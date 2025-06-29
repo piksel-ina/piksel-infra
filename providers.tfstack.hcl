@@ -31,6 +31,10 @@ required_providers {
     source  = "hashicorp/random"
     version = "~> 3.0"
   }
+  postgresql = {
+    source  = "cyrilgdn/postgresql"
+    version = "~> 1.22"
+  }
 }
 
 provider "aws" "configurations" {
@@ -90,6 +94,18 @@ provider "aws" "cross_account" {
     default_tags {
       tags = var.default_tags
     }
+  }
+}
+
+provider "postgresql" "configurations" {
+  config {
+
+    host     = split(":", component.database.db_endpoint)[0]
+    port     = 5432
+    database = "postgres"
+    username = component.database.db_username
+    password = component.database.db_password
+    sslmode  = "require"
   }
 }
 
