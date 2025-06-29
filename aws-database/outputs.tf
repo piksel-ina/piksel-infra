@@ -25,12 +25,6 @@ output "db_username" {
   sensitive   = true
 }
 
-output "db_password" {
-  description = "Database password"
-  value       = aws_secretsmanager_secret_version.db_password.secret_string
-  sensitive   = true
-}
-
 output "db_instance_id" {
   description = "RDS instance identifier"
   value       = module.db.db_instance_identifier

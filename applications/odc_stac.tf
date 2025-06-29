@@ -28,7 +28,7 @@ resource "random_password" "stac_write" {
 }
 
 resource "aws_secretsmanager_secret" "stac_write_password" {
-  name        = "${local.prefix}-stac-write-password"
+  name        = "stac-write-password"
   description = "Password for STAC database connection - Write"
 
   tags = local.tags
@@ -47,7 +47,7 @@ resource "random_password" "stac_read" {
 }
 
 resource "aws_secretsmanager_secret" "stacread_password" {
-  name        = "${local.prefix}-stac-read-password"
+  name        = "stac-read-password"
   description = "Password for STAC database connection - Read"
 
   tags = local.tags

@@ -24,7 +24,7 @@ resource "random_password" "argo_random_string" {
 }
 
 resource "aws_secretsmanager_secret" "argo_password" {
-  name        = "${local.prefix}-argo-workflow-password"
+  name        = "argo-workflows-password"
   description = "Password for Argo Workflow server"
 
   tags = local.tags
@@ -58,13 +58,6 @@ resource "kubernetes_secret" "argo_server_sso" {
 resource "aws_s3_bucket" "argo" {
   bucket = "${local.prefix}-argo-artifacts-dep"
   tags   = local.tags
-}
-
-resource "postgresql_role" "argo_user" {
-  provider = postgresql
-  name     = "argo"
-  login    = true
-  password = aws_secretsmanager_secret_version.argo_password.secret_string
 }
 
 # --- IAM Policy for Read/Write ---

@@ -31,7 +31,7 @@ resource "random_password" "odc_write" {
 }
 
 resource "aws_secretsmanager_secret" "odc_write_password" {
-  name        = "${local.prefix}-odc-password"
+  name        = "odc-password"
   description = "Password for ODC database connection - Write"
 
   tags = local.tags
@@ -51,7 +51,7 @@ resource "random_password" "odc_read" {
 }
 
 resource "aws_secretsmanager_secret" "odc_read_password" {
-  name        = "${local.prefix}-odc-read-password"
+  name        = "odc-read-password"
   description = "Password for ODC database connection - Read"
 
   tags = local.tags

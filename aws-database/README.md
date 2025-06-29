@@ -55,7 +55,6 @@ No requirements.
 | <a name="output_db_instance_id"></a> [db\_instance\_id](#output\_db\_instance\_id) | RDS instance identifier |
 | <a name="output_db_name"></a> [db\_name](#output\_db\_name) | Database name |
 | <a name="output_db_namespace"></a> [db\_namespace](#output\_db\_namespace) | Database Kubernetes namespace |
-| <a name="output_db_password"></a> [db\_password](#output\_db\_password) | Database password |
 | <a name="output_db_port"></a> [db\_port](#output\_db\_port) | RDS database port |
 | <a name="output_db_username"></a> [db\_username](#output\_db\_username) | Database username |
 | <a name="output_k8s_db_service"></a> [k8s\_db\_service](#output\_k8s\_db\_service) | Kubernetes database service FQDN |

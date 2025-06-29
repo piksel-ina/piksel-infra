@@ -29,7 +29,7 @@ resource "random_password" "jupyterhub_random_string" {
 }
 
 resource "aws_secretsmanager_secret" "jupyterhub_password" {
-  name = "${local.prefix}-jupyterhub-password"
+  name = "jupyterhub-password"
 }
 
 resource "aws_secretsmanager_secret_version" "jupyterhub_password" {
