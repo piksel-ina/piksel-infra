@@ -3,7 +3,7 @@ locals {
   private_subnets = var.private_subnets_ids
   cluster_name    = var.cluster_name
   project         = lower(var.project)
-  db_username     = replace("${local.project}_${lower(var.environment)}", "/[^a-zA-Z0-9_]/", "")
+  db_username     = replace("${lower(local.project)}_${lower(var.environment)}", "/[^a-zA-Z0-9_]/", "")
 }
 
 # --- Generates 32-character random password with special characters ---
@@ -53,7 +53,7 @@ module "db" {
   allocated_storage = var.db_allocated_storage
 
   manage_master_user_password = false
-  db_name                     = local.project
+  db_name                     = lower(local.project)
   username                    = local.db_username
   password                    = aws_secretsmanager_secret_version.db_password.secret_string
   port                        = 5432

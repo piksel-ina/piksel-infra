@@ -178,6 +178,8 @@ output "database_metadata" {
     instance_id      = string
     k8s_service_fqdn = string
     k8s_namespace    = string
+    database_name    = string
+    db_username      = string
     security_group = object({
       arn         = string
       id          = string
@@ -192,6 +194,8 @@ output "database_metadata" {
     instance_id      = component.database.db_instance_id
     k8s_service_fqdn = component.database.k8s_db_service
     k8s_namespace    = component.database.db_namespace
+    database_name    = component.database.db_name
+    db_username      = component.database.db_username
     security_group = {
       arn         = component.database.security_group_arn_database
       id          = component.database.security_group_id_database
