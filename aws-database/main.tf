@@ -80,6 +80,20 @@ resource "kubernetes_namespace" "db" {
   }
 }
 
+# --- Add the database password to the Kubernetes secret ---
+resource "kubernetes_secret" "db_password" {
+  metadata {
+    name      = "db-password"
+    namespace = kubernetes_namespace.db.metadata[0].name
+  }
+  data = {
+    db_name    = local.project
+    db_address = split(":", module.db.db_instance_endpoint)[0]
+    username   = local.db_username
+    password   = base64encode(aws_secretsmanager_secret_version.db_password.secret_string)
+  }
+}
+
 # --- Allows workloads in cluster to connect to the DB using a K8s service name ---
 resource "kubernetes_service" "db_endpoint" {
   metadata {
