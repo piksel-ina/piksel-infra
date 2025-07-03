@@ -55,7 +55,7 @@ deployment "development" {
     db_allocated_storage    = 50
     backup_retention_period = 14
     # --- Application Setup ---
-    auth0_tenant                         = "dev-yqkhkttr7nx6u7o4.us.auth0.com"
+    oauth_tenant                         = "ap-southeast-3zfzkrhjdu.auth.ap-southeast-3.amazoncognito.com"
     odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]
     read_external_buckets = [
       "usgs-landsat",

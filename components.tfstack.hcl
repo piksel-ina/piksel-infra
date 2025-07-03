@@ -148,7 +148,7 @@ component "applications" {
     k8s_db_service                       = component.database.k8s_db_service
     subdomains                           = var.subdomains
     public_hosted_zone_id                = var.public_hosted_zone_id
-    auth0_tenant                         = var.auth0_tenant
+    oauth_tenant                         = var.oauth_tenant
     internal_buckets                     = [component.s3_bucket.public_bucket_name]
     read_external_buckets                = var.read_external_buckets
     odc_cloudfront_crossaccount_role_arn = var.odc_cloudfront_crossaccount_role_arn

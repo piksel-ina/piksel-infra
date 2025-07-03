@@ -194,8 +194,8 @@ variable "backup_retention_period" {
   type        = number
 }
 
-variable "auth0_tenant" {
-  description = "The Auth0 tenant URL"
+variable "oauth_tenant" {
+  description = "The oauth tenant URL"
   type        = string
 }
 

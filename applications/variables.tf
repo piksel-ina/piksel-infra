@@ -35,9 +35,9 @@ variable "oidc_issuer_url" {
   type        = string
 }
 
-variable "auth0_tenant" {
+variable "oauth_tenant" {
   type        = string
-  description = "The Auth0 tenant URL"
+  description = "The oauth tenant URL"
 }
 
 variable "db_namespace" {

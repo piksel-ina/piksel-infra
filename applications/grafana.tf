@@ -182,8 +182,8 @@ resource "kubernetes_secret" "grafana" {
       # IRSA
       service_account_role_arn = aws_iam_role.grafana.arn
 
-      # Auth0
-      auth0_tenant = var.auth0_tenant
+      # oauth
+      oauth_tenant = var.oauth_tenant
 
       # Grafana Subdomain
       grafana_subdomain = "grafana.${var.subdomains[0]}"

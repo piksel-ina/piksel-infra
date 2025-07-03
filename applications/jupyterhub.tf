@@ -91,7 +91,7 @@ resource "kubernetes_secret" "jupyterhub" {
       jhub_auth_client_secret = split(":", data.aws_secretsmanager_secret_version.hub_client_secret.secret_string)[1]
 
       # Need to strip the https:// off the front and .auth0.com off the back
-      auth0_tenant = trimsuffix(trimprefix(var.auth0_tenant, "https://"), ".auth0.com")
+      auth0_tenant = trimsuffix(trimprefix(var.oauth_tenant, "https://"), ".auth0.com")
 
       # Jupyterhub hub database
       jhub_db_name     = "jupyterhub"
