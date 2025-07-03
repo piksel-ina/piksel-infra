@@ -12,7 +12,8 @@ grafana:
       use_refresh_token: true
       email_attribute_path: email
       groups_attribute_path: cognito:groups
-      role_attribute_path: "contains(cognito:groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
+      role_attribute_path: ("cognito:groups" | contains([*], 'admin') && 'Admin' || 'Viewer')
+      role_attribute_strict: true
       allow_assign_grafana_admin: true
       auto_login: true
   envValueFrom:
