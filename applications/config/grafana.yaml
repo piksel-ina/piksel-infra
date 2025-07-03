@@ -4,7 +4,7 @@ grafana:
       name: Cognito
       enabled: true
       allow_sign_up: true
-      scopes: openid email
+      scopes: openid email profile
       auth_url: https://${oauth_tenant}/oauth2/authorize
       token_url: https://${oauth_tenant}/oauth2/token
       api_url: https://${oauth_tenant}/oauth2/userInfo
@@ -12,8 +12,9 @@ grafana:
       use_refresh_token: true
       email_attribute_path: email
       groups_attribute_path: cognito:groups
-      role_attribute_path: "contains(groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
+      role_attribute_path: "contains(cognito:groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
       allow_assign_grafana_admin: true
+      auto_login: true
   envValueFrom:
     GF_AUTH_GENERIC_OAUTH_CLIENT_ID:
       secretKeyRef:
