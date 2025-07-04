@@ -232,7 +232,7 @@ resource "kubernetes_manifest" "karpenter_gpu_node_class" {
       name = "gpu"
     }
     spec = {
-      amiFamily = "Custom"
+      amiFamily = "AL2023"
       role      = module.karpenter.node_iam_role_name
 
       amiSelectorTerms = [
