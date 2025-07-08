@@ -112,14 +112,20 @@ resource "aws_iam_role" "argo_workflow_role" {
           Federated = var.eks_oidc_provider_arn
         }
         Condition = {
+          StringLike = {
+            "${replace(var.oidc_issuer_url, "https://", "")}:sub" = [
+              "system:serviceaccount:${kubernetes_namespace.argo_workflow.metadata[0].name}:${local.service_account_name_argo}",
+              "system:serviceaccount:${kubernetes_namespace.argo_workflow.metadata[0].name}:argo-workflows-server"
+            ]
+          }
           StringEquals = {
-            "${replace(var.oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:${kubernetes_namespace.argo_workflow.metadata[0].name}:${local.service_account_name_argo}"
             "${replace(var.oidc_issuer_url, "https://", "")}:aud" = "sts.amazonaws.com"
           }
         }
       }
     ]
   })
+  tags = local.tags
 }
 
 # --- Add db secret to argo namespace ---
