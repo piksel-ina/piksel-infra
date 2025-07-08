@@ -46,6 +46,11 @@ variable "db_namespace" {
   default     = "database"
 }
 
+variable "db_address" {
+  description = "Database address"
+  type        = string
+}
+
 variable "k8s_db_service" {
   description = "Kubernetes database service FQDN"
   type        = string

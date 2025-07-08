@@ -2,6 +2,8 @@ locals {
   oauth_secret_argo         = "argo-oauth-${lower(var.environment)}"
   argo_namespace            = "argo-workflows"
   service_account_name_argo = "argo-workflows-executor"
+  project                   = lower(var.project)
+  db_username               = replace("${lower(local.project)}_${lower(var.environment)}", "/[^a-zA-Z0-9_]/", "")
 }
 
 # --- Dedicated namespace for all Argo resources ---
@@ -119,6 +121,25 @@ resource "aws_iam_role" "argo_workflow_role" {
     ]
   })
 }
+
+# --- Add db secret to argo namespace ---
+data "aws_secretsmanager_secret_version" "db_secret" {
+  secret_id = "database-password"
+}
+
+resource "kubernetes_secret" "argo_db_secret" {
+  metadata {
+    name      = "db-secret"
+    namespace = kubernetes_namespace.argo_workflow.metadata[0].name
+  }
+  data = {
+    db_name    = local.project
+    db_address = var.db_address
+    username   = local.db_username
+    password   = base64encode(data.aws_secretsmanager_secret_version.db_secret.secret_string)
+  }
+}
+
 
 # --- Add Secret to Argo and database namespace ---
 resource "kubernetes_secret" "argo_secret" {
