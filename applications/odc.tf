@@ -63,7 +63,6 @@ resource "aws_secretsmanager_secret_version" "odc_read_password" {
 }
 
 # --- Pass ODC read secret to the odc namespace ---
-# Only need the DB read secret in the ODC namespace. Writing is done in Argo.
 resource "kubernetes_secret" "odcread_namespace_secret" {
   metadata {
     name      = "odcread-secret"
@@ -72,6 +71,18 @@ resource "kubernetes_secret" "odcread_namespace_secret" {
   data = {
     username = "odcread"
     password = aws_secretsmanager_secret_version.odc_read_password.secret_string
+  }
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "odc_namespace_secret" {
+  metadata {
+    name      = "odc-secret"
+    namespace = kubernetes_namespace.odc.metadata[0].name
+  }
+  data = {
+    username = "odc"
+    password = aws_secretsmanager_secret_version.odc_write_password.secret_string
   }
   type = "Opaque"
 }
