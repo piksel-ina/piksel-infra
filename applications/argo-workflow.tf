@@ -87,7 +87,8 @@ resource "aws_iam_policy" "argo_artifact_read_write_policy" {
         # Write
         Action = [
           "S3:PutObject",
-          "S3:PutObjectAcl"
+          "S3:PutObjectAcl",
+          "s3:DeleteObject",
         ]
         Effect = "Allow"
         Resource = [
