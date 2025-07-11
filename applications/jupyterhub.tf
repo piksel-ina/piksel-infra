@@ -74,6 +74,19 @@ resource "random_password" "dask_gateway_api_token" {
   upper   = false
 }
 
+resource "kubernetes_secret" "jhub_oauth" {
+  metadata {
+    name      = "jhub-oauth"
+    namespace = kubernetes_namespace.hub.metadata[0].name
+  }
+
+  data = {
+    client_id     = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[0]
+    client_secret = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[1]
+    oauth_tenant  = var.oauth_tenant
+  }
+}
+
 # --- Combine all secrets into a single config that GitOps can consume ---
 resource "kubernetes_secret" "jupyterhub" {
   metadata {
