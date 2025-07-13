@@ -83,7 +83,8 @@ resource "kubernetes_secret" "jhub_oauth" {
   data = {
     client_id     = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[0]
     client_secret = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[1]
-    oauth_tenant  = var.oauth_tenant
+    authorize_url = "https://${var.oauth_tenant}/oauth2/authorize"
+    token_url     = "https://${var.oauth_tenant}/oauth2/token"
   }
 }
 
