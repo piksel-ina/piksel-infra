@@ -45,8 +45,9 @@ resource "kubernetes_secret" "hub_db_secret" {
     namespace = kubernetes_namespace.hub.metadata[0].name
   }
   data = {
-    username = "jupyterhub"
-    password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+    db_url = "postgresql://jupyterhub:${aws_secretsmanager_secret_version.jupyterhub_password.secret_string}@pg-proxy-service.database.svc.cluster.local:6432/jupyterhub"
+    # username = "jupyterhub"
+    # password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
   }
   type = "Opaque"
 }
