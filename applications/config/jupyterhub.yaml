@@ -5,36 +5,38 @@
 #     GDAL_DISABLE_READDIR_ON_OPEN: "EMPTY_DIR"
 #     GDAL_HTTP_MAX_RETRY: "10"
 #     GDAL_HTTP_RETRY_DELAY: "0.5"
-# hub:
-#   config:
-#     GenericOAuthenticator:
-#       allow_all: True
-#       auto_login: True
-#       enable_auth_state: True
-#       userdata_from_id_token: True
-#       client_id: ${jhub_auth_client_id}
-#       client_secret: ${jhub_auth_client_secret}
-#       oauth_callback_url: https://${host_name}/hub/oauth_callback
-#       authorize_url: https://${oauth_tenant}/oauth2/authorize
-#       token_url: https://${oauth_tenant}/oauth2/token
-#       logout_redirect_url: https://${host_name}/hub/home
-#       login_service: "AWS Cognito"
-#       username_claim: email
-#       scope:
-#         - openid
-#         - email
-#         - profile
-#         - aws.cognito.signin.user.admin
-#       auth_state_groups_key: cognito:groups
-#       admin_groups:
-#         - "jhub-admin"
-#       manage_groups: true
-#     JupyterHub:
-#       authenticator_class: generic-oauth
-#   services:
-#     dask-gateway:
-#       apiToken: ${jhub_dask_gateway_api_token}
-#   cookieSecret: ${jhub_hub_cookie_secret_token}
+hub:
+  db:
+    type: postgres
+    upgrade: true
+    password: ${jhub_db_password}
+  config:
+    GenericOAuthenticator:
+      allow_all: True
+      auto_login: True
+      enable_auth_state: True
+      userdata_from_id_token: True
+      client_id: ${jhub_auth_client_id}
+      client_secret: ${jhub_auth_client_secret}
+      authorize_url: https://${oauth_tenant}/oauth2/authorize
+      token_url: https://${oauth_tenant}/oauth2/token
+      login_service: "AWS Cognito"
+      username_claim: email
+      scope:
+        - openid
+        - email
+        - profile
+        - aws.cognito.signin.user.admin
+      auth_state_groups_key: cognito:groups
+      admin_groups:
+        - "jhub-admin"
+      manage_groups: true
+    JupyterHub:
+      authenticator_class: generic-oauth
+  services:
+    dask-gateway:
+      apiToken: ${jhub_dask_gateway_api_token}
+  cookieSecret: ${jhub_hub_cookie_secret_token}
 
 proxy:
   secretToken: ${jhub_proxy_secret_token}
