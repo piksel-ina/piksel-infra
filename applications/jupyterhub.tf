@@ -122,14 +122,16 @@ resource "kubernetes_secret" "jupyterhub" {
 }
 
 # --- Kubernetes secrets for JupyterHub ---
-resource "kubernetes_secret" "hub-dask-token" {
+resource "kubernetes_secret" "jhub_token" {
   metadata {
-    name      = "hub-dask-token"
+    name      = "jhub-token"
     namespace = kubernetes_namespace.hub.metadata[0].name
   }
 
   data = {
-    token = random_password.dask_gateway_api_token.result
+    cookie_token = random_id.jhub_hub_cookie_secret_token.hex
+    proxy_token  = random_id.jhub_proxy_secret_token.hex
+    dask_token   = random_password.dask_gateway_api_token.result
   }
 
   type = "Opaque"
