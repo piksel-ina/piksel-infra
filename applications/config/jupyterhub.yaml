@@ -27,7 +27,7 @@ hub:
         - email
         - profile
         - aws.cognito.signin.user.admin
-      auth_state_groups_key: cognito:groups
+      claim_groups_key: "cognito:groups"
       admin_groups:
         - "jhub-admin"
       manage_groups: true
