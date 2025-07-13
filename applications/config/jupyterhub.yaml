@@ -12,10 +12,10 @@ hub:
     password: ${jhub_db_password}
   config:
     GenericOAuthenticator:
-      allow_all: True
-      auto_login: True
-      enable_auth_state: True
-      userdata_from_id_token: True
+      allow_all: true
+      auto_login: true
+      enable_auth_state: true
+      userdata_from_id_token: true
       client_id: ${jhub_auth_client_id}
       client_secret: ${jhub_auth_client_secret}
       authorize_url: https://${oauth_tenant}/oauth2/authorize
@@ -27,10 +27,10 @@ hub:
         - email
         - profile
         - aws.cognito.signin.user.admin
-      claim_groups_key: "cognito:groups"
-      admin_groups:
-        - "jhub-admin"
-      manage_groups: true
+      admin_users:
+        - muhammad.taufik@big.go.id
+      # auth_state_groups_key: "oauth_user.cognito:groups"
+      # manage_groups: true
     JupyterHub:
       authenticator_class: generic-oauth
   services:
