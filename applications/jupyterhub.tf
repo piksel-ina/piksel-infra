@@ -45,8 +45,10 @@ resource "kubernetes_secret" "hub_db_secret" {
     namespace = kubernetes_namespace.hub.metadata[0].name
   }
   data = {
-    username = "jupyterhub"
-    password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+    username         = "jupyterhub"
+    password         = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+    odcread-password = aws_secretsmanager_secret_version.odc_read_password.secret_string
+    odc-password     = aws_secretsmanager_secret_version.odc_write_password.secret_string
   }
   type = "Opaque"
 }
@@ -74,19 +76,6 @@ resource "random_password" "dask_gateway_api_token" {
   upper   = false
 }
 
-resource "kubernetes_secret" "jhub_oauth" {
-  metadata {
-    name      = "jhub-oauth"
-    namespace = kubernetes_namespace.hub.metadata[0].name
-  }
-
-  data = {
-    client_id     = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[0]
-    client_secret = split(":", data.aws_secretsmanager_secret_version.argo_client_secret.secret_string)[1]
-    authorize_url = "https://${var.oauth_tenant}/oauth2/authorize"
-    token_url     = "https://${var.oauth_tenant}/oauth2/token"
-  }
-}
 
 # --- Combine all secrets into a single config that GitOps can consume ---
 resource "kubernetes_secret" "jupyterhub" {
@@ -116,23 +105,9 @@ resource "kubernetes_secret" "jupyterhub" {
       jhub_hub_cookie_secret_token = random_id.jhub_hub_cookie_secret_token.hex
       jhub_proxy_secret_token      = random_id.jhub_proxy_secret_token.hex
       jhub_dask_gateway_api_token  = random_password.dask_gateway_api_token.result
+
+      odcread_password = aws_secretsmanager_secret_version.odc_read_password.secret_string
     })
-  }
-
-  type = "Opaque"
-}
-
-# --- Kubernetes secrets for JupyterHub ---
-resource "kubernetes_secret" "jhub_token" {
-  metadata {
-    name      = "jhub-token"
-    namespace = kubernetes_namespace.hub.metadata[0].name
-  }
-
-  data = {
-    cookie_token = random_id.jhub_hub_cookie_secret_token.hex
-    proxy_token  = random_id.jhub_proxy_secret_token.hex
-    dask_token   = random_password.dask_gateway_api_token.result
   }
 
   type = "Opaque"

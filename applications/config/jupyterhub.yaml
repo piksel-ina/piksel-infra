@@ -1,10 +1,3 @@
-# singleuser:
-#   extraEnv:
-#     AWS_DEFAULT_REGION: ${region}
-#     AWS_NO_SIGN_REQUEST: "YES"
-#     GDAL_DISABLE_READDIR_ON_OPEN: "EMPTY_DIR"
-#     GDAL_HTTP_MAX_RETRY: "10"
-#     GDAL_HTTP_RETRY_DELAY: "0.5"
 hub:
   db:
     type: postgres
@@ -40,3 +33,8 @@ hub:
 
 proxy:
   secretToken: ${jhub_proxy_secret_token}
+
+singleuser:
+  extraEnv:
+    AWS_DEFAULT_REGION: ${region}
+    ODC_DEFAULT_DB_PASSWORD: ${odcread_password}
