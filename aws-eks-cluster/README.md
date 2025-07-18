@@ -91,8 +91,8 @@ No requirements.
 |------|------|
 | [aws_efs_access_point.coastline_changes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_access_point) | resource |
 | [aws_efs_access_point.public_data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_access_point) | resource |
-| [aws_efs_file_system.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_file_system) | resource |
-| [aws_efs_mount_target.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_mount_target) | resource |
+| [aws_efs_file_system.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_file_system) | resource |
+| [aws_efs_mount_target.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_mount_target) | resource |
 | [aws_security_group.efs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 
@@ -108,6 +108,7 @@ No requirements.
 | <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |
 | <a name="input_sso-admin-role-arn"></a> [sso-admin-role-arn](#input\_sso-admin-role-arn) | The ARN of SSO Admin group | `string` | n/a | yes |
 | <a name="input_vpc-cni-version"></a> [vpc-cni-version](#input\_vpc-cni-version) | The version of VPC CNI for this environment | `string` | n/a | yes |
+| <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | CIDR block for the VPC | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID value | `string` | n/a | yes |
 
 ## Outputs

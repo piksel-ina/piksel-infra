@@ -9,7 +9,7 @@ resource "aws_security_group" "efs" {
     from_port       = 2049
     to_port         = 2049
     protocol        = "tcp"
-    security_groups = [module.eks.cluster_primary_security_group_id]
+    security_groups = [var.vpc_cidr_block]
     description     = "NFS traffic from EKS cluster"
   }
 
@@ -26,7 +26,7 @@ resource "aws_security_group" "efs" {
 }
 
 # --- EFS File System ---
-resource "aws_efs_file_system" "main" {
+resource "aws_efs_file_system" "data" {
   creation_token = "${local.cluster}-efs"
 
   throughput_mode = "bursting" # or "elastic"/"provisioned"
@@ -38,17 +38,19 @@ resource "aws_efs_file_system" "main" {
 }
 
 # --- EFS Mount Targets ---
-resource "aws_efs_mount_target" "main" {
+resource "aws_efs_mount_target" "data" {
   count           = length(var.private_subnets_ids)
-  file_system_id  = aws_efs_file_system.main.id
+  file_system_id  = aws_efs_file_system.data.id
   subnet_id       = var.private_subnets_ids[count.index]
   security_groups = [aws_security_group.efs.id]
+
+  depends_on = [aws_efs_file_system.data, aws_security_group.efs]
 }
 
 # --- Public data access point ---
 # read-only for most, read-write for data admins
 resource "aws_efs_access_point" "public_data" {
-  file_system_id = aws_efs_file_system.main.id
+  file_system_id = aws_efs_file_system.data.id
 
   posix_user {
     gid = 1000
@@ -56,7 +58,7 @@ resource "aws_efs_access_point" "public_data" {
   }
 
   root_directory {
-    path = "/data/public"
+    path = "/public-data"
     creation_info {
       owner_gid   = 1000
       owner_uid   = 1000
@@ -73,7 +75,7 @@ resource "aws_efs_access_point" "public_data" {
 
 # --- Coastline changes project access point ---
 resource "aws_efs_access_point" "coastline_changes" {
-  file_system_id = aws_efs_file_system.main.id
+  file_system_id = aws_efs_file_system.data.id
 
   posix_user {
     gid = 2000 # coastline-changes group
@@ -81,7 +83,7 @@ resource "aws_efs_access_point" "coastline_changes" {
   }
 
   root_directory {
-    path = "/data/coastline-changes"
+    path = "/coastline-changes"
     creation_info {
       owner_gid   = 2000
       owner_uid   = 1000
@@ -101,12 +103,12 @@ resource "aws_efs_access_point" "coastline_changes" {
 # --- Outputs ---
 output "efs_file_system_id" {
   description = "ID of the EFS File System"
-  value       = aws_efs_file_system.main.id
+  value       = aws_efs_file_system.data.id
 }
 
 output "efs_file_system_arn" {
   description = "ARN of the EFS File System"
-  value       = aws_efs_file_system.main.arn
+  value       = aws_efs_file_system.data.arn
 }
 
 output "efs_security_group_id" {
@@ -116,7 +118,7 @@ output "efs_security_group_id" {
 
 output "efs_mount_target_ids" {
   description = "List of IDs for EFS Mount Targets"
-  value       = aws_efs_mount_target.main[*].id
+  value       = aws_efs_mount_target.data[*].id
 }
 
 output "public_data_access_point_id" {

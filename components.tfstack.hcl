@@ -30,6 +30,7 @@ component "eks-cluster" {
   inputs = {
     cluster_name        = var.cluster_name
     vpc_id              = component.network.vpc_id
+    vpc_cidr_block      = component.network.vpc_cidr_block
     private_subnets_ids = component.network.private_subnets
     eks-version         = var.eks-version
     coredns-version     = var.coredns-version

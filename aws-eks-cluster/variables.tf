@@ -45,3 +45,8 @@ variable "kube-proxy-version" {
   type        = string
   description = "The version of kube-proxy for this environment"
 }
+
+variable "vpc_cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
