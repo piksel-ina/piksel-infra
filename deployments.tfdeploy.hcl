@@ -54,6 +54,8 @@ deployment "development" {
     db_instance_class       = "db.t3.small"
     db_allocated_storage    = 50
     backup_retention_period = 14
+    # --- EFS Setup ---
+    efs_backup_enabled = false
     # --- Application Setup ---
     oauth_tenant                         = "ap-southeast-3zfzkrhjdu.auth.ap-southeast-3.amazoncognito.com"
     odc_cloudfront_crossaccount_role_arn = upstream_input.shared.odc_cloudfront_crossaccount_role_arns["dev"]

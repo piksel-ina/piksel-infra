@@ -121,14 +121,14 @@ output "efs_metadata" {
     coastline_changes_access_point_arn = string
   })
   value = {
-    file_system_id                     = component.eks-cluster.efs_file_system_id
-    file_system_arn                    = component.eks-cluster.efs_file_system_arn
-    security_group_id                  = component.eks-cluster.efs_security_group_id
-    mount_target_ids                   = component.eks-cluster.efs_mount_target_ids
-    public_data_access_point_id        = component.eks-cluster.public_data_access_point_id
-    public_data_access_point_arn       = component.eks-cluster.public_data_access_point_arn
-    coastline_changes_access_point_id  = component.eks-cluster.coastline_changes_access_point_id
-    coastline_changes_access_point_arn = component.eks-cluster.coastline_changes_access_point_arn
+    file_system_id                     = component.elastic-filesystem.efs_file_system_id
+    file_system_arn                    = component.elastic-filesystem.efs_file_system_arn
+    security_group_id                  = component.elastic-filesystem.efs_security_group_id
+    mount_target_ids                   = component.elastic-filesystem.efs_mount_target_ids
+    public_data_access_point_id        = component.elastic-filesystem.public_data_access_point_id
+    public_data_access_point_arn       = component.elastic-filesystem.public_data_access_point_arn
+    coastline_changes_access_point_id  = component.elastic-filesystem.coastline_changes_access_point_id
+    coastline_changes_access_point_arn = component.elastic-filesystem.coastline_changes_access_point_arn
   }
 }
 

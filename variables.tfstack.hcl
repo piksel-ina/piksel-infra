@@ -209,3 +209,9 @@ variable "odc_cloudfront_crossaccount_role_arn" {
   description = "value of the cross-account IAM role in CloudFront account"
   type        = string
 }
+
+variable "efs_backup_enabled" {
+  description = "Enable EFS backup policy"
+  type        = bool
+  default     = false
+}

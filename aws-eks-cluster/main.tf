@@ -40,27 +40,6 @@ module "vpc_cni_irsa_role" {
   tags = local.tags
 }
 
-module "efs_csi_irsa_role" {
-  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version   = "5.55.0"
-  role_name = "${local.cluster}-efs-csi"
-
-  attach_efs_csi_policy = true
-
-  role_policy_arns = {
-    EFSClientWrite = "arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
-  }
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:efs-csi-controller-sa"]
-    }
-  }
-
-  tags = local.tags
-}
-
 
 # --- Create Cluster ---
 module "eks" {
@@ -105,11 +84,6 @@ module "eks" {
       most_recent              = true
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
-    }
-    aws-efs-csi-driver = {
-      most_recent              = true
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.efs_csi_irsa_role.iam_role_arn
     }
   }
 

@@ -134,6 +134,26 @@ component "database" {
   }
 }
 
+component "elastic-filesystem" {
+  source = "./aws-efs"
+
+  inputs = {
+    account_id            = component.network.account_id
+    vpc_id                = component.network.vpc_id
+    vpc_cidr_block        = component.network.vpc_cidr_block
+    private_subnets_ids   = component.network.private_subnets
+    cluster_name          = var.cluster_name
+    eks_oidc_provider_arn = component.eks-cluster.cluster_oidc_provider_arn
+    efs_backup_enabled    = var.efs_backup_enabled
+    default_tags          = var.default_tags
+  }
+
+  providers = {
+    aws        = provider.aws.configurations
+    kubernetes = provider.kubernetes.configurations
+  }
+}
+
 component "applications" {
   source = "./applications"
 

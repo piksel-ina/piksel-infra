@@ -1,4 +1,29 @@
-# --- EFS Resources ---
+locals {
+  cluster = var.cluster_name
+  tags    = var.default_tags
+}
+
+# --- IRSA ---
+module "efs_csi_irsa_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version   = "5.55.0"
+  role_name = "${local.cluster}-efs-csi"
+
+  attach_efs_csi_policy = true
+
+  role_policy_arns = {
+    EFSClientWrite = "arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
+  }
+
+  oidc_providers = {
+    ex = {
+      provider_arn               = var.eks_oidc_provider_arn
+      namespace_service_accounts = ["filesystem:efs-csi-controller-sa"]
+    }
+  }
+
+  tags = local.tags
+}
 
 # --- Security group for EFS ---
 resource "aws_security_group" "efs" {
@@ -6,11 +31,11 @@ resource "aws_security_group" "efs" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 2049
-    to_port         = 2049
-    protocol        = "tcp"
-    security_groups = [var.vpc_cidr_block]
-    description     = "NFS traffic from EKS cluster"
+    from_port   = 2049
+    to_port     = 2049
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "NFS traffic from EKS cluster"
   }
 
   egress {
@@ -27,10 +52,17 @@ resource "aws_security_group" "efs" {
 
 # --- EFS File System ---
 resource "aws_efs_file_system" "data" {
-  creation_token = "${local.cluster}-efs"
+  creation_token   = "${local.cluster}-efs"
+  performance_mode = "generalPurpose" # or "maxIO" for high throughput
 
   throughput_mode = "bursting" # or "elastic"/"provisioned"
   # provisioned_throughput_in_mibps = 100 # Uncomment and set if using "provisioned"
+
+  encrypted = true
+
+  lifecycle_policy {
+    transition_to_ia = "AFTER_30_DAYS"
+  }
 
   tags = merge(local.tags, {
     Name = "${local.cluster}-efs"
@@ -44,7 +76,43 @@ resource "aws_efs_mount_target" "data" {
   subnet_id       = var.private_subnets_ids[count.index]
   security_groups = [aws_security_group.efs.id]
 
+
   depends_on = [aws_efs_file_system.data, aws_security_group.efs]
+}
+
+# --- Enable EFS Backup ---
+resource "aws_efs_backup_policy" "data" {
+  file_system_id = aws_efs_file_system.data.id
+
+  backup_policy {
+    status = var.efs_backup_enabled ? "ENABLED" : "DISABLED"
+  }
+}
+
+# --- EFS Lifecycle Policy ---
+resource "aws_efs_file_system_policy" "data" {
+  file_system_id = aws_efs_file_system.data.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${var.account_id}:root"
+        }
+        Action = [
+          "elasticfilesystem:ClientMount",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:ClientRootAccess"
+        ]
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" = "true"
+          }
+        }
+      }
+    ]
+  })
 }
 
 # --- Public data access point ---
@@ -96,47 +164,4 @@ resource "aws_efs_access_point" "coastline_changes" {
     Type        = "project-collaborative"
     Description = "Coastline changes project workspace - collaborative access"
   })
-}
-
-
-
-# --- Outputs ---
-output "efs_file_system_id" {
-  description = "ID of the EFS File System"
-  value       = aws_efs_file_system.data.id
-}
-
-output "efs_file_system_arn" {
-  description = "ARN of the EFS File System"
-  value       = aws_efs_file_system.data.arn
-}
-
-output "efs_security_group_id" {
-  description = "ID of the Security Group for EFS"
-  value       = aws_security_group.efs.id
-}
-
-output "efs_mount_target_ids" {
-  description = "List of IDs for EFS Mount Targets"
-  value       = aws_efs_mount_target.data[*].id
-}
-
-output "public_data_access_point_id" {
-  description = "ID of the Public Data Access Point"
-  value       = aws_efs_access_point.public_data.id
-}
-
-output "public_data_access_point_arn" {
-  description = "ARN of the Public Data Access Point"
-  value       = aws_efs_access_point.public_data.arn
-}
-
-output "coastline_changes_access_point_id" {
-  description = "ID of the Coastline Changes Project Access Point"
-  value       = aws_efs_access_point.coastline_changes.id
-}
-
-output "coastline_changes_access_point_arn" {
-  description = "ARN of the Coastline Changes Project Access Point"
-  value       = aws_efs_access_point.coastline_changes.arn
 }
