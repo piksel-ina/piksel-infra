@@ -107,6 +107,31 @@ output "eks_cluster_metadata" {
   }
 }
 
+# --- EFS Outputs ---
+output "efs_metadata" {
+  description = "Output of EFS File System and Access Points"
+  type = object({
+    file_system_id                     = string
+    file_system_arn                    = string
+    security_group_id                  = string
+    mount_target_ids                   = list(string)
+    public_data_access_point_id        = string
+    public_data_access_point_arn       = string
+    coastline_changes_access_point_id  = string
+    coastline_changes_access_point_arn = string
+  })
+  value = {
+    file_system_id                     = component.eks-cluster.efs_file_system_id
+    file_system_arn                    = component.eks-cluster.efs_file_system_arn
+    security_group_id                  = component.eks-cluster.efs_security_group_id
+    mount_target_ids                   = component.eks-cluster.efs_mount_target_ids
+    public_data_access_point_id        = component.eks-cluster.public_data_access_point_id
+    public_data_access_point_arn       = component.eks-cluster.public_data_access_point_arn
+    coastline_changes_access_point_id  = component.eks-cluster.coastline_changes_access_point_id
+    coastline_changes_access_point_arn = component.eks-cluster.coastline_changes_access_point_arn
+  }
+}
+
 # --- External DNS Outputs ---
 output "external_dns_metadata" {
   description = "Output of External DNS configuration and resources"

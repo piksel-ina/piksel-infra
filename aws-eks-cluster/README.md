@@ -81,6 +81,7 @@ No requirements.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
+| <a name="module_efs_csi_irsa_role"></a> [efs\_csi\_irsa\_role](#module\_efs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 20.33 |
 | <a name="module_vpc_cni_irsa_role"></a> [vpc\_cni\_irsa\_role](#module\_vpc\_cni\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 
@@ -88,6 +89,11 @@ No requirements.
 
 | Name | Type |
 |------|------|
+| [aws_efs_access_point.coastline_changes](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_access_point) | resource |
+| [aws_efs_access_point.public_data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_access_point) | resource |
+| [aws_efs_file_system.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_file_system) | resource |
+| [aws_efs_mount_target.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_mount_target) | resource |
+| [aws_security_group.efs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 
 ## Inputs
@@ -115,4 +121,12 @@ No requirements.
 | <a name="output_cluster_oidc_issuer_url"></a> [cluster\_oidc\_issuer\_url](#output\_cluster\_oidc\_issuer\_url) | EKS Cluster OIDC Issuer URL |
 | <a name="output_cluster_oidc_provider_arn"></a> [cluster\_oidc\_provider\_arn](#output\_cluster\_oidc\_provider\_arn) | EKS Cluster OIDC Provider ARN |
 | <a name="output_cluster_tls_certificate_sha1_fingerprint"></a> [cluster\_tls\_certificate\_sha1\_fingerprint](#output\_cluster\_tls\_certificate\_sha1\_fingerprint) | EKS Cluster TLS Certificate SHA1 Fingerprint |
+| <a name="output_coastline_changes_access_point_arn"></a> [coastline\_changes\_access\_point\_arn](#output\_coastline\_changes\_access\_point\_arn) | ARN of the Coastline Changes Project Access Point |
+| <a name="output_coastline_changes_access_point_id"></a> [coastline\_changes\_access\_point\_id](#output\_coastline\_changes\_access\_point\_id) | ID of the Coastline Changes Project Access Point |
+| <a name="output_efs_file_system_arn"></a> [efs\_file\_system\_arn](#output\_efs\_file\_system\_arn) | ARN of the EFS File System |
+| <a name="output_efs_file_system_id"></a> [efs\_file\_system\_id](#output\_efs\_file\_system\_id) | ID of the EFS File System |
+| <a name="output_efs_mount_target_ids"></a> [efs\_mount\_target\_ids](#output\_efs\_mount\_target\_ids) | List of IDs for EFS Mount Targets |
+| <a name="output_efs_security_group_id"></a> [efs\_security\_group\_id](#output\_efs\_security\_group\_id) | ID of the Security Group for EFS |
+| <a name="output_public_data_access_point_arn"></a> [public\_data\_access\_point\_arn](#output\_public\_data\_access\_point\_arn) | ARN of the Public Data Access Point |
+| <a name="output_public_data_access_point_id"></a> [public\_data\_access\_point\_id](#output\_public\_data\_access\_point\_id) | ID of the Public Data Access Point |
 <!-- END_TF_DOCS -->
