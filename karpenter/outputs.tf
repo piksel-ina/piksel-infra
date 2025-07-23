@@ -20,20 +20,20 @@ output "karpenter_helm_release_status" {
 
 output "karpenter_node_class_status" {
   description = "Status of the Karpenter EC2NodeClass."
-  value       = try(kubernetes_manifest.karpenter_node_class.object["status"], null)
+  value       = try(yamldecode(kubectl_manifest.karpenter_node_class.live_manifest_incluster).status, null)
 }
 
 output "karpenter_node_pool_name" {
   description = "The name of the default Karpenter NodePool."
-  value       = try(kubernetes_manifest.karpenter_node_pool.object["metadata"]["name"], null)
+  value       = try(yamldecode(kubectl_manifest.karpenter_node_pool.live_manifest_incluster).metadata.name, null)
 }
 
 output "karpenter_node_class_gpu_status" {
   description = "Status of the Karpenter GPU NodePool."
-  value       = try(kubernetes_manifest.karpenter_node_pool_gpu.object["status"], null)
+  value       = try(yamldecode(kubectl_manifest.karpenter_node_pool_gpu.live_manifest_incluster).status, null)
 }
 
 output "karpenter_node_pool_gpu_name" {
   description = "The name of the GPU Karpenter NodePool."
-  value       = try(kubernetes_manifest.karpenter_node_pool_gpu.object["metadata"]["name"], null)
+  value       = try(yamldecode(kubectl_manifest.karpenter_node_pool_gpu.live_manifest_incluster).metadata.name, null)
 }
