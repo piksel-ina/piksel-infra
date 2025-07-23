@@ -18,19 +18,16 @@ module "networks" {
 module "eks-cluster" {
   source = "../aws-eks-cluster"
 
-
   cluster_name        = local.cluster_name
   vpc_id              = module.networks.vpc_id
   vpc_cidr_block      = module.networks.vpc_cidr_block
-  private_subnets_ids = component.network.private_subnets
-  eks-version         = var.eks-version
-  coredns-version     = var.coredns-version
-  vpc-cni-version     = var.vpc-cni-version
-  kube-proxy-version  = var.kube-proxy-version
-  sso-admin-role-arn  = var.sso-admin-role-arn
+  private_subnets_ids = module.networks.private_subnets
+  eks-version         = "1.32"
+  coredns-version     = "v1.11.4-eksbuild.2"
+  vpc-cni-version     = "v1.19.2-eksbuild.1"
+  kube-proxy-version  = "v1.32.0-eksbuild.2"
+  sso-admin-role-arn  = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
   default_tags        = var.default_tags
-
-
 
   depends_on = [module.networks]
 }

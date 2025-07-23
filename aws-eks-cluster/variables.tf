@@ -1,3 +1,8 @@
+locals {
+  cluster = var.cluster_name
+  tags    = var.default_tags
+}
+
 variable "cluster_name" {
   description = "Name of the EKS cluster for tagging subnets"
   type        = string
@@ -13,6 +18,12 @@ variable "default_tags" {
 variable "vpc_id" {
   description = "VPC ID value"
   type        = string
+}
+
+variable "vpc_cidr_block" {
+  description = "CIDR block"
+  type        = string
+
 }
 
 variable "private_subnets_ids" {

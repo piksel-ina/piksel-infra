@@ -1,46 +1,3 @@
-locals {
-  cluster = var.cluster_name
-  tags    = var.default_tags
-}
-
-# --- IRSA - IAM roles for service accounts ---
-module "ebs_csi_irsa_role" {
-  source                = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version               = "5.55.0"
-  role_name             = "${local.cluster}-ebs-csi"
-  attach_ebs_csi_policy = true
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:ebs-csi-controller-sa"]
-    }
-  }
-
-  tags = local.tags
-}
-
-module "vpc_cni_irsa_role" {
-  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version   = "5.55.0"
-  role_name = "${local.cluster}-vpc-cni"
-
-  # Attach the AWS managed policy
-  role_policy_arns = {
-    AmazonEKS_CNI_Policy = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  }
-
-  oidc_providers = {
-    ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-node"]
-    }
-  }
-
-  tags = local.tags
-}
-
-
 # --- Create Cluster ---
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -58,8 +15,8 @@ module "eks" {
         computeType = "Fargate"
         autoScaling = {
           enabled     = true
-          minReplicas = 4
-          maxReplicas = 10
+          minReplicas = 3
+          maxReplicas = 6
         }
         resources = {
           requests = {
@@ -85,26 +42,48 @@ module "eks" {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
+    aws-efs-csi-driver = {
+      most_recent              = true
+      resolve_conflicts        = "OVERWRITE"
+      service_account_role_arn = module.efs_csi_irsa_role.iam_role_arn
+    }
   }
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids
 
-  # Fargate profiles use the cluster primary security group so these are not utilized
-  create_cluster_security_group = false
-  create_node_security_group    = false
+  # --- NEW: EKS Managed Node Groups ---
+  eks_managed_node_groups = {
+    general = {
+      name           = "${local.cluster}-general"
+      instance_types = ["t3.medium", "t3.large"]
+
+      min_size     = 1
+      max_size     = 2
+      desired_size = 2
+
+      # Use the latest EKS Optimized AMI
+      ami_type = "AL2023_x86_64_STANDARD"
+
+      capacity_type = "SPOT"
+
+      # Disk configuration
+      disk_size = 20
+      disk_type = "gp3"
+
+      # Use our custom security group
+      vpc_security_group_ids = [aws_security_group.node_group_sg.id]
+
+      tags = merge(local.tags, {
+        "karpenter.sh/discovery" = local.cluster
+      })
+    }
+  }
+
+  create_cluster_security_group = true
+  create_node_security_group    = true
 
   fargate_profiles = {
-    kube_system = {
-      selectors = [
-        { namespace = "kube-system" }
-      ]
-    }
-    karpenter = {
-      selectors = [
-        { namespace = "karpenter" }
-      ]
-    }
     flux = {
       selectors = [
         { namespace = "flux-system" }
