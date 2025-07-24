@@ -81,7 +81,7 @@ This configuration will create and manage the following key resources:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_karpenter"></a> [karpenter](#module\_karpenter) | terraform-aws-modules/eks/aws//modules/karpenter | n/a |
+| <a name="module_karpenter"></a> [karpenter](#module\_karpenter) | terraform-aws-modules/eks/aws//modules/karpenter | ~> 20.33 |
 
 ## Resources
 

@@ -99,6 +99,8 @@ No requirements.
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster for tagging subnets | `string` | `"piksel-eks-cluster"` | no |
 | <a name="input_coredns-version"></a> [coredns-version](#input\_coredns-version) | The version of CoreDNS for this environment | `string` | n/a | yes |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_ebs-csi-version"></a> [ebs-csi-version](#input\_ebs-csi-version) | The version of EBS CSI driver | `string` | n/a | yes |
+| <a name="input_efs-csi-version"></a> [efs-csi-version](#input\_efs-csi-version) | The version of EFS CSI driver | `string` | n/a | yes |
 | <a name="input_eks-version"></a> [eks-version](#input\_eks-version) | The version of Kubernetes for this environment | `string` | n/a | yes |
 | <a name="input_kube-proxy-version"></a> [kube-proxy-version](#input\_kube-proxy-version) | The version of kube-proxy for this environment | `string` | n/a | yes |
 | <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |

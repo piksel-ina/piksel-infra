@@ -16,7 +16,8 @@ locals {
 
 # --- Karpenter (magic autoscaler) ---
 module "karpenter" {
-  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "~> 20.33"
 
   enable_irsa            = true
   cluster_name           = local.cluster
@@ -89,7 +90,7 @@ resource "helm_release" "karpenter" {
   create_namespace = true
   name             = "karpenter"
   repository       = "oci://public.ecr.aws/karpenter"
-  version          = "1.5.1"
+  version          = "1.5.3"
   chart            = "karpenter"
   description      = "Karpenter autoscaler for EKS cluster"
 
@@ -116,6 +117,15 @@ resource "helm_release" "karpenter" {
         limits:
           cpu: 1
           memory: 2Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: eks.amazonaws.com/compute-type
+              operator: NotIn
+              values:
+              - fargate
     EOT
   ]
 }

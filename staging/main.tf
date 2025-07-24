@@ -26,6 +26,8 @@ module "eks-cluster" {
   coredns-version     = "v1.11.4-eksbuild.2"
   vpc-cni-version     = "v1.19.2-eksbuild.1"
   kube-proxy-version  = "v1.32.0-eksbuild.2"
+  ebs-csi-version     = "v1.46.0-eksbuild.1"
+  efs-csi-version     = "v2.1.9-eksbuild.1"
   sso-admin-role-arn  = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
   default_tags        = var.default_tags
 
@@ -58,5 +60,4 @@ module "karpenter" {
   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
-
 }

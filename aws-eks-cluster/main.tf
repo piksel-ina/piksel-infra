@@ -38,12 +38,12 @@ module "eks" {
       service_account_role_arn = module.vpc_cni_irsa_role.iam_role_arn
     }
     aws-ebs-csi-driver = {
-      most_recent              = true
+      addon_version            = var.ebs-csi-version
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
     aws-efs-csi-driver = {
-      most_recent              = true
+      addon_version            = var.efs-csi-version
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.efs_csi_irsa_role.iam_role_arn
     }
@@ -56,9 +56,9 @@ module "eks" {
   eks_managed_node_groups = {
     general = {
       name           = "${local.cluster}-general"
-      instance_types = ["t3.medium", "t3.large"]
+      instance_types = ["t3.medium"]
 
-      min_size     = 1
+      min_size     = 2
       max_size     = 2
       desired_size = 2
 
@@ -73,6 +73,20 @@ module "eks" {
 
       # Use our custom security group
       vpc_security_group_ids = [aws_security_group.node_group_sg.id]
+
+      labels = {
+        role                                                      = "system"
+        "node.kubernetes.io/exclude-from-external-load-balancers" = "true"
+      }
+
+      # Prevent apps workload here
+      taints = [
+        {
+          key    = "workload-type"
+          value  = "system"
+          effect = "NO_SCHEDULE"
+        }
+      ]
 
       tags = merge(local.tags, {
         "karpenter.sh/discovery" = local.cluster

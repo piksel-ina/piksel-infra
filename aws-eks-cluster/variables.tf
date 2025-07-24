@@ -56,3 +56,14 @@ variable "kube-proxy-version" {
   type        = string
   description = "The version of kube-proxy for this environment"
 }
+
+variable "ebs-csi-version" {
+  type        = string
+  description = "The version of EBS CSI driver"
+}
+
+variable "efs-csi-version" {
+  type        = string
+  description = "The version of EFS CSI driver"
+
+}
