@@ -10,7 +10,7 @@ locals {
 resource "random_password" "db_random_string" {
   length           = 32
   special          = true
-  override_special = "@#$&*+-="
+  override_special = "#$&*+-="
 }
 
 # --- Creates a secret in AWS Secrets Manager ---
@@ -25,12 +25,6 @@ resource "aws_secretsmanager_secret" "db_password" {
 resource "aws_secretsmanager_secret_version" "db_password" {
   secret_id     = aws_secretsmanager_secret.db_password.id
   secret_string = random_password.db_random_string.result
-}
-
-# --- Defines a group of private subnets where RDS instance will reside ---
-resource "aws_db_subnet_group" "default" {
-  name       = "database"
-  subnet_ids = local.private_subnets
 }
 
 # --- Creates a managed PostgreSQL 16 RDS instance ---
@@ -60,6 +54,7 @@ module "db" {
 
   create_db_subnet_group = true
   subnet_ids             = local.private_subnets
+  multi_az               = var.db_multi_az
 
   vpc_security_group_ids = [module.security_group.security_group_id]
 
@@ -90,7 +85,7 @@ resource "kubernetes_secret" "db_password" {
     db_name    = local.project
     db_address = split(":", module.db.db_instance_endpoint)[0]
     username   = local.db_username
-    password   = base64encode(aws_secretsmanager_secret_version.db_password.secret_string)
+    password   = aws_secretsmanager_secret_version.db_password.secret_string
   }
 }
 

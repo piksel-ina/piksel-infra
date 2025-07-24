@@ -11,9 +11,7 @@ module "networks" {
   vpc_cidr     = "10.2.0.0/16"
   az_count     = "2"
   default_tags = var.default_tags
-
 }
-
 
 module "eks-cluster" {
   source = "../aws-eks-cluster"
@@ -47,6 +45,8 @@ module "external-dns" {
   externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
   public_hosted_zone_id             = "Z06367032PXGIV8NRRW3G"
   default_tags                      = var.default_tags
+
+  depends_on = [module.eks-cluster]
 }
 
 module "karpenter" {
@@ -60,6 +60,8 @@ module "karpenter" {
   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
+
+  depends_on = [module.eks-cluster]
 }
 
 module "s3_bucket" {
@@ -68,4 +70,23 @@ module "s3_bucket" {
   project      = var.project
   environment  = var.environment
   default_tags = var.default_tags
+}
+
+
+module "database" {
+  source = "../aws-database"
+
+  project                 = var.project
+  environment             = var.environment
+  vpc_id                  = module.networks.vpc_id
+  vpc_cidr_block          = module.networks.vpc_cidr_block
+  private_subnets_ids     = module.networks.private_subnets
+  cluster_name            = module.eks-cluster.cluster_name
+  default_tags            = var.default_tags
+  db_instance_class       = "db.t3.large"
+  db_allocated_storage    = 50
+  backup_retention_period = 14
+  db_multi_az             = false
+
+  depends_on = [module.eks-cluster]
 }

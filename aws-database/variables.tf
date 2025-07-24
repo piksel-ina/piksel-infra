@@ -70,6 +70,11 @@ variable "backup_retention_period" {
   }
 }
 
+variable "db_multi_az" {
+  description = "Database multi availability zone deployment"
+  type        = bool
+}
+
 # --- Security Group Variables ---
 variable "vpc_id" {
   description = "The ID of the VPC to associate with the security group"

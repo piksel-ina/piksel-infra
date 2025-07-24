@@ -75,3 +75,25 @@ output "s3_public_metadata" {
     arn  = module.s3_bucket.public_bucket_arn
   }
 }
+
+# --- Database outputs ---
+output "database_metadata" {
+  description = "Output of RDS database configuration and resources"
+
+  value = {
+    endpoint         = module.database.db_endpoint
+    address          = module.database.db_address
+    port             = module.database.db_port
+    instance_id      = module.database.db_instance_id
+    k8s_service_fqdn = module.database.k8s_db_service
+    k8s_namespace    = module.database.db_namespace
+    database_name    = module.database.db_name
+    db_username      = module.database.db_username
+    security_group = {
+      arn         = module.database.security_group_arn_database
+      id          = module.database.security_group_id_database
+      name        = module.database.security_group_name_database
+      description = module.database.security_group_description_database
+    }
+  }
+}
