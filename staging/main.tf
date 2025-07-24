@@ -61,3 +61,11 @@ module "karpenter" {
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
 }
+
+module "s3_bucket" {
+  source = "../aws-s3-bucket"
+
+  project      = var.project
+  environment  = var.environment
+  default_tags = var.default_tags
+}
