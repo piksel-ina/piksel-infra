@@ -131,6 +131,19 @@ resource "helm_release" "external_dns" {
         }
       ]
 
+      nodeSelector = {
+        "karpenter.sh/controller" = "true"
+      }
+
+      tolerations = [
+        {
+          key      = "CriticalAddonsOnly"
+          operator = "Equal"
+          value    = "true"
+          effect   = "NoSchedule"
+        }
+      ]
+
       # Resource limits
       resources = {
         limits = {
@@ -154,5 +167,4 @@ resource "helm_release" "external_dns" {
   # Handle upgrades gracefully
   force_update  = false
   recreate_pods = false
-
 }
