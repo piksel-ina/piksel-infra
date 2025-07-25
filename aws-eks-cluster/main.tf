@@ -116,15 +116,6 @@ module "eks" {
       type        = "egress"
       cidr_blocks = ["0.0.0.0/0"]
     }
-    # Allow NFS for EFS CSI (adjust source_security_group_id to your EFS SG)
-    # ingress_nfs_from_efs = {
-    #   description              = "Allow NFS from EFS mount targets"
-    #   protocol                 = "tcp"
-    #   from_port                = 2049
-    #   to_port                  = 2049
-    #   type                     = "ingress"
-    #   source_security_group_id = "sg-xxxxxxxx"
-    # }
   }
 
   node_security_group_tags = merge(local.tags, {

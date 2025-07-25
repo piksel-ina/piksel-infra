@@ -57,12 +57,17 @@ variable "ebs-csi-version" {
   description = "The version of EBS CSI driver"
 }
 
-# variable "efs-csi-version" {
-#   type        = string
-#   description = "The version of EFS CSI driver"
-# }
-
 variable "node_group_version" {
   description = "Node Group Version"
   default     = "v1"
+}
+
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}
+variable "efs_backup_enabled" {
+  description = "Enable EFS backup policy"
+  type        = bool
+  default     = false
 }
