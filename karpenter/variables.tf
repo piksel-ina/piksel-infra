@@ -38,3 +38,11 @@ variable "gpu_nodepool_node_limit" {
   type        = number
   default     = 20
 }
+
+variable "token_user_name" {
+  description = "Toke Username"
+}
+
+variable "token_password" {
+  description = "sds"
+}

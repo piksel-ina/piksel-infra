@@ -23,6 +23,7 @@ module "karpenter" {
   cluster_name           = local.cluster
   irsa_oidc_provider_arn = local.oidc_provider
 
+
   # Node IAM role policies (for EC2 instances)
   node_iam_role_additional_policies = {
     AmazonSSMManagedInstanceCore            = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
@@ -86,13 +87,15 @@ module "karpenter" {
 
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
-  namespace        = "karpenter"
-  create_namespace = true
-  name             = "karpenter"
-  repository       = "oci://public.ecr.aws/karpenter"
-  version          = "1.5.3"
-  chart            = "karpenter"
-  description      = "Karpenter autoscaler for EKS cluster"
+  namespace           = "karpenter"
+  create_namespace    = true
+  name                = "karpenter"
+  repository          = "oci://public.ecr.aws/karpenter"
+  version             = "1.5.3"
+  chart               = "karpenter"
+  description         = "Karpenter autoscaler for EKS cluster"
+  repository_username = var.token_user_name
+  repository_password = var.token_password
 
   # Ensure Helm waits for all resources including CRDs
   wait            = true
@@ -117,15 +120,13 @@ resource "helm_release" "karpenter" {
         limits:
           cpu: 1
           memory: 2Gi
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: eks.amazonaws.com/compute-type
-              operator: NotIn
-              values:
-              - fargate
+    nodeSelector:
+      karpenter.sh/controller: "true"
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
     EOT
   ]
 }

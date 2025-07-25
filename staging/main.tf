@@ -49,22 +49,22 @@ module "external-dns" {
   depends_on = [module.eks-cluster]
 }
 
-# module "karpenter" {
-#   source = "../karpenter"
+module "karpenter" {
+  source = "../karpenter"
 
-#   cluster_name                = local.cluster_name
-#   oidc_provider_arn           = module.eks-cluster.cluster_oidc_provider_arn
-#   cluster_endpoint            = module.eks-cluster.cluster_endpoint
-#   default_nodepool_ami_alias  = "al2023@v20250505"
-#   default_nodepool_node_limit = 10000
-#   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
-#   gpu_nodepool_node_limit     = 20
-#   token_password              = data.aws_ecrpublic_authorization_token.token.password
-#   token_user_name             = data.aws_ecrpublic_authorization_token.token.user_name
-#   default_tags                = var.default_tags
+  cluster_name                = local.cluster_name
+  oidc_provider_arn           = module.eks-cluster.cluster_oidc_provider_arn
+  cluster_endpoint            = module.eks-cluster.cluster_endpoint
+  default_nodepool_ami_alias  = "al2023@v20250505"
+  default_nodepool_node_limit = 10000
+  gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+  gpu_nodepool_node_limit     = 20
+  token_password              = data.aws_ecrpublic_authorization_token.token.password
+  token_user_name             = data.aws_ecrpublic_authorization_token.token.user_name
+  default_tags                = var.default_tags
 
-#   depends_on = [module.eks-cluster]
-# }
+  depends_on = [module.eks-cluster]
+}
 
 module "s3_bucket" {
   source = "../aws-s3-bucket"

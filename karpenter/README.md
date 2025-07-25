@@ -106,6 +106,8 @@ This configuration will create and manage the following key resources:
 | <a name="input_gpu_nodepool_ami"></a> [gpu\_nodepool\_ami](#input\_gpu\_nodepool\_ami) | AMI for GPU node pools | `string` | `"amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"` | no |
 | <a name="input_gpu_nodepool_node_limit"></a> [gpu\_nodepool\_node\_limit](#input\_gpu\_nodepool\_node\_limit) | Default GPU node limit for GPU node pools | `number` | `20` | no |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | value | `any` | n/a | yes |
+| <a name="input_token_password"></a> [token\_password](#input\_token\_password) | sds | `any` | n/a | yes |
+| <a name="input_token_user_name"></a> [token\_user\_name](#input\_token\_user\_name) | Toke Username | `any` | n/a | yes |
 
 ## Outputs
 
