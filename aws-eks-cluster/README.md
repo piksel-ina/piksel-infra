@@ -89,7 +89,6 @@ No requirements.
 
 | Name | Type |
 |------|------|
-| [aws_security_group.node_group_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 
 ## Inputs
@@ -100,9 +99,9 @@ No requirements.
 | <a name="input_coredns-version"></a> [coredns-version](#input\_coredns-version) | The version of CoreDNS for this environment | `string` | n/a | yes |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_ebs-csi-version"></a> [ebs-csi-version](#input\_ebs-csi-version) | The version of EBS CSI driver | `string` | n/a | yes |
-| <a name="input_efs-csi-version"></a> [efs-csi-version](#input\_efs-csi-version) | The version of EFS CSI driver | `string` | n/a | yes |
 | <a name="input_eks-version"></a> [eks-version](#input\_eks-version) | The version of Kubernetes for this environment | `string` | n/a | yes |
 | <a name="input_kube-proxy-version"></a> [kube-proxy-version](#input\_kube-proxy-version) | The version of kube-proxy for this environment | `string` | n/a | yes |
+| <a name="input_node_group_version"></a> [node\_group\_version](#input\_node\_group\_version) | Node Group Version | `string` | `"v1"` | no |
 | <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |
 | <a name="input_sso-admin-role-arn"></a> [sso-admin-role-arn](#input\_sso-admin-role-arn) | The ARN of SSO Admin group | `string` | n/a | yes |
 | <a name="input_vpc-cni-version"></a> [vpc-cni-version](#input\_vpc-cni-version) | The version of VPC CNI for this environment | `string` | n/a | yes |

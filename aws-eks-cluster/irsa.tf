@@ -41,6 +41,10 @@ module "efs_csi_irsa_role" {
   role_name             = "${local.cluster}-efs-csi"
   attach_efs_csi_policy = true
 
+  role_policy_arns = {
+    EFSClientWrite = "arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
+  }
+
   oidc_providers = {
     ex = {
       provider_arn               = module.eks.oidc_provider_arn

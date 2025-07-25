@@ -25,44 +25,46 @@ module "eks-cluster" {
   vpc-cni-version     = "v1.19.2-eksbuild.1"
   kube-proxy-version  = "v1.32.0-eksbuild.2"
   ebs-csi-version     = "v1.46.0-eksbuild.1"
-  efs-csi-version     = "v2.1.9-eksbuild.1"
-  sso-admin-role-arn  = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
-  default_tags        = var.default_tags
+  # efs-csi-version     = "v2.1.9-eksbuild.1"
+  sso-admin-role-arn = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
+  default_tags       = var.default_tags
 
   depends_on = [module.networks]
 }
 
-module "external-dns" {
-  source = "../external-dns"
+# module "external-dns" {
+#   source = "../external-dns"
 
-  aws_region                        = var.aws_region
-  project                           = var.project
-  environment                       = var.environment
-  cluster_name                      = local.cluster_name
-  subdomains                        = ["staging.pik-sel.id"]
-  oidc_provider                     = module.eks-cluster.cluster_oidc_issuer_url
-  oidc_provider_arn                 = module.eks-cluster.cluster_oidc_provider_arn
-  externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
-  public_hosted_zone_id             = "Z06367032PXGIV8NRRW3G"
-  default_tags                      = var.default_tags
+#   aws_region                        = var.aws_region
+#   project                           = var.project
+#   environment                       = var.environment
+#   cluster_name                      = local.cluster_name
+#   subdomains                        = ["staging.pik-sel.id"]
+#   oidc_provider                     = module.eks-cluster.cluster_oidc_issuer_url
+#   oidc_provider_arn                 = module.eks-cluster.cluster_oidc_provider_arn
+#   externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
+#   public_hosted_zone_id             = "Z06367032PXGIV8NRRW3G"
+#   default_tags                      = var.default_tags
 
-  depends_on = [module.eks-cluster]
-}
+#   depends_on = [module.eks-cluster]
+# }
 
-module "karpenter" {
-  source = "../karpenter"
+# module "karpenter" {
+#   source = "../karpenter"
 
-  cluster_name                = local.cluster_name
-  oidc_provider_arn           = module.eks-cluster.cluster_oidc_provider_arn
-  cluster_endpoint            = module.eks-cluster.cluster_endpoint
-  default_nodepool_ami_alias  = "al2023@v20250505"
-  default_nodepool_node_limit = 10000
-  gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
-  gpu_nodepool_node_limit     = 20
-  default_tags                = var.default_tags
+#   cluster_name                = local.cluster_name
+#   oidc_provider_arn           = module.eks-cluster.cluster_oidc_provider_arn
+#   cluster_endpoint            = module.eks-cluster.cluster_endpoint
+#   default_nodepool_ami_alias  = "al2023@v20250505"
+#   default_nodepool_node_limit = 10000
+#   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+#   gpu_nodepool_node_limit     = 20
+#   token_password              = data.aws_ecrpublic_authorization_token.token.password
+#   token_user_name             = data.aws_ecrpublic_authorization_token.token.user_name
+#   default_tags                = var.default_tags
 
-  depends_on = [module.eks-cluster]
-}
+#   depends_on = [module.eks-cluster]
+# }
 
 module "s3_bucket" {
   source = "../aws-s3-bucket"
@@ -87,6 +89,18 @@ module "database" {
   db_allocated_storage    = 50
   backup_retention_period = 14
   db_multi_az             = false
-
-  depends_on = [module.eks-cluster]
 }
+
+# module "elastic-filesystem" {
+#   source = "../aws-efs"
+
+
+#   account_id            = module.networks.account_id
+#   vpc_id                = module.networks.vpc_id
+#   vpc_cidr_block        = module.networks.vpc_cidr_block
+#   private_subnets_ids   = module.networks.private_subnets
+#   cluster_name          = local.cluster_name
+#   eks_oidc_provider_arn = module.eks-cluster.cluster_oidc_provider_arn
+#   efs_backup_enabled    = false
+#   default_tags          = var.default_tags
+# }

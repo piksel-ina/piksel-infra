@@ -1,8 +1,3 @@
-locals {
-  cluster = var.cluster_name
-  tags    = var.default_tags
-}
-
 variable "cluster_name" {
   description = "Name of the EKS cluster for tagging subnets"
   type        = string
@@ -62,8 +57,12 @@ variable "ebs-csi-version" {
   description = "The version of EBS CSI driver"
 }
 
-variable "efs-csi-version" {
-  type        = string
-  description = "The version of EFS CSI driver"
+# variable "efs-csi-version" {
+#   type        = string
+#   description = "The version of EFS CSI driver"
+# }
 
+variable "node_group_version" {
+  description = "Node Group Version"
+  default     = "v1"
 }

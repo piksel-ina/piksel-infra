@@ -1,3 +1,8 @@
+locals {
+  cluster = var.cluster_name
+  tags    = var.default_tags
+}
+
 # --- Create Cluster ---
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -12,7 +17,6 @@ module "eks" {
     coredns = {
       addon_version = var.coredns-version
       configuration_values = jsonencode({
-        computeType = "Fargate"
         autoScaling = {
           enabled     = true
           minReplicas = 3
@@ -42,76 +46,49 @@ module "eks" {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
-    aws-efs-csi-driver = {
-      addon_version            = var.efs-csi-version
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.efs_csi_irsa_role.iam_role_arn
-    }
   }
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids
 
-  # --- NEW: EKS Managed Node Groups ---
+  # --- EKS Managed Node Groups ---
+  eks_managed_node_group_defaults = {
+    instance_types             = ["t3.medium", "t3.large", "m5.large"]
+    iam_role_attach_cni_policy = true
+    ami_type                   = "AL2023_x86_64_STANDARD"
+  }
+
   eks_managed_node_groups = {
-    general = {
-      name           = "${local.cluster}-general"
-      instance_types = ["t3.medium"]
+    system = {
+      name = "system-${var.node_group_version}"
 
       min_size     = 2
-      max_size     = 2
+      max_size     = 4
       desired_size = 2
 
-      # Use the latest EKS Optimized AMI
-      ami_type = "AL2023_x86_64_STANDARD"
-
-      capacity_type = "SPOT"
-
-      # Disk configuration
-      disk_size = 20
-      disk_type = "gp3"
-
-      # Use our custom security group
-      vpc_security_group_ids = [aws_security_group.node_group_sg.id]
+      capacity_type = "ON_DEMAND"
+      disk_size     = 20
+      disk_type     = "gp3"
 
       labels = {
-        role                                                      = "system"
-        "node.kubernetes.io/exclude-from-external-load-balancers" = "true"
+        "karpenter.sh/controller" = "true"
+        "version"                 = var.node_group_version
       }
 
-      # Prevent apps workload here
       taints = [
         {
-          key    = "workload-type"
-          value  = "system"
+          key    = "CriticalAddonsOnly"
+          value  = "true"
           effect = "NO_SCHEDULE"
         }
       ]
 
-      tags = merge(local.tags, {
-        "karpenter.sh/discovery" = local.cluster
-      })
+      tags = local.tags
     }
   }
 
-  create_cluster_security_group = true
-  create_node_security_group    = true
-
-  fargate_profiles = {
-    flux = {
-      selectors = [
-        { namespace = "flux-system" }
-      ]
-    }
-    external_dns = {
-      selectors = [
-        { namespace = "external-dns" }
-      ]
-    }
-  }
-
+  # Enable cluster access
   enable_cluster_creator_admin_permissions = true
-
   access_entries = {
     admin-access = {
       kubernetes_groups = []
@@ -128,13 +105,38 @@ module "eks" {
     }
   }
 
-  tags = merge(local.tags, {
+  # Additional Node Security Groups:
+  node_security_group_additional_rules = {
+    # Allow outbound DNS for External DNS
+    egress_dns_tcp = {
+      description = "Allow outbound DNS TCP"
+      protocol    = "tcp"
+      from_port   = 53
+      to_port     = 53
+      type        = "egress"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+    # Allow NFS for EFS CSI (adjust source_security_group_id to your EFS SG)
+    # ingress_nfs_from_efs = {
+    #   description              = "Allow NFS from EFS mount targets"
+    #   protocol                 = "tcp"
+    #   from_port                = 2049
+    #   to_port                  = 2049
+    #   type                     = "ingress"
+    #   source_security_group_id = "sg-xxxxxxxx"
+    # }
+  }
+
+  node_security_group_tags = merge(local.tags, {
     # NOTE - if creating multiple security groups with this module, only tag the
     # security group that Karpenter should utilize with the following tag
     # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.cluster
   })
+
+  tags = local.tags
 }
+
 
 data "aws_eks_cluster_auth" "this" {
   name = module.eks.cluster_name

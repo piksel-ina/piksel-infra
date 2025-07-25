@@ -52,20 +52,20 @@ output "external_dns_metadata" {
   }
 }
 
-# --- Karpenter Outputs ---
-output "karpenter_metadata" {
-  description = "Output of Karpenter configuration and resources"
-  value = {
-    iam_role_arn            = module.karpenter.karpenter_iam_role_arn
-    node_iam_role_name      = module.karpenter.karpenter_node_iam_role_name
-    interruption_queue_name = module.karpenter.karpenter_interruption_queue_name
-    helm_release_status     = module.karpenter.karpenter_helm_release_status
-    node_class_status       = module.karpenter.karpenter_node_class_status
-    node_pool_name          = module.karpenter.karpenter_node_pool_name
-    node_class_gpu_status   = module.karpenter.karpenter_node_class_gpu_status
-    node_pool_gpu_name      = module.karpenter.karpenter_node_pool_gpu_name
-  }
-}
+# # --- Karpenter Outputs ---
+# output "karpenter_metadata" {
+#   description = "Output of Karpenter configuration and resources"
+#   value = {
+#     iam_role_arn            = module.karpenter.karpenter_iam_role_arn
+#     node_iam_role_name      = module.karpenter.karpenter_node_iam_role_name
+#     interruption_queue_name = module.karpenter.karpenter_interruption_queue_name
+#     helm_release_status     = module.karpenter.karpenter_helm_release_status
+#     node_class_status       = module.karpenter.karpenter_node_class_status
+#     node_pool_name          = module.karpenter.karpenter_node_pool_name
+#     node_class_gpu_status   = module.karpenter.karpenter_node_class_gpu_status
+#     node_pool_gpu_name      = module.karpenter.karpenter_node_pool_gpu_name
+#   }
+# }
 
 # --- Public S3 Bucket ---
 output "s3_public_metadata" {
