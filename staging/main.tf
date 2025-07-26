@@ -1,5 +1,6 @@
 locals {
   cluster_name = "piksel-staging"
+  subdomains   = ["staging.pik-sel.id"]
 }
 
 module "networks" {
@@ -40,7 +41,7 @@ module "external-dns" {
   project                           = var.project
   environment                       = var.environment
   cluster_name                      = local.cluster_name
-  subdomains                        = ["staging.pik-sel.id"]
+  subdomains                        = local.subdomains
   oidc_provider                     = module.eks-cluster.cluster_oidc_issuer_url
   oidc_provider_arn                 = module.eks-cluster.cluster_oidc_provider_arn
   externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
@@ -90,4 +91,29 @@ module "database" {
   db_allocated_storage    = 50
   backup_retention_period = 14
   db_multi_az             = false
+}
+
+module "applications" {
+  source = "../applications"
+
+  account_id                           = module.networks.account_id
+  project                              = var.project
+  environment                          = var.environment
+  cluster_name                         = module.eks-cluster.cluster_name
+  default_tags                         = var.default_tags
+  eks_oidc_provider_arn                = module.eks-cluster.cluster_oidc_provider_arn
+  oidc_issuer_url                      = module.eks-cluster.cluster_oidc_issuer_url
+  db_namespace                         = module.database.db_namespace
+  db_address                           = module.database.db_address
+  k8s_db_service                       = module.database.k8s_db_service
+  subdomains                           = local.subdomains
+  public_hosted_zone_id                = "Z06367032PXGIV8NRRW3G"
+  oauth_tenant                         = "ap-southeast-3zfzkrhjdu.auth.ap-southeast-3.amazoncognito.com"
+  internal_buckets                     = [module.s3_bucket.public_bucket_name]
+  odc_cloudfront_crossaccount_role_arn = "arn:aws:iam::686410905891:role/odc-cloudfront-crossaccount-role-staging"
+  read_external_buckets = [
+    "usgs-landsat",
+    "copernicus-dem-30m",
+    "e84-earth-search-sentinel-data"
+  ]
 }

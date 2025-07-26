@@ -59,7 +59,6 @@ No requirements.
 | [aws_secretsmanager_secret_version.stac_write_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.stacread_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [kubernetes_namespace.argo_workflow](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
-| [kubernetes_namespace.flux_system](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.hub](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.monitoring](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.odc](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
@@ -79,7 +78,6 @@ No requirements.
 | [kubernetes_secret.odc_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.odcread_namespace_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.odcread_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
-| [kubernetes_secret.slack_webhook](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stac_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stacread_namespace_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stacread_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
@@ -102,7 +100,6 @@ No requirements.
 | [aws_secretsmanager_secret_version.db_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.grafana_client_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
 | [aws_secretsmanager_secret_version.hub_client_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
-| [aws_secretsmanager_secret_version.slack_webhook](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret_version) | data source |
 
 ## Inputs
 
@@ -137,7 +134,6 @@ No requirements.
 | <a name="output_argo_db_password_secret_arn"></a> [argo\_db\_password\_secret\_arn](#output\_argo\_db\_password\_secret\_arn) | The ARN of the AWS Secrets Manager secret storing the Argo DB password. |
 | <a name="output_argo_k8s_secret_name"></a> [argo\_k8s\_secret\_name](#output\_argo\_k8s\_secret\_name) | The name of the Kubernetes secret containing the Auth0 client secret. |
 | <a name="output_argo_workflow_namespace"></a> [argo\_workflow\_namespace](#output\_argo\_workflow\_namespace) | The namespace for all Argo resources. |
-| <a name="output_flux_namespace"></a> [flux\_namespace](#output\_flux\_namespace) | The namespace where Flux is deployed |
 | <a name="output_grafana_admin_secret_name"></a> [grafana\_admin\_secret\_name](#output\_grafana\_admin\_secret\_name) | The name of the Kubernetes secret storing the Grafana admin credentials. |
 | <a name="output_grafana_cloudwatch_policy_arn"></a> [grafana\_cloudwatch\_policy\_arn](#output\_grafana\_cloudwatch\_policy\_arn) | The IAM policy ARN attached to Grafana for CloudWatch access. |
 | <a name="output_grafana_db_password"></a> [grafana\_db\_password](#output\_grafana\_db\_password) | The Grafana database password. |
@@ -160,8 +156,6 @@ No requirements.
 | <a name="output_ows_cache_cloudfront_distribution_id"></a> [ows\_cache\_cloudfront\_distribution\_id](#output\_ows\_cache\_cloudfront\_distribution\_id) | CloudFront distribution ID |
 | <a name="output_ows_cache_cloudfront_domain_name"></a> [ows\_cache\_cloudfront\_domain\_name](#output\_ows\_cache\_cloudfront\_domain\_name) | CloudFront distribution domain name for ows cache |
 | <a name="output_ows_cache_dns_record"></a> [ows\_cache\_dns\_record](#output\_ows\_cache\_dns\_record) | FQDN of the Route53 record for ows cache |
-| <a name="output_slack_webhook_secret_arn"></a> [slack\_webhook\_secret\_arn](#output\_slack\_webhook\_secret\_arn) | The ARN of the AWS Secrets Manager secret for the Slack Webhook. |
-| <a name="output_slack_webhook_secret_name"></a> [slack\_webhook\_secret\_name](#output\_slack\_webhook\_secret\_name) | Slack webhook secret name |
 | <a name="output_stac_namespace"></a> [stac\_namespace](#output\_stac\_namespace) | Kubernetes namespace where STAC is deployed. |
 | <a name="output_stac_read_db_password"></a> [stac\_read\_db\_password](#output\_stac\_read\_db\_password) | STAC read database password. |
 | <a name="output_stac_read_secret_arn"></a> [stac\_read\_secret\_arn](#output\_stac\_read\_secret\_arn) | ARN of the AWS Secrets Manager secret for STAC read credentials. |
