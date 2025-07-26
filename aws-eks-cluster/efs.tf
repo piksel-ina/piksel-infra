@@ -52,8 +52,6 @@ resource "aws_efs_file_system" "data" {
   throughput_mode = "bursting" # or "elastic"/"provisioned"
   # provisioned_throughput_in_mibps = 100 # Uncomment and set if using "provisioned"
 
-  encrypted = true
-
   lifecycle_policy {
     transition_to_ia = "AFTER_30_DAYS"
   }
@@ -81,30 +79,4 @@ resource "aws_efs_backup_policy" "data" {
   backup_policy {
     status = var.efs_backup_enabled ? "ENABLED" : "DISABLED"
   }
-}
-
-# --- EFS Lifecycle Policy ---
-resource "aws_efs_file_system_policy" "data" {
-  file_system_id = aws_efs_file_system.data.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${var.account_id}:root"
-        }
-        Action = [
-          "elasticfilesystem:ClientMount",
-          "elasticfilesystem:ClientWrite",
-          "elasticfilesystem:ClientRootAccess"
-        ]
-        Condition = {
-          Bool = {
-            "aws:SecureTransport" = "true"
-          }
-        }
-      }
-    ]
-  })
 }
