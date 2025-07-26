@@ -97,3 +97,104 @@ output "database_metadata" {
     }
   }
 }
+
+
+# --- Grafana Metadata ---
+output "grafana_metadata" {
+  description = "Output of Grafana configuration and resources"
+  value = {
+    namespace               = module.applications.grafana_namespace
+    admin_secret_name       = module.applications.grafana_admin_secret_name
+    values_secret_name      = module.applications.grafana_values_secret_name
+    iam_role_arn            = module.applications.grafana_iam_role_arn
+    cloudwatch_policy_arn   = module.applications.grafana_cloudwatch_policy_arn
+    db_password_secret_arn  = module.applications.grafana_db_password_secret_arn
+    oauth_client_secret_arn = module.applications.grafana_oauth_client_secret_arn
+  }
+}
+
+# --- JupyterHub Outputs ---
+output "jupyterhub_metadata" {
+  description = "Output of JupyterHub configuration and resources"
+  value = {
+    namespace            = module.applications.jupyterhub_namespace
+    subdomain            = module.applications.jupyterhub_subdomain
+    db_secret_arn        = module.applications.jupyterhub_db_secret_arn
+    irsa_role_arn        = module.applications.jupyterhub_irsa_arn
+    service_account_name = module.applications.jupyterhub_service_account_name
+  }
+}
+
+# # --- Flux Outputs ---
+# output "flux_metadata" {
+#   description = "Output of Flux configuration and resources"
+#   type = object({
+#     namespace           = string
+#     webhook_secret_name = string
+#     webhook_secret_arn  = string
+#   })
+#   value = {
+#     namespace           = module.applications.flux_namespace
+#     webhook_secret_name = module.applications.slack_webhook_secret_name
+#     webhook_secret_arn  = module.applications.slack_webhook_secret_arn
+#   }
+# }
+
+
+# --- ODC Outputs ---
+output "odc_metadata" {
+  description = "Output of ODC configuration and resources"
+  value = {
+    namespace                 = module.applications.odc_namespace
+    write_password_secret_arn = module.applications.odc_write_password_secret_arn
+    read_password_secret_arn  = module.applications.odc_read_password_secret_arn
+    data_reader_role_arn      = module.applications.odc_data_reader_role_arn
+  }
+}
+
+# --- ODC OWS Cache Outputs ---
+output "odc_ows_cache_metadata" {
+  description = "Output of ODC OWS Cache configuration and resources"
+  value = {
+    cloudfront_domain_name     = module.applications.ows_cache_cloudfront_domain_name
+    cloudfront_distribution_id = module.applications.ows_cache_cloudfront_distribution_id
+    certificate_arn            = module.applications.ows_cache_certificate_arn
+    dns_record                 = module.applications.ows_cache_dns_record
+  }
+}
+
+# --- STAC Outputs ---
+output "stac_metadata" {
+  description = "Output of STAC configuration and resources"
+  value = {
+    namespace            = module.applications.stac_namespace
+    write_secret_arn     = module.applications.stac_write_secret_arn
+    read_secret_arn      = module.applications.stac_read_secret_arn
+    read_k8s_secret_name = module.applications.stacread_k8s_secret_name
+  }
+}
+
+# --- Argo Workflow Outputs ---
+output "argo_workflow_metadata" {
+  description = "Output of Argo Workflow configuration and resources"
+  value = {
+    artifact_bucket_name   = module.applications.argo_artifact_bucket_name
+    namespace              = module.applications.argo_workflow_namespace
+    iam_role_arn           = module.applications.argo_artifact_iam_role_arn
+    service_account_name   = module.applications.argo_artifact_service_account_name
+    iam_policy_arn         = module.applications.argo_artifact_iam_policy_arn
+    db_password_secret_arn = module.applications.argo_db_password_secret_arn
+    k8s_secret_name        = module.applications.argo_k8s_secret_name
+  }
+}
+
+# --- Terria Outputs ---
+output "terria_metadata" {
+  description = "Output of Terria configuration and resources"
+  value = {
+    bucket_name     = module.applications.terria_bucket_name
+    iam_user_name   = module.applications.terria_iam_user_name
+    k8s_secret_name = module.applications.terria_k8s_secret_name
+    k8s_namespace   = module.applications.terria_k8s_namespace
+  }
+}
