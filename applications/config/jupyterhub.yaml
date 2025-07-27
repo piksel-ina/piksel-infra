@@ -13,6 +13,7 @@ hub:
       client_secret: ${jhub_auth_client_secret}
       authorize_url: https://${oauth_tenant}/oauth2/authorize
       token_url: https://${oauth_tenant}/oauth2/token
+      logout_redirect_url: https://${oauth_tenant}/logout?client_id=${jhub_auth_client_id}&logout_uri=https://${host_name}/
       login_service: "AWS Cognito"
       username_claim: email
       scope:
