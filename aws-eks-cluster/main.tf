@@ -53,37 +53,48 @@ module "eks" {
 
   # --- EKS Managed Node Groups ---
   eks_managed_node_group_defaults = {
-    instance_types             = ["t3.medium", "t3.large", "m5.large"]
     iam_role_attach_cni_policy = true
     ami_type                   = "AL2023_x86_64_STANDARD"
+    disk_size                  = 20
+    disk_type                  = "gp3"
+
+    labels = {
+      "karpenter.sh/controller" = "true"
+    }
+
+    taints = [
+      {
+        key    = "CriticalAddonsOnly"
+        value  = "true"
+        effect = "NO_SCHEDULE"
+      }
+    ]
+    tags = local.tags
   }
 
   eks_managed_node_groups = {
+    # 1 On-Demand for system reliability
     system = {
-      name = "system-${var.node_group_version}"
+      name = "system-v2"
+
+      min_size     = 1
+      max_size     = 2
+      desired_size = 1
+
+      capacity_type  = "ON_DEMAND"
+      instance_types = ["c5.xlarge"]
+    }
+
+    # Spot node group for cost savings
+    system-spot = {
+      name = "system-spot-v1"
 
       min_size     = 2
       max_size     = 4
       desired_size = 2
 
-      capacity_type = "ON_DEMAND"
-      disk_size     = 20
-      disk_type     = "gp3"
-
-      labels = {
-        "karpenter.sh/controller" = "true"
-        "version"                 = var.node_group_version
-      }
-
-      taints = [
-        {
-          key    = "CriticalAddonsOnly"
-          value  = "true"
-          effect = "NO_SCHEDULE"
-        }
-      ]
-
-      tags = local.tags
+      capacity_type  = "SPOT"
+      instance_types = ["c5.xlarge", "c5.2xlarge", "m5.large", "t3.large", "t3.xlarge"]
     }
   }
 
