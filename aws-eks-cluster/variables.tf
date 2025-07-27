@@ -67,3 +67,9 @@ variable "efs_backup_enabled" {
   type        = bool
   default     = false
 }
+
+variable "cross_account_ecr_role_arn" {
+  description = "Cross Account ECR Role ARN"
+  type        = string
+  default     = "arn:aws:iam::686410905891:role/piksel-eks-ecr-access"
+}

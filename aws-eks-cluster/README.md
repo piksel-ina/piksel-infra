@@ -92,6 +92,7 @@ No requirements.
 | [aws_efs_backup_policy.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_backup_policy) | resource |
 | [aws_efs_file_system.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_file_system) | resource |
 | [aws_efs_mount_target.data](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/efs_mount_target) | resource |
+| [aws_iam_policy.assume_ecr_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_security_group.efs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_eks_cluster_auth.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster_auth) | data source |
 
@@ -102,6 +103,7 @@ No requirements.
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID | `string` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster for tagging subnets | `string` | `"piksel-eks-cluster"` | no |
 | <a name="input_coredns-version"></a> [coredns-version](#input\_coredns-version) | The version of CoreDNS for this environment | `string` | n/a | yes |
+| <a name="input_cross_account_ecr_role_arn"></a> [cross\_account\_ecr\_role\_arn](#input\_cross\_account\_ecr\_role\_arn) | Cross Account ECR Role ARN | `string` | `"arn:aws:iam::686410905891:role/piksel-eks-ecr-access"` | no |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_ebs-csi-version"></a> [ebs-csi-version](#input\_ebs-csi-version) | The version of EBS CSI driver | `string` | n/a | yes |
 | <a name="input_efs_backup_enabled"></a> [efs\_backup\_enabled](#input\_efs\_backup\_enabled) | Enable EFS backup policy | `bool` | `false` | no |

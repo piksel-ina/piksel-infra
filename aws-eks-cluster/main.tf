@@ -58,6 +58,10 @@ module "eks" {
     disk_size                  = 20
     disk_type                  = "gp3"
 
+    iam_role_additional_policies = {
+      AssumeECRRole = aws_iam_policy.assume_ecr_role.arn
+    }
+
     labels = {
       "karpenter.sh/controller" = "true"
     }

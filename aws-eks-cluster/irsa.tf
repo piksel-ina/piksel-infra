@@ -34,3 +34,23 @@ module "vpc_cni_irsa_role" {
 
   tags = local.tags
 }
+
+
+# --- Other IAM: ---
+
+# --- Policy that allows EKS nodes to assume the cross-account ECR role ---
+resource "aws_iam_policy" "assume_ecr_role" {
+  name        = "${local.cluster}-assume-ecr-role"
+  description = "Policy to assume cross-account ECR role"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = var.cross_account_ecr_role_arn
+      }
+    ]
+  })
+}
