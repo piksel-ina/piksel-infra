@@ -165,3 +165,49 @@ aws secretsmanager get-secret-value --secret-id grafana-oauth-dev --region ap-so
 
 1. **Wrong AWS Account**: Always verify with `aws sts get-caller-identity`
 2. **Workspace Confusion**: Check current workspace with `terraform workspace show`
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [aws_secretsmanager_secret.oauth_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret.slack_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.oauth_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [aws_secretsmanager_secret_version.slack_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_oauth_secrets"></a> [oauth\_secrets](#input\_oauth\_secrets) | Map of OAuth client secrets to create | <pre>map(object({<br/>    client_id     = string<br/>    client_secret = string<br/>    description   = string<br/>    project       = string<br/>    service       = string<br/>    tenant        = string<br/>  }))</pre> | `{}` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region for secrets | `string` | `"ap-southeast-3"` | no |
+| <a name="input_slack_secrets"></a> [slack\_secrets](#input\_slack\_secrets) | Map of Slack webhook secrets to create | <pre>map(object({<br/>    secret_string = string<br/>    description   = string<br/>    project       = string<br/>    service       = string<br/>    tenant        = string<br/>  }))</pre> | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_environment"></a> [environment](#output\_environment) | Current environment (workspace) |
+| <a name="output_oauth_secret_arns"></a> [oauth\_secret\_arns](#output\_oauth\_secret\_arns) | ARNs of created OAuth secrets |
+| <a name="output_oauth_secret_names"></a> [oauth\_secret\_names](#output\_oauth\_secret\_names) | Names of created OAuth secrets |
+| <a name="output_slack_secret_arns"></a> [slack\_secret\_arns](#output\_slack\_secret\_arns) | ARNs of created Slack secrets |
+| <a name="output_slack_secret_names"></a> [slack\_secret\_names](#output\_slack\_secret\_names) | Names of created Slack secrets |
+<!-- END_TF_DOCS -->

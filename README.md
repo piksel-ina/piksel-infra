@@ -2,113 +2,146 @@
 
 This repository contains the Infrastructure as Code (IaC) definitions, managed by [Terraform](https://www.terraform.io/), for the Piksel project's AWS infrastructure. It follows GitOps principles for managing deployments across different environments.
 
-## 1. Infrastructure Design
+## Overview
 
-### 1.1. Network
+This repository contains **Terraform configurations** for deploying and managing the **core AWS infrastructure** that supports our Kubernetes-based applications. This infrastructure serves as the foundation layer, while the actual Kubernetes workloads and applications are managed separately through GitOps practices in **[piksel-gitops repo](https://github.com/piksel-ina/piksel-gitops)**.
 
-Piksel’s AWS infrastructure uses a hub-and-spoke network architecture, where a central “hub” account manages shared services like DNS, ECR, and network routing, while isolated “spoke” accounts (for environments such as dev, staging, and prod) run workloads. This design leverages AWS Transit Gateway to enable private, secure connectivity between accounts—especially for pulling container images from a centralized ECR—ensuring that traffic stays off the public internet.
+### Directory Structure
 
-**Network Diagram:**
+```
+├── README.md              # Main project documentation
+├── applications/          # Application Configs (Flux CD, Argo Workflows, Grafana, Jupyter-hub, ODC, Terria)
+├── aws-database/          # Database infrastructure
+├── aws-eks-cluster/       # Amazon EKS cluster configuration
+├── aws-s3-bucket/         # S3 bucket resources and policies
+├── external-dns/          # External DNS controller configuration
+├── karpenter/             # Karpenter node provisioner setup
+├── networks/              # VPC, subnets, and networking resources
+├── secrets-management/    # Secrets and credential management
+└── staging/               # Staging environment specific configurations
+```
 
-<img src=".images/spoke-network.png" width="700" height="auto">
+### Relationship with GitOps
 
-For more details, see:
+This Terraform repository works in conjunction with our GitOps repository:
 
-[**🔗 Piksel Spoke Network Design**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/spoke-network-design.md)
+**🏗️ Infrastructure Layer (This Repo)**
 
-### 1.2. EKS Cluster Design
+- Provisions AWS resources using Terraform
+- Creates and configures EKS cluster
+- Sets up networking, databases, and storage
+- Manages infrastructure-level security
 
-The Piksel EKS clusters are designed for scalability, security, and efficient operations within the spoke account VPCs. Key design aspects include:
+**⚙️ Application Layer ([piksel-gitops](https://github.com/piksel-ina/piksel-gitops))**
 
-- **Managed Control Plane:** Utilizes AWS EKS for a managed, highly available Kubernetes control plane.
-- **Dynamic Node Provisioning:** Employs [Karpenter](https://karpenter.sh/) for efficient, just-in-time provisioning of EC2 nodes based on workload requirements, optimizing for cost and performance.
-- **Serverless Compute:** Leverages [AWS Fargate](https://aws.amazon.com/fargate/) profiles for running specific stateless workloads without managing underlying EC2 instances.
-- **Secure Pod Permissions:** Implements IAM Roles for Service Accounts (IRSA) to grant fine-grained AWS permissions directly to Kubernetes service accounts.
-- **Secrets Management:** Integrates securely with AWS Secrets Manager for managing sensitive information like API keys and database credentials.
-- **GitOps Application Deployment:** Cluster state and application deployments are managed declaratively via GitOps tooling (Flux CD) configured in the [piksel-gitops](https://github.com/piksel-ina/piksel-gitops) repository.
-- **Provisioning:** The Terraform code within _this repository_ is responsible for provisioning and managing the lifecycle of this EKS cluster design and its core AWS dependencies (VPC, IAM, RDS, S3, etc.).
+- Contains Kubernetes manifests and Helm charts
+- Manages application deployments via FluxCD
+- Handles application configuration and updates
+- Manages application-level resources within Kubernetes
 
-**EKS Cluster Diagram:**
+### Kubernetes Secrets Management
 
-<img src=".images/eks-cluster-overview.png" width="700" height="auto">
+The **only Kubernetes-specific configurations** in this repository are:
 
-For a comprehensive overview of the cluster architecture and each component, please refer to:
+- **Kubernetes Secrets** that integrate with **AWS Secrets Manager**
+- Secret synchronization between AWS and Kubernetes
 
-1. [**EKS Cluster Design**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-cluster-design.md),
-2. [**EKS Add-ons Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/eks-addons.md),
-3. [**Karpenter Configuration**](https://github.com/piksel-ina/piksel-document/blob/main/architecture/karpenter.md)
+This approach ensures:
 
-## 2. Developer Guide
+- Secrets are centrally managed in AWS
+- Kubernetes applications can securely access secrets
+- No sensitive data is stored in GitOps repository
+- Compliance with security best practices
 
-### 2.1. Stack OIDC Setup
+## Multi-Account Architecture
 
-The Stack OIDC configuration enables secure authentication between Terraform Cloud and AWS using OpenID Connect. This setup supports multi-environment deployments using different local backends/workspaces with the same configuration.
+Our infrastructure is deployed across **multiple AWS accounts** to ensure proper separation of environments, enhanced security, and compliance with best practices.
 
-**Prerequisites:**
+### Account Structure
 
-- Ensure AWS SSO profile matches the target environment where the OIDC role will be created
-- Verify you're authenticated to the correct AWS account using `aws sts get-caller-identity`
+<img src=".images/piksel-diagram-multiaccount.png" width="800" height="auto">
 
-**Setup Steps for Dev Environment:**
+1. **Shared Account [Piksel Hub](https://github.com/piksel-ina/piksel-hub)**
 
-1. **Create and switch to dev workspace:**
+   - _Purpose_: Centralized services and shared resources
+   - _Region_: ap-southeast-3
+   - _VPC CIDR_: 10.0.0.0/16
+   - _Key Components_:
+     - Route53 Hosted Zones for DNS management
+     - Elastic Container Registry (ECR) for container images
+     - AWS Cognito User Pool for authentication
+     - VPC Endpoints (ECR API, ECR Docker, S3 Gateway)
+     - Office connectivity and external DNS delegation
 
-   ```bash
-   terraform workspace new dev
-   ```
+2. **Downstream Accounts (Staging/Production Env - This Repo)**
 
-2. **Initialize Terraform:**
+   - _Purpose_: Development and testing environment
+   - _VPC CIDR_: 10.2.0.0/16 & 10.3.0.0/16
+   - _Key Components_:
+     - EKS Cluster with worker nodes
+     - RDS Databases for application data
+     - AWS Secrets Manager for staging/production secrets
+     - NAT Gateway for outbound internet access
+     - Cognito App Client for staging/production applications
 
-   ```bash
-   terraform init
-   ```
+### Cross-Account Connectivity
 
-3. **Plan and apply the OIDC configuration:**
+1. **DNS Management Flow**
 
-   ```bash
-   terraform plan
-   terraform apply
-   ```
+   - External DNS Server delegates to Route53 NS records
+   - Shared Account manages centralized DNS records
+   - Route53 updates records across all environments
 
-4. **Verify deployment:**
-   ```bash
-   terraform output
-   ```
+2. **Container Image Distribution**
 
-**Multi-Environment Support:**
+   - ECR Repository in Shared Account stores all container images
+   - Cross-account IAM policies allow staging/production to pull images
+   - VPC Endpoints provide secure, private access to ECR
 
-- For **staging**: Create `staging` workspace and repeat the process
-- For **production**: Create `prod` workspace and repeat the process
-- Each workspace maintains isolated state while using the same configuration
+3. **Authentication Flow**
 
-**Important Notes:**
+   - AWS Cognito User Pool centralized in Shared Account
+   - App Clients configured per environment (staging/production)
+   - User authentication flows through centralized identity provider
+   - Cross-account trust relationships for secure access
 
-- Ensure your AWS SSO profile corresponds to the target environment
-- Each workspace will create environment-specific OIDC resources
-- The generated role ARN will be used in Terraform Cloud for workload identity authentication
+### Security & Isolation Benefits
 
-**Reference:** [Terraform Stacks Authentication Guide](https://developer.hashicorp.com/terraform/language/stacks/deploy/authenticate)
+1. **Environment Isolation**
+
+   - Complete separation between staging and production
+   - Independent billing and cost tracking
+   - Separate IAM policies and access controls
+   - Isolated network boundaries with different CIDR blocks
+
+2. **Centralized Services**
+
+   - Shared ECR reduces duplication and costs
+   - Centralized DNS simplifies domain management
+   - Single identity provider for consistent authentication
+   - Shared office connectivity for administrative access
+
+3. **Compliance & Governance**
+
+   - Account-level policies for different compliance requirements
+   - Separate audit trails per environment
+   - Independent backup and disaster recovery strategies
+   - Granular access control based on environment needs
+
+## Developer Guide
+
+### 2.1. Terraform - AWS OIDC Setup
+
+> _to be updated_
 
 ### 2.2. Add Secret to AWS Secrets Manager
 
-1. **Authenticate with AWS SSO**
-   If you haven't configure any sso session, please follow this guide - [Configure SSO with Piksel URL](https://github.com/piksel-ina/piksel-document/blob/main/operations/02-AWS-identity-center-guide.md#aws-cli-setup-and-access)
+> _to be updated_
 
-2. **Verify Your AWS Account**
-   Before proceeding, ensure you are operating in the correct AWS account:
+### 2.3. AWS Service Quotas for Worker Nodes (Karpenter)
 
-   ```bash
-   aws sts get-caller-identity
-   ```
-
-3. **Add the Secret to AWS Secrets Manager**
-
-   - Use Terraform with local backend to apply the configuration
-   - For more detail step-by-step guide, please refer to [**piksel-secret-management**](./secrets-management/README.md)
-
-### 2.3. AWS Service Quotas for GPU Nodes (Karpenter)
-
-Before running GPU workloads with Karpenter, ensure that the AWS account has sufficient EC2 service quotas for the required GPU instance families. By default, new AWS accounts have a vCPU limit of `0` for GPU instance families (such as G, P, or Inf), which prevents Karpenter from provisioning GPU nodes.
+> _to be updated_
+> Before running GPU workloads with Karpenter, ensure that the AWS account has sufficient EC2 service quotas for the required GPU instance families. By default, new AWS accounts have a vCPU limit of `0` for GPU instance families (such as G, P, or Inf), which prevents Karpenter from provisioning GPU nodes.
 
 **Requesting GPU Instance Quota Increases:**
 
