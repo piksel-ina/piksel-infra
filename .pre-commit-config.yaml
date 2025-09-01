@@ -16,4 +16,4 @@ repos:
         name: Format Terraform code
       - id: terraform_docs
         name: "Generate Auto-Documentation"
-        files: ^(applications|network|aws-database|eksternal-dns|aws-eks-cluster|aws-s3-bucket|karpenter)/.*\.tf$
+        files: ^(applications|networks|aws-database|external-dns|aws-eks-cluster|aws-s3-bucket|karpenter|secrets-management|staging)/.*\.tf$
