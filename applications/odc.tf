@@ -116,6 +116,7 @@ resource "aws_iam_policy" "read_policy" {
 # --- IAM Role for Service Account (IRSA) ----
 module "iam_eks_role_bucket_odc" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version   = "~> 5.0"
   role_name = "svc-${local.service_account_name_odc}"
 
   oidc_providers = {

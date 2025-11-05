@@ -17,8 +17,8 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_iam_eks_role_bucket_odc"></a> [iam\_eks\_role\_bucket\_odc](#module\_iam\_eks\_role\_bucket\_odc) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | n/a |
-| <a name="module_iam_eks_role_hub_reader"></a> [iam\_eks\_role\_hub\_reader](#module\_iam\_eks\_role\_hub\_reader) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | n/a |
+| <a name="module_iam_eks_role_bucket_odc"></a> [iam\_eks\_role\_bucket\_odc](#module\_iam\_eks\_role\_bucket\_odc) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.0 |
+| <a name="module_iam_eks_role_hub_reader"></a> [iam\_eks\_role\_hub\_reader](#module\_iam\_eks\_role\_hub\_reader) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | ~> 5.0 |
 
 ## Resources
 

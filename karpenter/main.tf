@@ -192,10 +192,10 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           requirements:
             - key: karpenter.k8s.aws/instance-category
               operator: In
-              values: ["c", "m", "r", "t"]
+              values: ["c", "m", "t"]
             - key: karpenter.k8s.aws/instance-cpu
               operator: In
-              values: ["4", "8", "16", "32", "48", "64", "96", "192"]
+              values: ["4", "8", "16", "32"]
             - key: karpenter.k8s.aws/instance-hypervisor
               operator: In
               values: ["nitro"]
@@ -207,9 +207,47 @@ resource "kubectl_manifest" "karpenter_node_pool" {
               values: ["amd64"]
       limits:
         cpu: ${var.default_nodepool_node_limit}
+
       disruption:
         consolidationPolicy: WhenEmptyOrUnderutilized
         consolidateAfter: 20m
+        expireAfter: 720h
+
+        budgets:
+          # Business hours: 8am-7pm GMT+7 (1am-12pm UTC) - Conservative
+          - nodes: "10%"
+            schedule: "0 1 * * mon-fri"
+            duration: "11h"
+            reasons:
+              - "Underutilized"
+              - "Empty"
+
+          # Night hours: 8pm-7am GMT+7 - More aggressive
+          - nodes: "30%"
+            schedule: "0 13 * * *"
+            duration: "11h"
+            reasons:
+              - "Underutilized"
+              - "Empty"
+              - "Drifted"
+
+          # Saturday: All day
+          - nodes: "40%"
+            schedule: "0 0 * * sat"
+            duration: "24h"
+            reasons:
+              - "Underutilized"
+              - "Empty"
+              - "Drifted"
+
+          # Sunday: All day
+          - nodes: "40%"
+            schedule: "0 0 * * sun"
+            duration: "24h"
+            reasons:
+              - Underutilized
+              - "Empty"
+              - "Drifted"
   YAML
 }
 

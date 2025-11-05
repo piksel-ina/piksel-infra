@@ -151,6 +151,7 @@ resource "aws_iam_policy" "hub_user_read_policy" {
 # --- IRSA for JupyterHub users ---
 module "iam_eks_role_hub_reader" {
   source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version   = "~> 5.0"
   role_name = "svc-hub-user-read"
 
   oidc_providers = {
