@@ -25,3 +25,6 @@ terraform.rc
 # Ignore keypairs directory
 keys/
 keys/*
+
+# Ignore Terraform backup files
+tf_backup/
