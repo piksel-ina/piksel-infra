@@ -246,6 +246,52 @@ resource "aws_iam_role_policy_attachment" "argo_workflow_s3" {
   policy_arn = aws_iam_policy.argo_artifact_read_write_policy.arn
 }
 
+
+# --- IAM Policy for Public Bucket Access ---
+resource "aws_iam_policy" "argo_public_bucket_policy" {
+  name        = "svc-${local.service_account_name_argo}-public-bucket-policy"
+  description = "Public bucket access policy for ${local.service_account_name_argo}"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # Read
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+        ]
+        Effect = "Allow"
+        Resource = [
+          var.public_bucket_arn,
+          "${var.public_bucket_arn}/*"
+        ]
+      },
+      {
+        # Write
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:DeleteObject",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "${var.public_bucket_arn}/*"
+        ]
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+# --- Attach Public Bucket Policy ---
+resource "aws_iam_role_policy_attachment" "argo_workflow_public_bucket" {
+  role       = aws_iam_role.argo_workflow_role.name
+  policy_arn = aws_iam_policy.argo_public_bucket_policy.arn
+}
+
 # # --- Add IAM user and access keys for Argo artifact storage ---
 # # --- Temporary Solution ---
 

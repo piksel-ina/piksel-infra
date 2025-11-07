@@ -88,3 +88,8 @@ variable "public_hosted_zone_id" {
   description = "The ID of the public hosted zone"
   type        = string
 }
+
+variable "public_bucket_arn" {
+  description = "ARN of the public S3 bucket for Argo workflow outputs"
+  type        = string
+}

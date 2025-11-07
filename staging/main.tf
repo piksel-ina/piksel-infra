@@ -111,6 +111,7 @@ module "applications" {
   oauth_tenant                         = "ap-southeast-3zfzkrhjdu.auth.ap-southeast-3.amazoncognito.com"
   internal_buckets                     = [module.s3_bucket.public_bucket_name]
   odc_cloudfront_crossaccount_role_arn = "arn:aws:iam::686410905891:role/odc-cloudfront-crossaccount-role-staging"
+  public_bucket_arn                    = module.s3_bucket.public_bucket_arn
   read_external_buckets = [
     "usgs-landsat",
     "copernicus-dem-30m",
