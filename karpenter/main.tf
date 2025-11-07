@@ -192,10 +192,10 @@ resource "kubectl_manifest" "karpenter_node_pool" {
           requirements:
             - key: karpenter.k8s.aws/instance-category
               operator: In
-              values: ["c", "m", "t"]
+              values: ["c", "m", "t", "r"]
             - key: karpenter.k8s.aws/instance-cpu
               operator: In
-              values: ["4", "8", "16", "32"]
+              values: ["4", "8", "16", "32", "48", "64", "128", "192"]
             - key: karpenter.k8s.aws/instance-hypervisor
               operator: In
               values: ["nitro"]
