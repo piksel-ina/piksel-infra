@@ -91,7 +91,7 @@ resource "helm_release" "karpenter" {
   create_namespace    = true
   name                = "karpenter"
   repository          = "oci://public.ecr.aws/karpenter"
-  version             = "1.5.3"
+  version             = "1.7.3"
   chart               = "karpenter"
   description         = "Karpenter autoscaler for EKS cluster"
   repository_username = var.token_user_name
