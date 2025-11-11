@@ -86,14 +86,15 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_standard" {
               operator: In
               values: ["xlarge"]
 
+      limits:
         cpu: ${var.default_nodepool_node_limit}
 
       disruption:
         consolidationPolicy: WhenEmpty
-        consolidateAfter: 30s
-        expireAfter: 720h
+        consolidateAfter: 5m
+        expireAfter: 168h
 
         budgets:
-          nodes: "100%"
+          - nodes: "100%"
   YAML
 }
