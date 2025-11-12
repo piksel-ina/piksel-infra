@@ -19,7 +19,7 @@ resource "kubectl_manifest" "karpenter_node_class_jupyter" {
       blockDeviceMappings:
         - deviceName: /dev/xvda
           ebs:
-            volumeSize: 60Gi
+            volumeSize: 40Gi
             volumeType: gp3
             encrypted: true
             deleteOnTermination: true
@@ -78,9 +78,66 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_standard" {
               operator: In
               values: ["r7i", "r6i", "r5"]
 
-            - key: "karpenter.k8s.aws/instance-generation"
-              operator : Gt
-              values : ["4"]
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["large"]
+
+      limits:
+        cpu: ${var.default_nodepool_node_limit}
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 1m
+        expireAfter: 168h
+
+        budgets:
+          - nodes: "100%"
+  YAML
+}
+
+# --- Moderate NodePool ---
+resource "kubectl_manifest" "karpenter_node_pool_jupyter_moderate" {
+  depends_on = [kubectl_manifest.karpenter_node_class_jupyter]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: jupyter-moderate
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            jupyter-profile: moderate
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: jupyter
+
+          taints:
+            - key: jupyter-profile
+              value: moderate
+              effect: NoSchedule
+
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["spot", "on-demand"]
+
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+            - key: karpenter.k8s.aws/instance-family
+              operator: In
+              values: ["r7i", "r6i", "r5"]
 
             - key: karpenter.k8s.aws/instance-size
               operator: In
@@ -91,7 +148,68 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_standard" {
 
       disruption:
         consolidationPolicy: WhenEmpty
-        consolidateAfter: 5m
+        consolidateAfter: 1m
+        expireAfter: 168h
+
+        budgets:
+          - nodes: "100%"
+  YAML
+}
+
+# --- Power-User NodePool ---
+resource "kubectl_manifest" "karpenter_node_pool_jupyter_poweruser" {
+  depends_on = [kubectl_manifest.karpenter_node_class_jupyter]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: jupyter-poweruser
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            jupyter-profile: poweruser
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: jupyter
+
+          taints:
+            - key: jupyter-profile
+              value: poweruser
+              effect: NoSchedule
+
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["spot", "on-demand"]
+
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+            - key: karpenter.k8s.aws/instance-family
+              operator: In
+              values: ["r7i", "r6i", "r5"]
+
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["2xlarge"]
+
+      limits:
+        cpu: ${var.default_nodepool_node_limit}
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 1m
         expireAfter: 168h
 
         budgets:
