@@ -78,7 +78,3 @@ provider "aws" {
     role_arn = "arn:aws:iam::686410905891:role/odc-cloudfront-crossaccount-role-staging"
   }
 }
-
-data "aws_ecrpublic_authorization_token" "token" {
-  provider = aws.virginia
-}

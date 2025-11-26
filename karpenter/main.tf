@@ -87,15 +87,13 @@ module "karpenter" {
 
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
-  namespace           = "karpenter"
-  create_namespace    = true
-  name                = "karpenter"
-  repository          = "oci://public.ecr.aws/karpenter"
-  version             = "1.7.3"
-  chart               = "karpenter"
-  description         = "Karpenter autoscaler for EKS cluster"
-  repository_username = var.token_user_name
-  repository_password = var.token_password
+  namespace        = "karpenter"
+  create_namespace = true
+  name             = "karpenter"
+  repository       = "oci://public.ecr.aws/karpenter"
+  version          = "1.8.2"
+  chart            = "karpenter"
+  description      = "Karpenter autoscaler for EKS cluster"
 
   # Ensure Helm waits for all resources including CRDs
   wait            = true
