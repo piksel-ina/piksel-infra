@@ -524,11 +524,72 @@ resource "kubectl_manifest" "karpenter_node_pool_data_production_r_8xlarge" {
 
             - key: karpenter.k8s.aws/instance-family
               operator: In
-              values: ["r7i", "r6i"]
+              values: ["r7i", "r6i", "r5"]
 
             - key: karpenter.k8s.aws/instance-size
               operator: In
               values: ["8xlarge"]
+
+      limits:
+        cpu: 280
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 5m
+        expireAfter: 168h
+
+        budgets:
+          - nodes: "100%"
+  YAML
+}
+
+# --- R Series with 4x Large NodePool ---
+resource "kubectl_manifest" "karpenter_node_pool_data_production_r_4xlarge" {
+  depends_on = [kubectl_manifest.karpenter_node_class_data_production]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: data-production-r4xlarge
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            data-production: r4xlarge
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: data-production
+
+          taints:
+            - key: data-production
+              value: r4xlarge
+              effect: NoSchedule
+
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["spot"]
+
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+            - key: karpenter.k8s.aws/instance-family
+              operator: In
+              values: ["r7i", "r6i", "r5"]
+
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["4xlarge"]
 
       limits:
         cpu: 280
