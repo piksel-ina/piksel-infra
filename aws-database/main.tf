@@ -65,7 +65,9 @@ module "db" {
   # Prevent accidental deletion and re-building
   deletion_protection = true
 
-  tags = local.tags
+  tags = merge(local.tags, {
+    NodeGroup = "database"
+  })
 }
 
 # --- Creates a Kubernetes namespace ---

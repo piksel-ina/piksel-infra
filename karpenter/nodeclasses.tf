@@ -32,6 +32,8 @@ resource "kubectl_manifest" "karpenter_node_class" {
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+      tags:
+        NodeGroup: "Others"
   YAML
 }
 
@@ -143,6 +145,8 @@ resource "kubectl_manifest" "karpenter_gpu_node_class" {
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+      tags:
+        NodeGroup: "GPU"
   YAML
 }
 
@@ -216,7 +220,7 @@ resource "kubectl_manifest" "karpenter_node_class_jupyter" {
         - tags:
             karpenter.sh/discovery: ${local.cluster}
       tags:
-        Workload: "Jupyter-Sandboxes"
+        NodeGroup: "Jupyter-Sandboxes"
         User-type: "Standard-Users"
   YAML
 }
@@ -317,7 +321,7 @@ resource "kubectl_manifest" "karpenter_node_class_develop_jupyter" {
         - tags:
             karpenter.sh/discovery: ${local.cluster}
       tags:
-        Workload: "Jupyter-Sandboxes"
+        NodeGroup: "Jupyter-Sandboxes"
         User-type: "Advanced-Users"
   YAML
 }
@@ -478,7 +482,7 @@ resource "kubectl_manifest" "karpenter_node_class_data_production" {
         - tags:
             karpenter.sh/discovery: ${local.cluster}
       tags:
-        Workload: "Data-Production"
+        NodeGroup: "Data-Production"
   YAML
 }
 

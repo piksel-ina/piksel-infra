@@ -3,6 +3,10 @@ locals {
   tags    = var.default_tags
 }
 
+data "aws_eks_cluster_auth" "this" {
+  name = module.eks.cluster_name
+}
+
 # --- Create Cluster ---
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -19,17 +23,17 @@ module "eks" {
       configuration_values = jsonencode({
         autoScaling = {
           enabled     = true
-          minReplicas = 3
-          maxReplicas = 6
+          minReplicas = 2
+          maxReplicas = 10
         }
         resources = {
           requests = {
-            cpu    = "0.50"
-            memory = "256M"
+            cpu    = "150m"
+            memory = "125M"
           }
           limits = {
-            cpu    = "1.00"
-            memory = "512M"
+            cpu    = "1000m"
+            memory = "250M"
           }
         }
       })
@@ -73,32 +77,34 @@ module "eks" {
         effect = "NO_SCHEDULE"
       }
     ]
-    tags = local.tags
+    tags = merge(local.tags, {
+      NodeGroup = "System"
+    })
   }
 
   eks_managed_node_groups = {
     # 1 On-Demand for system reliability
     system = {
-      name = "system-v2"
+      name = "system-v3"
 
       min_size     = 1
       max_size     = 2
       desired_size = 1
 
       capacity_type  = "ON_DEMAND"
-      instance_types = ["c5.xlarge"]
+      instance_types = ["t3.large"]
     }
 
     # Spot node group for cost savings
     system-spot = {
-      name = "system-spot-v1"
+      name = "system-spot-v2"
 
-      min_size     = 2
+      min_size     = 1
       max_size     = 4
       desired_size = 2
 
       capacity_type  = "SPOT"
-      instance_types = ["c5.xlarge", "c5.2xlarge", "m5.large", "t3.large", "t3.xlarge"]
+      instance_types = ["m5.large", "m5a.large", "t3.large"]
     }
   }
 
@@ -141,9 +147,4 @@ module "eks" {
   })
 
   tags = local.tags
-}
-
-
-data "aws_eks_cluster_auth" "this" {
-  name = module.eks.cluster_name
 }
