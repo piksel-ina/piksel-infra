@@ -45,7 +45,6 @@ module "external-dns" {
   oidc_provider                     = module.eks-cluster.cluster_oidc_issuer_url
   oidc_provider_arn                 = module.eks-cluster.cluster_oidc_provider_arn
   externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
-  public_hosted_zone_id             = "Z06367032PXGIV8NRRW3G"
   default_tags                      = var.default_tags
 
   depends_on = [module.eks-cluster]

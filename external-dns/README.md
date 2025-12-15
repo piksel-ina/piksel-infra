@@ -67,7 +67,6 @@ No modules.
 | <a name="input_oidc_provider"></a> [oidc\_provider](#input\_oidc\_provider) | EKS Cluster OIDC provider issuer | `any` | n/a | yes |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | EKS Cluster OIDC provider arn | `any` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | The name of the project | `string` | n/a | yes |
-| <a name="input_public_hosted_zone_id"></a> [public\_hosted\_zone\_id](#input\_public\_hosted\_zone\_id) | The ID of the public hosted zone | `string` | n/a | yes |
 | <a name="input_subdomains"></a> [subdomains](#input\_subdomains) | List of domain filters for ExternalDNS | `list(string)` | n/a | yes |
 
 ## Outputs

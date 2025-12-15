@@ -120,7 +120,6 @@ resource "helm_release" "external_dns" {
       extraArgs = {
         "aws-assume-role"             = var.externaldns_crossaccount_role_arn
         "aws-assume-role-external-id" = "external-dns-${lower(var.environment)}"
-        "zone-id-filter"              = var.public_hosted_zone_id
       }
 
       # Environment variables for AWS
