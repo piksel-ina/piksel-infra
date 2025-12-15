@@ -101,10 +101,10 @@ module "eks" {
 
       min_size     = 1
       max_size     = 4
-      desired_size = 2
+      desired_size = 1
 
       capacity_type  = "SPOT"
-      instance_types = ["m5.large", "m5a.large", "t3.large"]
+      instance_types = ["t3.medium", "t3.large", "c5.large", "c5d.large", "m5.large", "m5d.large"]
     }
   }
 
