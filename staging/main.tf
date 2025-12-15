@@ -1,6 +1,6 @@
 locals {
   cluster_name = "piksel-staging"
-  subdomains   = ["staging.pik-sel.id"]
+  subdomains   = ["staging.pik-sel.id", "staging.piksel.big.go.id"]
 }
 
 module "networks" {
@@ -85,7 +85,7 @@ module "database" {
   private_subnets_ids     = module.networks.private_subnets
   cluster_name            = module.eks-cluster.cluster_name
   default_tags            = var.default_tags
-  db_instance_class       = "db.t3.large"
+  db_instance_class       = "db.t4g.medium"
   db_allocated_storage    = 50
   backup_retention_period = 14
   db_multi_az             = false
