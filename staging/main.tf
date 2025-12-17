@@ -1,6 +1,6 @@
 locals {
   cluster_name = "piksel-staging"
-  subdomains   = ["staging.pik-sel.id", "staging.piksel.big.go.id"]
+  subdomains   = ["staging.piksel.big.go.id"]
 }
 
 module "networks" {
@@ -104,8 +104,8 @@ module "applications" {
   db_address                           = module.database.db_address
   k8s_db_service                       = module.database.k8s_db_service
   subdomains                           = local.subdomains
-  public_hosted_zone_id                = "Z06367032PXGIV8NRRW3G"
-  oauth_tenant                         = "ap-southeast-3zfzkrhjdu.auth.ap-southeast-3.amazoncognito.com"
+  public_hosted_zone_id                = "Z00431943HAESMJJNQCQR"
+  oauth_tenant                         = "auth.staging.piksel.big.go.id"
   internal_buckets                     = [module.s3_bucket.public_bucket_name]
   odc_cloudfront_crossaccount_role_arn = "arn:aws:iam::686410905891:role/odc-cloudfront-crossaccount-role-staging"
   public_bucket_arn                    = module.s3_bucket.public_bucket_arn
