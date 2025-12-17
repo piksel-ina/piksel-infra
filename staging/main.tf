@@ -105,7 +105,7 @@ module "applications" {
   k8s_db_service                       = module.database.k8s_db_service
   subdomains                           = local.subdomains
   public_hosted_zone_id                = "Z00431943HAESMJJNQCQR"
-  oauth_tenant                         = "auth.piksel.big.go.id"
+  oauth_tenant                         = "oauth.piksel.big.go.id"
   internal_buckets                     = [module.s3_bucket.public_bucket_name]
   odc_cloudfront_crossaccount_role_arn = "arn:aws:iam::686410905891:role/odc-cloudfront-crossaccount-role-staging"
   public_bucket_arn                    = module.s3_bucket.public_bucket_arn
