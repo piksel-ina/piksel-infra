@@ -8,6 +8,8 @@ hub:
       allow_all: true
       auto_login: true
       enable_auth_state: true
+      auth_refresh_age: 300
+      refresh_pre_spawn: true
       userdata_from_id_token: true
       client_id: ${jhub_auth_client_id}
       client_secret: ${jhub_auth_client_secret}
@@ -23,8 +25,6 @@ hub:
         - aws.cognito.signin.user.admin
       admin_users:
         - muhammad.taufik@big.go.id
-      # auth_state_groups_key: "oauth_user.cognito:groups"
-      # manage_groups: true
     JupyterHub:
       authenticator_class: generic-oauth
   services:
