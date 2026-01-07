@@ -29,6 +29,8 @@ resource "kubectl_manifest" "karpenter_node_class" {
       subnetSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+            SubnetType: "Private"
+      associatePublicIPAddress: false
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
@@ -142,6 +144,8 @@ resource "kubectl_manifest" "karpenter_gpu_node_class" {
       subnetSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+            SubnetType: "Private"
+      associatePublicIPAddress: false
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
@@ -216,6 +220,8 @@ resource "kubectl_manifest" "karpenter_node_class_jupyter" {
       subnetSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+            SubnetType: "Private"
+      associatePublicIPAddress: false
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
@@ -317,6 +323,8 @@ resource "kubectl_manifest" "karpenter_node_class_develop_jupyter" {
       subnetSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+            SubnetType: "Private"
+      associatePublicIPAddress: false
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
@@ -478,6 +486,8 @@ resource "kubectl_manifest" "karpenter_node_class_data_production" {
       subnetSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}
+            SubnetType: "Public"
+      associatePublicIPAddress: true
       securityGroupSelectorTerms:
         - tags:
             karpenter.sh/discovery: ${local.cluster}

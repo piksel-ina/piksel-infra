@@ -54,6 +54,7 @@ module "vpc" {
   public_subnet_tags = {
     "SubnetType"             = "Public"
     "kubernetes.io/role/elb" = 1
+    "karpenter.sh/discovery" = var.cluster_name
   }
 
   private_subnet_tags = {
