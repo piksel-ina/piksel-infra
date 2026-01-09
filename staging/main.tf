@@ -17,19 +17,20 @@ module "networks" {
 module "eks-cluster" {
   source = "../aws-eks-cluster"
 
-  account_id          = module.networks.account_id
-  cluster_name        = local.cluster_name
-  vpc_id              = module.networks.vpc_id
-  vpc_cidr_block      = module.networks.vpc_cidr_block
-  private_subnets_ids = module.networks.private_subnets
-  eks-version         = "1.32"
-  coredns-version     = "v1.11.4-eksbuild.2"
-  vpc-cni-version     = "v1.19.2-eksbuild.1"
-  kube-proxy-version  = "v1.32.0-eksbuild.2"
-  ebs-csi-version     = "v1.46.0-eksbuild.1"
-  sso-admin-role-arn  = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
-  efs_backup_enabled  = false
-  default_tags        = var.default_tags
+  account_id             = module.networks.account_id
+  cluster_name           = local.cluster_name
+  vpc_id                 = module.networks.vpc_id
+  vpc_cidr_block         = module.networks.vpc_cidr_block
+  private_subnets_ids    = module.networks.private_subnets
+  eks-version            = "1.32"
+  coredns-version        = "v1.11.4-eksbuild.2"
+  vpc-cni-version        = "v1.19.2-eksbuild.1"
+  kube-proxy-version     = "v1.32.0-eksbuild.2"
+  ebs-csi-version        = "v1.46.0-eksbuild.1"
+  cloudwatch-obs-version = "v4.8.0-eksbuild.1"
+  sso-admin-role-arn     = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
+  efs_backup_enabled     = false
+  default_tags           = var.default_tags
 
   depends_on = [module.networks]
 }
@@ -62,7 +63,7 @@ module "karpenter" {
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
 
-  depends_on = [module.eks-cluster]
+  # depends_on = [module.eks-cluster]
 }
 
 module "s3_bucket" {

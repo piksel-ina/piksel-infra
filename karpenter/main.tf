@@ -30,6 +30,7 @@ module "karpenter" {
     AmazonEBSCSIDriverPolicy                = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
     AmazonCNIPolicy                         = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
     AmazonElasticFileSystemClientFullAccess = "arn:aws:iam::aws:policy/AmazonElasticFileSystemClientFullAccess"
+    AmazonEC2ContainerRegistryReadOnly      = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   }
 
   # Karpenter controller additional IAM policy statements
@@ -85,6 +86,30 @@ module "karpenter" {
   tags = local.tags
 }
 
+# --- Add inline policy for cross-account ECR access to AWS EKS repositories ---
+resource "aws_iam_role_policy" "karpenter_node_ecr_cross_account" {
+  name = "EKS-ECR-CrossAccount-Access"
+  role = module.karpenter.node_iam_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowPullFromAWSEKSECR"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+        Resource = [
+          "arn:aws:ecr:*:296578399912:repository/*",
+          "arn:aws:ecr:*:602401143452:repository/*"
+        ]
+      }
+    ]
+  })
+}
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
   namespace        = "karpenter"

@@ -35,6 +35,25 @@ module "vpc_cni_irsa_role" {
   tags = local.tags
 }
 
+module "cloudwatch_observability_irsa_role" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.55.0"
+
+  role_name = "${local.cluster}-cloudwatch-observability"
+
+  role_policy_arns = {
+    CloudWatchAgentServerPolicy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  }
+
+  oidc_providers = {
+    ex = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["cloudwatch:cloudwatch-agent"]
+    }
+  }
+
+  tags = local.tags
+}
 
 # --- Other IAM: ---
 

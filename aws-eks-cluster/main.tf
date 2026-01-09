@@ -50,10 +50,16 @@ module "eks" {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
+    amazon-cloudwatch-observability = {
+      addon_version            = var.cloudwatch-obs-version
+      service_account_role_arn = module.cloudwatch_observability_irsa_role.iam_role_arn
+    }
   }
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids
+
+  cluster_enabled_log_types = ["api", "authenticator", "controllerManager", "scheduler"]
 
   # --- EKS Managed Node Groups ---
   eks_managed_node_group_defaults = {
@@ -63,7 +69,8 @@ module "eks" {
     disk_type                  = "gp3"
 
     iam_role_additional_policies = {
-      AssumeECRRole = aws_iam_policy.assume_ecr_role.arn
+      AssumeECRRole                      = aws_iam_policy.assume_ecr_role.arn
+      AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
     }
 
     labels = {

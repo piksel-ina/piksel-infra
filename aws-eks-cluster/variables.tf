@@ -57,6 +57,11 @@ variable "ebs-csi-version" {
   description = "The version of EBS CSI driver"
 }
 
+variable "cloudwatch-obs-version" {
+  type        = string
+  description = "CloudWatch Observability add-on version"
+}
+
 variable "account_id" {
   description = "AWS account ID"
   type        = string

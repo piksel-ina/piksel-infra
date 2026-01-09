@@ -73,6 +73,7 @@ This configuration will create and manage the following key resources:
 
 | Name | Version |
 |------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | n/a |
 | <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | >= 1.7.0 |
 | <a name="provider_time"></a> [time](#provider\_time) | n/a |
@@ -87,6 +88,7 @@ This configuration will create and manage the following key resources:
 
 | Name | Type |
 |------|------|
+| [aws_iam_role_policy.karpenter_node_ecr_cross_account](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [helm_release.karpenter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [kubectl_manifest.karpenter_gpu_node_class](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
 | [kubectl_manifest.karpenter_node_class](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |

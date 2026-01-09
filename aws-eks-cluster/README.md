@@ -80,6 +80,7 @@ No requirements.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_cloudwatch_observability_irsa_role"></a> [cloudwatch\_observability\_irsa\_role](#module\_cloudwatch\_observability\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 | <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 | <a name="module_efs_csi_irsa_role"></a> [efs\_csi\_irsa\_role](#module\_efs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 20.33 |
@@ -101,6 +102,7 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID | `string` | n/a | yes |
+| <a name="input_cloudwatch-obs-version"></a> [cloudwatch-obs-version](#input\_cloudwatch-obs-version) | CloudWatch Observability add-on version | `string` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of the EKS cluster for tagging subnets | `string` | `"piksel-eks-cluster"` | no |
 | <a name="input_coredns-version"></a> [coredns-version](#input\_coredns-version) | The version of CoreDNS for this environment | `string` | n/a | yes |
 | <a name="input_cross_account_ecr_role_arn"></a> [cross\_account\_ecr\_role\_arn](#input\_cross\_account\_ecr\_role\_arn) | Cross Account ECR Role ARN | `string` | `"arn:aws:iam::686410905891:role/piksel-eks-ecr-access"` | no |
