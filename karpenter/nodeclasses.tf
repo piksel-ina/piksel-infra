@@ -273,11 +273,11 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_standard" {
 
             - key: karpenter.k8s.aws/instance-family
               operator: In
-              values: ["r7i", "r6i", "r5"]
+              values: ["m7", "m6", "m5", "m6i", "m6a", "m7i"]
 
             - key: karpenter.k8s.aws/instance-size
               operator: In
-              values: ["large"]
+              values: ["xlarge"]
 
       limits:
         cpu: ${var.default_nodepool_node_limit}
