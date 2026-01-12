@@ -85,7 +85,7 @@ module "database" {
   private_subnets_ids     = module.networks.private_subnets
   cluster_name            = module.eks-cluster.cluster_name
   default_tags            = var.default_tags
-  db_instance_class       = "db.t4g.medium"
+  db_instance_class       = "db.t4g.large"
   db_allocated_storage    = 50
   backup_retention_period = 14
   db_multi_az             = false

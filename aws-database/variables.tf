@@ -75,6 +75,12 @@ variable "db_multi_az" {
   type        = bool
 }
 
+variable "is_changes_applied_immediately" {
+  description = "Apply RDS Changes Immediately instead during maintenance window"
+  type        = bool
+  default     = true
+}
+
 # --- Security Group Variables ---
 variable "vpc_id" {
   description = "The ID of the VPC to associate with the security group"

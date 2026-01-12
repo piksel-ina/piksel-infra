@@ -40,6 +40,7 @@ No requirements.
 | <a name="input_db_multi_az"></a> [db\_multi\_az](#input\_db\_multi\_az) | Database multi availability zone deployment | `bool` | n/a | yes |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | The name of the environment | `string` | n/a | yes |
+| <a name="input_is_changes_applied_immediately"></a> [is\_changes\_applied\_immediately](#input\_is\_changes\_applied\_immediately) | Apply RDS Changes Immediately instead during maintenance window | `bool` | `true` | no |
 | <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | The name of the project | `string` | n/a | yes |
 | <a name="input_psql_family"></a> [psql\_family](#input\_psql\_family) | Postrgress Database family | `string` | `"postgres16"` | no |

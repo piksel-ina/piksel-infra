@@ -65,7 +65,7 @@ module "db" {
   # Prevent accidental deletion and re-building
   deletion_protection = true
 
-  apply_immediately = true
+  apply_immediately = var.is_changes_applied_immediately
 
   tags = merge(local.tags, {
     NodeGroup = "database"
