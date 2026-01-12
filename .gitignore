@@ -17,6 +17,8 @@ local_override.tf
 
 # Sensitive variable files
 *.auto.tfvars.local
+*.auto.tfvars
+dev.auto.tfvars
 
 # Ignore CLI configuration files
 .terraformrc
@@ -28,3 +30,6 @@ keys/*
 
 # Ignore Terraform backup files
 tf_backup/
+
+.secrets/
+*.pem
