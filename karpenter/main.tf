@@ -104,12 +104,20 @@ resource "aws_iam_role_policy" "karpenter_node_ecr_cross_account" {
         ]
         Resource = [
           "arn:aws:ecr:*:296578399912:repository/*",
-          "arn:aws:ecr:*:602401143452:repository/*"
+          "arn:aws:ecr:*:602401143452:repository/*",
+          "arn:aws:ecr:*:686410905891:repository/*"
         ]
+      },
+      {
+        Sid      = "AllowAssumeECRRole"
+        Effect   = "Allow"
+        Action   = "sts:AssumeRole"
+        Resource = var.cross_account_ecr_role_arn
       }
     ]
   })
 }
+
 # --- Karpenter Helm Chart with proper wait conditions ---
 resource "helm_release" "karpenter" {
   namespace        = "karpenter"

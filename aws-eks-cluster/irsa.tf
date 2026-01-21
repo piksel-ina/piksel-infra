@@ -55,8 +55,8 @@ module "cloudwatch_observability_irsa_role" {
   tags = local.tags
 }
 
-# --- Other IAM: ---
 
+# --- Policy that allows EKS nodes to assume the cross-account ECR role ---
 # --- Policy that allows EKS nodes to assume the cross-account ECR role ---
 resource "aws_iam_policy" "assume_ecr_role" {
   name        = "${local.cluster}-assume-ecr-role"
@@ -66,9 +66,24 @@ resource "aws_iam_policy" "assume_ecr_role" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid      = "AssumeECRRole"
         Effect   = "Allow"
         Action   = "sts:AssumeRole"
         Resource = var.cross_account_ecr_role_arn
+      },
+      {
+        Sid    = "AllowPullFromAWSEKSECR"
+        Effect = "Allow"
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ]
+        Resource = [
+          "arn:aws:ecr:*:296578399912:repository/*",
+          "arn:aws:ecr:*:602401143452:repository/*",
+          "arn:aws:ecr:*:686410905891:repository/*"
+        ]
       }
     ]
   })
