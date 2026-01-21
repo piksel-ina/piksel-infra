@@ -43,12 +43,18 @@ module "cloudwatch_observability_irsa_role" {
 
   role_policy_arns = {
     CloudWatchAgentServerPolicy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    CloudWatchLogsFullAccess    = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
   }
 
   oidc_providers = {
     ex = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["cloudwatch:cloudwatch-agent"]
+      provider_arn = module.eks.oidc_provider_arn
+      namespace_service_accounts = [
+        "amazon-cloudwatch:cloudwatch-agent",
+        "amazon-cloudwatch:amazon-cloudwatch-observability-controller-manager",
+        "amazon-cloudwatch:dcgm-exporter-service-acct",
+        "amazon-cloudwatch:neuron-monitor-service-acct"
+      ]
     }
   }
 
@@ -56,7 +62,6 @@ module "cloudwatch_observability_irsa_role" {
 }
 
 
-# --- Policy that allows EKS nodes to assume the cross-account ECR role ---
 # --- Policy that allows EKS nodes to assume the cross-account ECR role ---
 resource "aws_iam_policy" "assume_ecr_role" {
   name        = "${local.cluster}-assume-ecr-role"

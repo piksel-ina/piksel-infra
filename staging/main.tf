@@ -27,7 +27,7 @@ module "eks-cluster" {
   vpc-cni-version        = "v1.19.2-eksbuild.1"
   kube-proxy-version     = "v1.32.0-eksbuild.2"
   ebs-csi-version        = "v1.46.0-eksbuild.1"
-  cloudwatch-obs-version = "v4.8.0-eksbuild.1"
+  cloudwatch-obs-version = "v4.9.0-eksbuild.1"
   sso-admin-role-arn     = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
   efs_backup_enabled     = false
   default_tags           = var.default_tags
