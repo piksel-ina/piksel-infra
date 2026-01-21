@@ -14,6 +14,44 @@ module "networks" {
   default_tags = var.default_tags
 }
 
+module "amazon_observability" {
+  source = "../amazon-observability"
+
+  aws_region  = var.aws_region
+  project     = var.project
+  environment = var.environment
+
+  cluster_name = local.cluster_name
+
+  log_retention_days    = 7
+  cw_log_retention_days = 7
+  default_tags          = var.default_tags
+}
+
+module "s3_bucket" {
+  source = "../aws-s3-bucket"
+
+  project      = var.project
+  environment  = var.environment
+  default_tags = var.default_tags
+}
+
+module "database" {
+  source = "../aws-database"
+
+  project                 = var.project
+  environment             = var.environment
+  vpc_id                  = module.networks.vpc_id
+  vpc_cidr_block          = module.networks.vpc_cidr_block
+  private_subnets_ids     = module.networks.private_subnets
+  cluster_name            = module.eks-cluster.cluster_name
+  default_tags            = var.default_tags
+  db_instance_class       = "db.t4g.large"
+  db_allocated_storage    = 50
+  backup_retention_period = 14
+  db_multi_az             = false
+}
+
 module "eks-cluster" {
   source = "../aws-eks-cluster"
 
@@ -32,7 +70,7 @@ module "eks-cluster" {
   efs_backup_enabled     = false
   default_tags           = var.default_tags
 
-  depends_on = [module.networks]
+  depends_on = [module.networks, module.amazon_observability]
 }
 
 module "external-dns" {
@@ -63,32 +101,7 @@ module "karpenter" {
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
 
-  # depends_on = [module.eks-cluster]
-}
-
-module "s3_bucket" {
-  source = "../aws-s3-bucket"
-
-  project      = var.project
-  environment  = var.environment
-  default_tags = var.default_tags
-}
-
-
-module "database" {
-  source = "../aws-database"
-
-  project                 = var.project
-  environment             = var.environment
-  vpc_id                  = module.networks.vpc_id
-  vpc_cidr_block          = module.networks.vpc_cidr_block
-  private_subnets_ids     = module.networks.private_subnets
-  cluster_name            = module.eks-cluster.cluster_name
-  default_tags            = var.default_tags
-  db_instance_class       = "db.t4g.large"
-  db_allocated_storage    = 50
-  backup_retention_period = 14
-  db_multi_az             = false
+  depends_on = [module.eks-cluster]
 }
 
 module "applications" {
