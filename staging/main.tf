@@ -70,7 +70,7 @@ module "eks-cluster" {
   efs_backup_enabled     = false
   default_tags           = var.default_tags
 
-  depends_on = [module.networks, module.amazon_observability]
+  depends_on = [module.networks]
 }
 
 module "external-dns" {

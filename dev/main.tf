@@ -194,6 +194,10 @@ resource "aws_instance" "this" {
     AutoStop      = tostring(each.value.enable_autostop)
     AutoStopGroup = var.autostop_group_name
   })
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 # --- Nightly stop schedule (19:00 WIB = 12:00 UTC) ---
