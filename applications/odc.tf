@@ -131,6 +131,21 @@ module "iam_eks_role_bucket_odc" {
   }
 }
 
+# --- Service Account for ODC with IRSA ---
+resource "kubernetes_service_account" "odc_data_reader" {
+  metadata {
+    name      = local.service_account_name_odc
+    namespace = kubernetes_namespace.odc.metadata[0].name
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.iam_eks_role_bucket_odc.iam_role_arn
+    }
+  }
+
+  depends_on = [
+    module.iam_eks_role_bucket_odc
+  ]
+}
+
 # --- Set up a cloudfront cache for the `ows` endpoint ---
 
 # --- Create Role to assume the cross-account role in the shared account ---
