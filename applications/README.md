@@ -27,21 +27,21 @@ No requirements.
 | [aws_acm_certificate.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate) | resource |
 | [aws_acm_certificate_validation.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation) | resource |
 | [aws_cloudfront_distribution.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudfront_distribution) | resource |
-| [aws_iam_access_key.terria](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_policy.argo_artifact_read_write_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.argo_public_bucket_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.hub_user_read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.read_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_policy.terria_s3_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.argo_workflow_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.grafana](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.odc_cloudfront_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role.terria_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.odc_cloudfront_assume_crossaccount](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_role_policy_attachment.argo_workflow_public_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.argo_workflow_s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.grafana_cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_user.terria_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
-| [aws_iam_user_policy.terria_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
+| [aws_iam_role_policy_attachment.terria_s3_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_route53_record.ows_cache](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.ows_certificate](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_s3_bucket.argo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket) | resource |
@@ -60,6 +60,7 @@ No requirements.
 | [aws_secretsmanager_secret_version.odc_write_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.stac_write_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_secretsmanager_secret_version.stacread_password](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
+| [kubernetes_config_map.terria_config](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/config_map) | resource |
 | [kubernetes_namespace.argo_workflow](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.hub](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
 | [kubernetes_namespace.monitoring](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
@@ -83,9 +84,9 @@ No requirements.
 | [kubernetes_secret.stac_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stacread_namespace_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_secret.stacread_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
-| [kubernetes_secret.terria_secret](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret) | resource |
 | [kubernetes_service_account.hub_user_read](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [kubernetes_service_account.odc_data_reader](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
+| [kubernetes_service_account.terria](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
 | [random_bytes.grafana_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/bytes) | resource |
 | [random_id.jhub_hub_cookie_secret_token](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [random_id.jhub_proxy_secret_token](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
@@ -166,8 +167,11 @@ No requirements.
 | <a name="output_stac_write_db_password"></a> [stac\_write\_db\_password](#output\_stac\_write\_db\_password) | STAC write database password. |
 | <a name="output_stac_write_secret_arn"></a> [stac\_write\_secret\_arn](#output\_stac\_write\_secret\_arn) | ARN of the AWS Secrets Manager secret for STAC write credentials. |
 | <a name="output_stacread_k8s_secret_name"></a> [stacread\_k8s\_secret\_name](#output\_stacread\_k8s\_secret\_name) | Kubernetes secret name for STAC read credentials. |
+| <a name="output_terria_bucket_arn"></a> [terria\_bucket\_arn](#output\_terria\_bucket\_arn) | ARN of the S3 bucket for TerriaMap |
 | <a name="output_terria_bucket_name"></a> [terria\_bucket\_name](#output\_terria\_bucket\_name) | The name of the S3 bucket for Terria. |
-| <a name="output_terria_iam_user_name"></a> [terria\_iam\_user\_name](#output\_terria\_iam\_user\_name) | The IAM user that can access the bucket. |
-| <a name="output_terria_k8s_namespace"></a> [terria\_k8s\_namespace](#output\_terria\_k8s\_namespace) | Kubernetes namespace where the secret is stored. |
-| <a name="output_terria_k8s_secret_name"></a> [terria\_k8s\_secret\_name](#output\_terria\_k8s\_secret\_name) | Kubernetes secret containing bucket credentials. |
+| <a name="output_terria_configmap_name"></a> [terria\_configmap\_name](#output\_terria\_configmap\_name) | Name of the ConfigMap containing TerriaMap configuration |
+| <a name="output_terria_iam_role_arn"></a> [terria\_iam\_role\_arn](#output\_terria\_iam\_role\_arn) | ARN of the IAM role for TerriaMap service account (IRSA) |
+| <a name="output_terria_iam_role_name"></a> [terria\_iam\_role\_name](#output\_terria\_iam\_role\_name) | Name of the IAM role for TerriaMap |
+| <a name="output_terria_namespace"></a> [terria\_namespace](#output\_terria\_namespace) | Kubernetes namespace for TerriaMap |
+| <a name="output_terria_service_account_name"></a> [terria\_service\_account\_name](#output\_terria\_service\_account\_name) | Name of the Kubernetes service account for TerriaMap |
 <!-- END_TF_DOCS -->

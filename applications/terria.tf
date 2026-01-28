@@ -1,52 +1,16 @@
 locals {
-  terria_namespace = "terria"
+  terria_namespace       = "terria"
+  terria_service_account = "terria-sa"
 }
 
-# --- Need a bucket and a access and secret key to write to it ---
+# --- S3 Bucket for TerriaMap sharing ---
 resource "aws_s3_bucket" "terria_bucket" {
   bucket = "${local.prefix}-terria-bucket"
-
-  tags = local.tags
+  tags   = local.tags
 }
 
-# --- Add IAM User to write to the bucket ---
-resource "aws_iam_user" "terria_user" {
-  name = "${local.prefix}-terria-user"
-  tags = local.tags
-}
 
-# --- Create access key for the user ---
-resource "aws_iam_access_key" "terria" {
-  user = aws_iam_user.terria_user.name
-}
-
-# --- Create policy to allow the user to write to the bucket ---
-resource "aws_iam_user_policy" "terria_policy" {
-  name = "${local.prefix}-terria-policy"
-  user = aws_iam_user.terria_user.name
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:PutObject",
-        "s3:GetObject",
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.terria_bucket.arn}",
-        "${aws_s3_bucket.terria_bucket.arn}/*"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-# --- Store the access and secret key as a k8s secret ---
+# --- Kubernetes Namespace ---
 resource "kubernetes_namespace" "terria" {
   metadata {
     name = local.terria_namespace
@@ -63,16 +27,101 @@ resource "kubernetes_namespace" "terria" {
   }
 }
 
-# --- Store the access and secret key as a Kubernetes secret ---
-resource "kubernetes_secret" "terria_secret" {
+# --- IAM Policy for S3 Access ---
+resource "aws_iam_policy" "terria_s3_policy" {
+  name        = "svc-${local.terria_service_account}-policy"
+  description = "S3 bucket access policy for TerriaMap sharing feature"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        # Read
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.terria_bucket.bucket}",
+          "arn:aws:s3:::${aws_s3_bucket.terria_bucket.bucket}/*"
+        ]
+      },
+      {
+        # Write
+        Action = [
+          "s3:PutObject",
+          "s3:DeleteObject",
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::${aws_s3_bucket.terria_bucket.bucket}/*"
+        ]
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+# --- IAM Role for Service Account ---
+resource "aws_iam_role" "terria_role" {
+  name = "iam-role-for-${local.terria_service_account}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = var.eks_oidc_provider_arn
+        }
+        Condition = {
+          StringEquals = {
+            "${replace(var.oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:${kubernetes_namespace.terria.metadata[0].name}:${local.terria_service_account}"
+            "${replace(var.oidc_issuer_url, "https://", "")}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = local.tags
+}
+
+# --- Attach Policy to Role ---
+resource "aws_iam_role_policy_attachment" "terria_s3_policy_attachment" {
+  role       = aws_iam_role.terria_role.name
+  policy_arn = aws_iam_policy.terria_s3_policy.arn
+}
+
+# --- Kubernetes Service Account with IRSA annotation ---
+resource "kubernetes_service_account" "terria" {
   metadata {
-    name      = "terria-bucket-creds"
+    name      = local.terria_service_account
+    namespace = kubernetes_namespace.terria.metadata[0].name
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = aws_iam_role.terria_role.arn
+    }
+
+    labels = {
+      project     = var.project
+      environment = var.environment
+    }
+  }
+}
+
+# --- Store bucket name as ConfigMap ---
+resource "kubernetes_config_map" "terria_config" {
+  metadata {
+    name      = "terria-config"
     namespace = kubernetes_namespace.terria.metadata[0].name
   }
 
   data = {
-    "bucket-name" = aws_s3_bucket.terria_bucket.id
-    "access-key"  = aws_iam_access_key.terria.id
-    "secret-key"  = aws_iam_access_key.terria.secret
+    "bucket-name"   = aws_s3_bucket.terria_bucket.id
+    "bucket-region" = aws_s3_bucket.terria_bucket.region
   }
 }

@@ -151,19 +151,35 @@ output "terria_bucket_name" {
   value       = aws_s3_bucket.terria_bucket.id
 }
 
-output "terria_iam_user_name" {
-  description = "The IAM user that can access the bucket."
-  value       = aws_iam_user.terria_user.name
+output "terria_bucket_arn" {
+  description = "ARN of the S3 bucket for TerriaMap"
+  value       = aws_s3_bucket.terria_bucket.arn
 }
 
-output "terria_k8s_secret_name" {
-  description = "Kubernetes secret containing bucket credentials."
-  value       = kubernetes_secret.terria_secret.metadata[0].name
+
+output "terria_iam_role_arn" {
+  description = "ARN of the IAM role for TerriaMap service account (IRSA)"
+  value       = aws_iam_role.terria_role.arn
 }
 
-output "terria_k8s_namespace" {
-  description = "Kubernetes namespace where the secret is stored."
+output "terria_iam_role_name" {
+  description = "Name of the IAM role for TerriaMap"
+  value       = aws_iam_role.terria_role.name
+}
+
+output "terria_namespace" {
+  description = "Kubernetes namespace for TerriaMap"
   value       = kubernetes_namespace.terria.metadata[0].name
+}
+
+output "terria_service_account_name" {
+  description = "Name of the Kubernetes service account for TerriaMap"
+  value       = kubernetes_service_account.terria.metadata[0].name
+}
+
+output "terria_configmap_name" {
+  description = "Name of the ConfigMap containing TerriaMap configuration"
+  value       = kubernetes_config_map.terria_config.metadata[0].name
 }
 
 # --- Flux outputs ---

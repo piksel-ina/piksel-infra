@@ -192,9 +192,11 @@ output "argo_workflow_metadata" {
 output "terria_metadata" {
   description = "Output of Terria configuration and resources"
   value = {
-    bucket_name     = module.applications.terria_bucket_name
-    iam_user_name   = module.applications.terria_iam_user_name
-    k8s_secret_name = module.applications.terria_k8s_secret_name
-    k8s_namespace   = module.applications.terria_k8s_namespace
+    bucket_name          = module.applications.terria_bucket_name
+    iam_role_arn         = module.applications.terria_iam_role_arn
+    iam_role_name        = module.applications.terria_iam_role_name
+    namespace            = module.applications.terria_namespace
+    service_account_name = module.applications.terria_service_account_name
+    configmap_name       = module.applications.terria_configmap_name
   }
 }
