@@ -171,17 +171,6 @@ module "eks" {
       AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
     }
 
-    labels = {
-      "karpenter.sh/controller" = "true"
-    }
-
-    taints = [
-      {
-        key    = "CriticalAddonsOnly"
-        value  = "true"
-        effect = "NO_SCHEDULE"
-      }
-    ]
     tags = merge(local.tags, {
       NodeGroup = "System"
     })
@@ -190,7 +179,7 @@ module "eks" {
   eks_managed_node_groups = {
     # 1 On-Demand for system reliability
     system = {
-      name = "system-v3"
+      name = "system-v3-1"
 
       min_size     = 1
       max_size     = 2
@@ -198,11 +187,23 @@ module "eks" {
 
       capacity_type  = "ON_DEMAND"
       instance_types = ["t3.large"]
+
+      labels = {
+        "karpenter.sh/controller" = "true"
+      }
+
+      taints = [
+        {
+          key    = "CriticalAddonsOnly"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      ]
     }
 
     # Spot node group for cost savings
     system-spot = {
-      name = "system-spot-v2"
+      name = "system-spot-v3"
 
       min_size     = 1
       max_size     = 4
@@ -210,6 +211,18 @@ module "eks" {
 
       capacity_type  = "SPOT"
       instance_types = ["t3.medium", "t3.large", "c5.large", "c5d.large", "m5.large", "m5d.large"]
+
+      labels = {
+        "karpenter.sh/controller" = "true"
+      }
+
+      taints = [
+        {
+          key    = "CriticalAddonsOnly"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      ]
     }
   }
 
@@ -245,9 +258,6 @@ module "eks" {
   }
 
   node_security_group_tags = merge(local.tags, {
-    # NOTE - if creating multiple security groups with this module, only tag the
-    # security group that Karpenter should utilize with the following tag
-    # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.cluster
   })
 
