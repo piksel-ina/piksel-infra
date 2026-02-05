@@ -69,8 +69,6 @@ module "eks-cluster" {
   sso-admin-role-arn     = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
   efs_backup_enabled     = false
   default_tags           = var.default_tags
-
-  depends_on = [module.networks]
 }
 
 module "external-dns" {
@@ -85,8 +83,6 @@ module "external-dns" {
   oidc_provider_arn                 = module.eks-cluster.cluster_oidc_provider_arn
   externaldns_crossaccount_role_arn = "arn:aws:iam::686410905891:role/externaldns-crossaccount-role-staging"
   default_tags                      = var.default_tags
-
-  depends_on = [module.eks-cluster]
 }
 
 module "karpenter" {
@@ -100,8 +96,6 @@ module "karpenter" {
   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
-
-  depends_on = [module.eks-cluster]
 }
 
 module "applications" {
