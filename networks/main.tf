@@ -66,3 +66,27 @@ module "vpc" {
 
   tags = local.tags
 }
+
+resource "aws_subnet" "public_large" {
+  count                   = local.az_count
+  vpc_id                  = module.vpc.vpc_id
+  cidr_block              = cidrsubnet(local.cidr, 6, count.index + 4) # /22 = 1024 IPs
+  availability_zone       = local.azs[count.index]
+  map_public_ip_on_launch = true
+
+  tags = merge(
+    local.tags,
+    {
+      Name                     = "${local.prefix}-public-large-${trimprefix(local.azs[count.index], "ap-southeast-")}"
+      SubnetType               = "Public"
+      "kubernetes.io/role/elb" = 1
+      "karpenter.sh/discovery" = var.cluster_name
+    }
+  )
+}
+
+resource "aws_route_table_association" "public_large" {
+  count          = local.az_count
+  subnet_id      = aws_subnet.public_large[count.index].id
+  route_table_id = module.vpc.public_route_table_ids[0]
+}

@@ -13,10 +13,12 @@ output "network_metadata" {
       flow_log_cloudwatch_iam_role_arn = module.networks.vpc_flow_log_cloudwatch_iam_role_arn
     }
     subnets = {
-      public_ids          = module.networks.public_subnets
-      public_cidr_blocks  = module.networks.public_subnets_cidr_blocks
-      private_ids         = module.networks.private_subnets
-      private_cidr_blocks = module.networks.private_subnets_cidr_blocks
+      public_ids                = module.networks.public_subnets
+      public_cidr_blocks        = module.networks.public_subnets_cidr_blocks
+      private_ids               = module.networks.private_subnets
+      private_cidr_blocks       = module.networks.private_subnets_cidr_blocks
+      public_large_subnet_ids   = module.networks.public_large_subnet_ids
+      public_large_subnet_cidrs = module.networks.public_large_subnet_cidrs
     }
     nat = {
       ids        = module.networks.natgw_ids

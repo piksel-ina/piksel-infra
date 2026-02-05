@@ -78,3 +78,13 @@ output "vpc_flow_log_cloudwatch_iam_role_arn" {
   description = "ARN of the CloudWatch Log Group for Flow Logs (if enabled)"
   value       = module.vpc.vpc_flow_log_cloudwatch_iam_role_arn
 }
+
+output "public_large_subnet_ids" {
+  description = "IDs of additional large public subnets"
+  value       = aws_subnet.public_large[*].id
+}
+
+output "public_large_subnet_cidrs" {
+  description = "CIDR blocks of additional large public subnets"
+  value       = aws_subnet.public_large[*].cidr_block
+}
