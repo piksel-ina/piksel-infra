@@ -93,6 +93,7 @@ module "karpenter" {
   cluster_endpoint            = module.eks-cluster.cluster_endpoint
   default_nodepool_ami_alias  = "al2023@v20250505"
   default_nodepool_node_limit = 10000
+  data_production_cpu_limit   = 300
   gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags

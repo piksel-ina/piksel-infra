@@ -33,6 +33,12 @@ variable "default_nodepool_node_limit" {
   default     = 10000
 }
 
+variable "data_production_cpu_limit" {
+  description = "Data Production Nodepool CPU Limit"
+  type        = number
+  default     = 10000
+}
+
 variable "gpu_nodepool_node_limit" {
   description = "Default GPU node limit for GPU node pools"
   type        = number

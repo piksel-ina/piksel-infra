@@ -545,7 +545,7 @@ resource "kubectl_manifest" "karpenter_node_pool_data_production_r_8xlarge" {
               values: ["8xlarge"]
 
       limits:
-        cpu: 280
+        cpu: ${var.data_production_cpu_limit}
 
       disruption:
         consolidationPolicy: WhenEmpty
@@ -606,7 +606,7 @@ resource "kubectl_manifest" "karpenter_node_pool_data_production_r_4xlarge" {
               values: ["4xlarge"]
 
       limits:
-        cpu: 280
+        cpu: ${var.data_production_cpu_limit}
 
       disruption:
         consolidationPolicy: WhenEmpty

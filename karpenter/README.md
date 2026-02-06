@@ -111,6 +111,7 @@ This configuration will create and manage the following key resources:
 | <a name="input_cluster_endpoint"></a> [cluster\_endpoint](#input\_cluster\_endpoint) | value | `any` | n/a | yes |
 | <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | Name of EKS Cluster | `any` | n/a | yes |
 | <a name="input_cross_account_ecr_role_arn"></a> [cross\_account\_ecr\_role\_arn](#input\_cross\_account\_ecr\_role\_arn) | Cross Account ECR Role ARN | `string` | `"arn:aws:iam::686410905891:role/piksel-eks-ecr-access"` | no |
+| <a name="input_data_production_cpu_limit"></a> [data\_production\_cpu\_limit](#input\_data\_production\_cpu\_limit) | Data Production Nodepool CPU Limit | `number` | `10000` | no |
 | <a name="input_default_nodepool_ami_alias"></a> [default\_nodepool\_ami\_alias](#input\_default\_nodepool\_ami\_alias) | AMI alias for default node pools | `string` | `"al2023@v20250505"` | no |
 | <a name="input_default_nodepool_node_limit"></a> [default\_nodepool\_node\_limit](#input\_default\_nodepool\_node\_limit) | Default node limit for node pools | `number` | `10000` | no |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | value | `map` | `{}` | no |
