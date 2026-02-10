@@ -258,6 +258,8 @@ resource "aws_cloudfront_distribution" "ows_cache" {
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "owsOrigin"
 
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.ows_cors.id
+
     forwarded_values {
       query_string = true
       headers = [
@@ -327,5 +329,30 @@ resource "aws_route53_record" "ows_cache" {
     name                   = aws_cloudfront_distribution.ows_cache.domain_name
     zone_id                = aws_cloudfront_distribution.ows_cache.hosted_zone_id
     evaluate_target_health = false
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "ows_cors" {
+  name    = "ows-cors-policy"
+  comment = "CORS policy for OWS"
+
+  cors_config {
+    access_control_allow_credentials = false
+
+    access_control_allow_headers {
+      items = ["*"]
+    }
+
+    access_control_allow_methods {
+      items = ["GET", "HEAD", "OPTIONS", "POST"]
+    }
+
+    access_control_allow_origins {
+      items = ["*"]
+    }
+
+    access_control_max_age_sec = 86400
+
+    origin_override = true
   }
 }
