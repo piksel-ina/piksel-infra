@@ -263,10 +263,14 @@ resource "aws_iam_policy" "argo_public_bucket_policy" {
           "s3:GetObjectAcl",
         ]
         Effect = "Allow"
-        Resource = [
-          var.public_bucket_arn,
-          "${var.public_bucket_arn}/*"
-        ]
+        Resource = flatten([
+          for bucket in local.read_buckets : [
+            "arn:aws:s3:::${bucket}",
+            "arn:aws:s3:::${bucket}/*",
+            "${var.public_bucket_arn}",
+            "${var.public_bucket_arn}/*"
+          ]
+        ])
       },
       {
         # Write

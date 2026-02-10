@@ -131,10 +131,14 @@ resource "aws_iam_policy" "hub_user_read_policy" {
           "S3:GetObjectAcl",
         ]
         Effect = "Allow"
-        Resource = [
-          "arn:aws:s3:::usgs-landsat",
-          "arn:aws:s3:::usgs-landsat/*",
-        ]
+        Resource = flatten([
+          for bucket in local.read_buckets : [
+            "arn:aws:s3:::${bucket}",
+            "arn:aws:s3:::${bucket}/*",
+            "${var.public_bucket_arn}",
+            "${var.public_bucket_arn}/*"
+          ]
+        ])
       },
       {
         # Statement for requester pays access
@@ -142,7 +146,12 @@ resource "aws_iam_policy" "hub_user_read_policy" {
         Action = [
           "s3:GetBucketRequestPayment"
         ]
-        Resource = "arn:aws:s3:::usgs-landsat"
+        Resource = flatten([
+          for bucket in local.read_buckets : [
+            "arn:aws:s3:::${bucket}",
+            "${var.public_bucket_arn}"
+          ]
+        ])
       }
     ]
   })
