@@ -496,6 +496,130 @@ resource "kubectl_manifest" "karpenter_node_class_data_production" {
   YAML
 }
 
+
+# --- R Series with 16x Large NodePool ---
+resource "kubectl_manifest" "karpenter_node_pool_data_production_r_16xlarge" {
+  depends_on = [kubectl_manifest.karpenter_node_class_data_production]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: data-production-r16xlarge
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            data-production: r16xlarge
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: data-production
+
+          taints:
+            - key: data-production
+              value: r16xlarge
+              effect: NoSchedule
+
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["spot"]
+
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+            - key: karpenter.k8s.aws/instance-family
+              operator: In
+              values: ["r7i", "r6i", "r5"]
+
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["16xlarge"]
+
+      limits:
+        cpu: ${var.data_production_cpu_limit}
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 5m
+        expireAfter: 168h
+
+        budgets:
+          - nodes: "100%"
+  YAML
+}
+
+
+# --- R Series with 12x Large NodePool ---
+resource "kubectl_manifest" "karpenter_node_pool_data_production_r_12xlarge" {
+  depends_on = [kubectl_manifest.karpenter_node_class_data_production]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: data-production-r12xlarge
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            data-production: r12xlarge
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: data-production
+
+          taints:
+            - key: data-production
+              value: r12xlarge
+              effect: NoSchedule
+
+          requirements:
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["spot"]
+
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+            - key: karpenter.k8s.aws/instance-family
+              operator: In
+              values: ["r7i", "r6i", "r5"]
+
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["12xlarge"]
+
+      limits:
+        cpu: ${var.data_production_cpu_limit}
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 5m
+        expireAfter: 168h
+
+        budgets:
+          - nodes: "100%"
+  YAML
+}
+
 # --- R Series with 8x Large NodePool ---
 resource "kubectl_manifest" "karpenter_node_pool_data_production_r_8xlarge" {
   depends_on = [kubectl_manifest.karpenter_node_class_data_production]
