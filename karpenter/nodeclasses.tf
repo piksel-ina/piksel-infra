@@ -364,7 +364,7 @@ resource "kubectl_manifest" "karpenter_node_pool_develop_jupyter_medium" {
           requirements:
             - key: karpenter.sh/capacity-type
               operator: In
-              values: ["spot", "on-demand"]
+              values: ["on-demand"]
 
             - key: kubernetes.io/arch
               operator: In
@@ -425,7 +425,7 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_large" {
           requirements:
             - key: karpenter.sh/capacity-type
               operator: In
-              values: ["spot", "on-demand"]
+              values: ["on-demand"]
 
             - key: kubernetes.io/arch
               operator: In
