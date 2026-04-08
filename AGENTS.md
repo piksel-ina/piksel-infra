@@ -41,6 +41,20 @@ New module or provider added? Run `make init-<env>` first.
 - `*.tfvars` and `*.auto.tfvars` are gitignored. `dev/dev.auto.tfvars` is the one exception.
 - `dev/.secrets/` holds generated SSH keys — also gitignored.
 
+## Cluster Checks (Staging)
+
+Scripts in `scripts/` use variables exported by the Makefile (colors, AWS profile, region, cluster name, etc.).
+
+| Target | What it does |
+|---|---|
+| `make check-context` | Show current kubectl context and cluster info |
+| `make check-ami` | Compare running node AMIs against AWS recommended versions |
+| `make check-versions` | Compare installed addon versions against AWS recommendations |
+| `make check-health` | Check cluster health and pod status |
+| `make check-endpoints` | Auto-discover and test LoadBalancer + Ingress endpoints (parallel) |
+| `make restart-deployments` | Restart all deployments (interactive confirmation) |
+| `make scan-deprecated` | Scan cluster for deprecated Kubernetes APIs using `pluto` |
+
 ## Danger Zones
 
 - **Never run `terraform destroy` in any environment.**
