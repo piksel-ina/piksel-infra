@@ -510,6 +510,56 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_very_large" {
   YAML
 }
 
+# --- Ultra Large Instances NodePool (r7i.8xlarge) ---
+resource "kubectl_manifest" "karpenter_node_pool_jupyter_ultra" {
+  depends_on = [kubectl_manifest.karpenter_node_class_develop_jupyter]
+
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: jupyter-ultra
+      labels:
+        app.kubernetes.io/managed-by: terraform
+    spec:
+      template:
+        metadata:
+          labels:
+            jupyter-profile: ultra
+        spec:
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: dev-jupyter
+          taints:
+            - key: jupyter-profile
+              value: ultra
+              effect: NoSchedule
+          requirements:
+            - key: node.kubernetes.io/instance-type
+              operator: In
+              values: ["r7i.8xlarge"]
+            - key: karpenter.sh/capacity-type
+              operator: In
+              values: ["on-demand"]
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+            - key: kubernetes.io/os
+              operator: In
+              values: ["linux"]
+
+      limits:
+        cpu: ${var.default_nodepool_node_limit}
+
+      disruption:
+        consolidationPolicy: WhenEmpty
+        consolidateAfter: 5m
+        expireAfter: 168h
+        budgets:
+          - nodes: "100%"
+  YAML
+}
 
 ######################################################
 # --- Data Production Nodeclasses ------
