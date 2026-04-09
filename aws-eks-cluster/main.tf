@@ -50,13 +50,7 @@ module "eks" {
       resolve_conflicts        = "OVERWRITE"
       service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
     }
-    amazon-cloudwatch-observability = {
-      addon_version            = var.cloudwatch-obs-version
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.cloudwatch_observability_irsa_role.iam_role_arn
-
-      configuration_values = jsonencode(local.cloudwatch_observability_config)
-  } }
+  }
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids

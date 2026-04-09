@@ -81,6 +81,7 @@ output "s3_public_metadata" {
 # --- Database outputs ---
 output "database_metadata" {
   description = "Output of RDS database configuration and resources"
+  sensitive   = true
 
   value = {
     endpoint         = module.database.db_endpoint
@@ -105,11 +106,11 @@ output "database_metadata" {
 output "grafana_metadata" {
   description = "Output of Grafana configuration and resources"
   value = {
-    namespace               = module.applications.grafana_namespace
-    admin_secret_name       = module.applications.grafana_admin_secret_name
-    values_secret_name      = module.applications.grafana_values_secret_name
-    iam_role_arn            = module.applications.grafana_iam_role_arn
-    cloudwatch_policy_arn   = module.applications.grafana_cloudwatch_policy_arn
+    namespace          = module.applications.grafana_namespace
+    admin_secret_name  = module.applications.grafana_admin_secret_name
+    values_secret_name = module.applications.grafana_values_secret_name
+    iam_role_arn       = module.applications.grafana_iam_role_arn
+
     db_password_secret_arn  = module.applications.grafana_db_password_secret_arn
     oauth_client_secret_arn = module.applications.grafana_oauth_client_secret_arn
   }
