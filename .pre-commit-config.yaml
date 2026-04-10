@@ -14,6 +14,12 @@ repos:
     hooks:
       - id: terraform_fmt
         name: Format Terraform code
+      - id: terraform_validate
+        name: Validate Terraform code
+        args:
+          - --hook-config=--retry-once-with-cleanup=true
+          - --tf-init-args=-upgrade
+        files: ^(staging|dev)/.*\.tf$
       - id: terraform_docs
         name: "Generate Auto-Documentation"
         files: ^(applications|networks|aws-database|external-dns|aws-eks-cluster|aws-s3-bucket|karpenter|secrets-management|staging)/.*\.tf$

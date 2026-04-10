@@ -162,6 +162,8 @@ resource "aws_instance" "this" {
 
   ami           = data.aws_ami.ubuntu.id
   instance_type = each.value.instance_type
+  monitoring    = true
+  ebs_optimized = true
 
   subnet_id = coalesce(
     try(each.value.subnet_id, null),

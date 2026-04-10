@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: "1.14.8"
+  TF_DOCS_VERSION: "v0.19.0"
+
+jobs:
+  fmt:
+    name: Terraform Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive -diff
+
+  validate:
+    name: Validate (${{ matrix.env }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        env: [staging, dev]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Init
+        run: terraform -chdir=${{ matrix.env }} init -backend=false
+
+      - name: Validate
+        run: terraform -chdir=${{ matrix.env }} validate
+
+  docs:
+    name: Terraform Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install terraform-docs
+        uses: jaxxstorm/action-install-gh-release@v2
+        with:
+          repo: terraform-docs/terraform-docs
+          tag: ${{ env.TF_DOCS_VERSION }}
+          cache: enable
+
+      - name: Check docs are up-to-date
+        run: |
+          MODULES=(
+            applications
+            networks
+            aws-database
+            external-dns
+            aws-eks-cluster
+            aws-s3-bucket
+            karpenter
+            secrets-management
+            staging
+          )
+
+          for mod in "${MODULES[@]}"; do
+            if [ -f "$mod/main.tf" ]; then
+              terraform-docs markdown table --output-file README.md --output-mode inject "$mod/"
+            fi
+          done
+
+          if ! git diff --exit-code -- '*.md'; then
+            echo "::error::Terraform docs are out of date. Run 'pre-commit run terraform_docs --all-files' or update READMEs manually."
+            exit 1
+          fi
+
+  checkov:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
+          quiet: true
+          soft_fail: true
+          output_format: cli
+          config_file: .checkov.yml

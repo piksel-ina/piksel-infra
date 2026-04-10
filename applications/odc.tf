@@ -194,6 +194,10 @@ resource "aws_acm_certificate" "ows_cache" {
       Purpose = "ows-cache"
     }
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # --- Create DNS validation records for the certificate ---

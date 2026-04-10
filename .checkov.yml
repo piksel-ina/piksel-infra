@@ -1,0 +1,10 @@
+block-list-secret-scan: []
+
+skip-check:
+  - CKV_TF_1
+  - CKV_AWS_148
+  - CKV_AWS_24
+  - CKV_AWS_260
+  - CKV_AWS_290
+  - CKV_AWS_355
+  - CKV_AWS_382
