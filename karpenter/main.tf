@@ -64,8 +64,9 @@ module "karpenter" {
       actions   = ["ssm:GetParameter"]
     },
     {
-      sid       = "AllowEFSOperations"
-      effect    = "Allow"
+      sid    = "AllowEFSOperations"
+      effect = "Allow"
+      #checkov:skip=CKV_AWS_288:TODO — scope resources to specific EFS ARN instead of "*"
       resources = ["*"]
       actions = [
         "elasticfilesystem:DescribeFileSystems",

@@ -28,6 +28,8 @@ resource "random_password" "stac_write" {
 }
 
 resource "aws_secretsmanager_secret" "stac_write_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name        = "stac-write-password"
   description = "Password for STAC database connection - Write"
 
@@ -47,6 +49,8 @@ resource "random_password" "stac_read" {
 }
 
 resource "aws_secretsmanager_secret" "stacread_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name        = "stac-read-password"
   description = "Password for STAC database connection - Read"
 

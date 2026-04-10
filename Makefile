@@ -1,4 +1,4 @@
-.PHONY: help pre-commit fmt
+.PHONY: help pre-commit fmt checkov
 
 # Colors
 RED    := \033[0;31m
@@ -41,7 +41,7 @@ help: ## Show this help message
 	@echo 'Usage: make <target>'
 	@echo ''
 	@echo '\033[1mGeneral\033[0m'
-	@grep -E '^(pre-commit|fmt):.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
+	@grep -E '^(pre-commit|fmt|checkov):.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
 	@echo ''
 	@echo '\033[1mStaging\033[0m'
 	@grep -E '^[a-z]+-staging:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
@@ -58,6 +58,9 @@ pre-commit: ## Run pre-commit hooks
 
 fmt: ## Format Terraform files
 	terraform fmt -recursive
+
+checkov: ## Run Checkov security scan
+	checkov --directory . --config-file .checkov.yml --compact
 
 # ============================================
 # STAGING

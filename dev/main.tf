@@ -1,5 +1,6 @@
 # --- Default VPC + default subnets ---
 resource "aws_default_vpc" "default" {
+  #checkov:skip=CKV_AWS_148:Dev environment uses default VPC intentionally. Isolated AWS account limits blast radius.
   tags = merge(var.tags, {
     Name = "${var.name_prefix}-default-vpc"
   })
@@ -80,6 +81,9 @@ resource "local_file" "private_key_pem" {
 
 # --- Security group: allow SSH ---
 resource "aws_security_group" "ssh" {
+  #checkov:skip=CKV_AWS_24:Dev env needs SSH access for Docker testing. Future: migrate to SSM Session Manager.
+  #checkov:skip=CKV_AWS_260:Dev env needs HTTP/HTTPS open for testing containerized workloads.
+  #checkov:skip=CKV_AWS_382:Standard unrestricted egress required for OS updates, package installs, and API calls.
   name_prefix = "${var.name_prefix}-ssh-"
   description = "Allow SSH inbound"
   vpc_id      = aws_default_vpc.default.id
@@ -158,6 +162,7 @@ resource "aws_security_group" "ssh" {
 
 # --- EC2 instances ---
 resource "aws_instance" "this" {
+  #checkov:skip=CKV2_AWS_41:Dev instances are SSH-only for Docker testing. No AWS API access needed from instance.
   for_each = var.instances
 
   ami           = data.aws_ami.ubuntu.id
@@ -222,6 +227,8 @@ resource "aws_iam_role" "eventbridge_ssm_automation" {
 }
 
 resource "aws_iam_role_policy" "eventbridge_start_automation" {
+  #checkov:skip=CKV_AWS_290:Dev-only auto-stop. ssm:StartAutomationExecution needs wildcard to target any SSM document.
+  #checkov:skip=CKV_AWS_355:Resource="*" required for SSM automation execution. Scoped to single action.
   name = "${var.name_prefix}-eventbridge-start-automation"
   role = aws_iam_role.eventbridge_ssm_automation.id
 
@@ -238,6 +245,8 @@ resource "aws_iam_role_policy" "eventbridge_start_automation" {
 }
 
 resource "aws_iam_role_policy" "automation_stop_instances" {
+  #checkov:skip=CKV_AWS_290:Dev-only auto-stop. ec2:StopInstances needs wildcard to target any instance by ID.
+  #checkov:skip=CKV_AWS_355:Resource="*" required for EC2 stop operations. Scoped to ec2:DescribeInstances and ec2:StopInstances only.
   name = "${var.name_prefix}-automation-stop-instances"
   role = aws_iam_role.eventbridge_ssm_automation.id
 

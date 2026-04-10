@@ -68,6 +68,7 @@ module "vpc" {
 }
 
 resource "aws_subnet" "public_large" {
+  #checkov:skip=CKV_AWS_130:Explicitly public subnets for ALB/ELB. Public IP assignment is required.
   count                   = local.az_count
   vpc_id                  = module.vpc.vpc_id
   cidr_block              = cidrsubnet(local.cidr, 6, count.index + 4) # /22 = 1024 IPs

@@ -93,3 +93,15 @@ variable "public_bucket_arn" {
   description = "ARN of the public S3 bucket for Argo workflow outputs"
   type        = string
 }
+
+variable "waf_log_retention_days" {
+  description = "Number of days to retain WAF logs in CloudWatch"
+  type        = number
+  default     = 365
+}
+
+variable "lifecycle_expiration_days" {
+  description = "Number of days before S3 objects expire. Override per environment (e.g. staging=60)"
+  type        = number
+  default     = 365
+}

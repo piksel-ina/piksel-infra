@@ -18,9 +18,10 @@ module "networks" {
 module "s3_bucket" {
   source = "../aws-s3-bucket"
 
-  project      = var.project
-  environment  = var.environment
-  default_tags = var.default_tags
+  project                   = var.project
+  environment               = var.environment
+  default_tags              = var.default_tags
+  lifecycle_expiration_days = 90
 }
 
 module "database" {
@@ -110,4 +111,6 @@ module "applications" {
     "copernicus-dem-30m",
     "e84-earth-search-sentinel-data"
   ]
+  waf_log_retention_days    = 30
+  lifecycle_expiration_days = 60
 }

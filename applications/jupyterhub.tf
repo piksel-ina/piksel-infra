@@ -30,6 +30,8 @@ resource "random_password" "jupyterhub_random_string" {
 }
 
 resource "aws_secretsmanager_secret" "jupyterhub_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name = "jupyterhub-password"
 }
 
@@ -116,6 +118,7 @@ resource "kubernetes_secret" "jupyterhub" {
 # --- Enable Data Access to Landsat with IRSA---
 # --- S3 read policy to access Landsat data ---
 resource "aws_iam_policy" "hub_user_read_policy" {
+  #checkov:skip=CKV_AWS_288:Read-only S3 policy. s3:GetObject scoped to known external Landsat/public buckets only.
   name        = "jupyterhub-user-read-policy"
   description = "IAM policy for JupyterHub users to read USGS Landsat data"
 

@@ -5,12 +5,32 @@ locals {
 
 # --- S3 Bucket for TerriaMap sharing ---
 resource "aws_s3_bucket" "terria_bucket" {
+  #checkov:skip=CKV2_AWS_6:No public access block needed. Bucket is private, access controlled via IAM/IRSA only.
+  #checkov:skip=CKV_AWS_18:Access logging to be implemented (TODO).
+  #checkov:skip=CKV_AWS_21:No versioning. Data is reproducible map sharing content.
+  #checkov:skip=CKV_AWS_144:No cross-region replication. Not urgent, future reconsider for compliance.
+  #checkov:skip=CKV_AWS_145:SSE-S3 encryption sufficient. CMK to be considered for future compliance.
+  #checkov:skip=CKV2_AWS_62:No event notifications needed. No downstream consumers.
   bucket = "${local.prefix}-terria-bucket"
   tags   = local.tags
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "terria" {
+  bucket = aws_s3_bucket.terria_bucket.id
 
-# --- Kubernetes Namespace ---
+  rule {
+    id     = "expire-old-data"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    expiration {
+      days = var.lifecycle_expiration_days
+    }
+  }
+} # --- Kubernetes Namespace ---
 resource "kubernetes_namespace" "terria" {
   metadata {
     name = local.terria_namespace

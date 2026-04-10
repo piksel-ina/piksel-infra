@@ -15,6 +15,8 @@ resource "random_password" "db_random_string" {
 
 # --- Creates a secret in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "db_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name        = "database-password"
   description = "Password to access database"
 

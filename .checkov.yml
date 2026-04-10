@@ -1,10 +1,6 @@
 block-list-secret-scan: []
 
 skip-check:
+  # CKV_TF_1: Ensure Terraform module sources use a commit hash.
+  # KEEP GLOBAL: All modules use local source = "../module" — commit hash check is N/A.
   - CKV_TF_1
-  - CKV_AWS_148
-  - CKV_AWS_24
-  - CKV_AWS_260
-  - CKV_AWS_290
-  - CKV_AWS_355
-  - CKV_AWS_382

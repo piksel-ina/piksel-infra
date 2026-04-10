@@ -33,6 +33,8 @@ resource "random_password" "grafana_random_string" {
 
 # --- Store database password in AWS Secrets Manager ---
 resource "aws_secretsmanager_secret" "grafana_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name        = "grafana-db-password"
   description = "Password for Grafana database connection"
 
@@ -103,6 +105,7 @@ resource "aws_iam_role" "grafana" {
 
 # --- Policy statement: cloudWatch read permissions ---
 data "aws_iam_policy_document" "grafana_cloudwatch" {
+  #checkov:skip=CKV_AWS_356:CloudWatch/Logs/EC2 read actions require Resource="*". TODO: scope to specific resources when defined.
   statement {
     effect = "Allow"
     actions = [
@@ -144,6 +147,7 @@ data "aws_iam_policy_document" "grafana_cloudwatch" {
 
 # --- Create Policy ---
 resource "aws_iam_policy" "grafana_cloudwatch" {
+  #checkov:skip=CKV_AWS_355:CloudWatch/Logs/EC2 read actions require Resource="*". TODO: scope to specific resources when defined.
   name        = "${local.eks_cluster}-grafana-cloudwatch-policy"
   description = "CloudWatch access for Grafana"
   policy      = data.aws_iam_policy_document.grafana_cloudwatch.json

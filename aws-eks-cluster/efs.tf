@@ -21,7 +21,9 @@ module "efs_csi_irsa_role" {
 
 # --- Security group for EFS ---
 resource "aws_security_group" "efs" {
+  #checkov:skip=CKV_AWS_382:Standard unrestricted egress for EFS. NFS mount requires outbound connectivity.
   name_prefix = "${local.cluster}-efs-"
+  description = "Security group for EFS file system access from EKS cluster"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -33,10 +35,15 @@ resource "aws_security_group" "efs" {
   }
 
   egress {
+    description = "Allow all outbound traffic from EFS"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 
   tags = merge(local.tags, {
@@ -46,8 +53,10 @@ resource "aws_security_group" "efs" {
 
 # --- EFS File System ---
 resource "aws_efs_file_system" "data" {
+  #checkov:skip=CKV_AWS_184:Uses AWS-managed encryption (encrypted=true). CMK to be considered for future compliance.
   creation_token   = "${local.cluster}-efs"
-  performance_mode = "generalPurpose" # or "maxIO" for high throughput
+  encrypted        = true
+  performance_mode = "generalPurpose"
 
   throughput_mode = "bursting" # or "elastic"/"provisioned"
   # provisioned_throughput_in_mibps = 100 # Uncomment and set if using "provisioned"

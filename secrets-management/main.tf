@@ -20,6 +20,8 @@ locals {
 # Slack webhook secrets
 resource "aws_secretsmanager_secret" "slack_secrets" {
   for_each = var.slack_secrets
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
 
   name        = "${each.key}-${local.environment}"
   description = each.value.description
@@ -43,6 +45,8 @@ resource "aws_secretsmanager_secret_version" "slack_secrets" {
 # OAuth client secrets (format: client_id:client_secret)
 resource "aws_secretsmanager_secret" "oauth_secrets" {
   for_each = var.oauth_secrets
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
 
   name        = "${each.key}-${local.environment}"
   description = each.value.description

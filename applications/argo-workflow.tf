@@ -26,6 +26,8 @@ resource "random_password" "argo_random_string" {
 }
 
 resource "aws_secretsmanager_secret" "argo_password" {
+  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
+  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
   name        = "argo-workflows-password"
   description = "Password for Argo Workflow server"
 
@@ -58,8 +60,31 @@ resource "kubernetes_secret" "argo_server_sso" {
 
 # --- Create a bucket, user and access keys for Argo's artifact storage ---
 resource "aws_s3_bucket" "argo" {
+  #checkov:skip=CKV2_AWS_6:No public access block needed. Bucket is private, access controlled via IAM/IRSA only.
+  #checkov:skip=CKV_AWS_18:Access logging to be implemented (TODO).
+  #checkov:skip=CKV_AWS_21:No versioning. Artifacts are reproducible outputs from workflows.
+  #checkov:skip=CKV_AWS_144:No cross-region replication. Not urgent, future reconsider for compliance.
+  #checkov:skip=CKV_AWS_145:SSE-S3 encryption sufficient. CMK to be considered for future compliance.
+  #checkov:skip=CKV2_AWS_62:No event notifications needed. No downstream consumers.
   bucket = "${local.prefix}-argo-artifacts-dep"
   tags   = local.tags
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "argo" {
+  bucket = aws_s3_bucket.argo.id
+
+  rule {
+    id     = "expire-artifacts"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    expiration {
+      days = var.lifecycle_expiration_days
+    }
+  }
 }
 
 # --- IAM Policy for Read/Write ---
