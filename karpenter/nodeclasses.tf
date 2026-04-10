@@ -536,9 +536,12 @@ resource "kubectl_manifest" "karpenter_node_pool_jupyter_ultra" {
               value: ultra
               effect: NoSchedule
           requirements:
-            - key: node.kubernetes.io/instance-type
+            - key: karpenter.k8s.aws/instance-family
               operator: In
-              values: ["r7i.8xlarge"]
+              values: ["r7i", "r6i", "r5"]
+            - key: karpenter.k8s.aws/instance-size
+              operator: In
+              values: ["8xlarge"]
             - key: karpenter.sh/capacity-type
               operator: In
               values: ["on-demand"]

@@ -4,7 +4,7 @@
 
 | Component | Version |
 |---|---|
-| EKS Control Plane | 1.33 (standard support until Jul 29, 2026) |
+| EKS Control Plane | 1.34 (standard support until Dec 2, 2026) |
 | Terraform AWS Provider | >= 6.0, < 7.0 (resolves to v6.40.0) |
 | terraform-aws-modules/eks/aws | ~> 21.0 |
 | Karpenter Helm Chart | 1.8.2 |
@@ -27,7 +27,7 @@
 |---|---|---|---|---|
 | **Phase 0** | AWS Provider v6 + EKS Module v21 upgrade | HIGH - breaking changes across all modules | 2-3 days | **DONE** |
 | **Phase 1** | EKS version 1.32 → 1.33 | MEDIUM - API deprecations, addon versions | 1 day | **DONE** |
-| **Phase 2** | EKS version 1.33 → 1.34 | LOW - fewer changes from 1.33 | 0.5 day | Pending |
+| **Phase 2** | EKS version 1.33 → 1.34 | LOW - fewer changes from 1.33 | 0.5 day | **DONE** |
 
 ## Urgency
 
@@ -90,13 +90,26 @@ completed before then to avoid extended support charges.
 - 12 Karpenter nodes on v1.33.8, 10 managed nodes still on v1.32.3 (drift replacement in progress)
 - State backed up after apply
 
+## Phase 2 Completion Notes
+
+- **Completed**: April 10, 2026
+- EKS control plane upgraded from 1.33 → 1.34 (in-place update)
+- Only kube-proxy changed: v1.33.10 → v1.34.6 (coredns, vpc-cni, ebs-csi unchanged — same versions compatible)
+- GPU AMI updated to `amazon-eks-node-al2023-x86_64-nvidia-1.34-v20260403`
+- AMI alias `al2023@v20260403` unchanged (resolves correctly for 1.34)
+- kubectl upgraded to v1.34.0
+- Plan showed 1 add, 6 change, 1 destroy (time_sleep recreation — expected)
+- No `forces replacement` on any critical resource
+- All addons match recommended versions after upgrade
+- Nodes converging: Karpenter nodes on v1.34.4, old nodes draining via drift
+
 ## Kubernetes Version Timeline (from AWS)
 
 | Version | EKS Release | End Standard Support | End Extended Support |
 |---|---|---|---|
 | 1.32 | Jan 23, 2025 | Mar 23, 2026 | Mar 23, 2027 |
-| 1.33 (current) | May 29, 2025 | Jul 29, 2026 | Jul 29, 2027 |
-| 1.34 (Phase 2) | Oct 2, 2025 | Dec 2, 2026 | Dec 2, 2027 |
+| 1.33 | May 29, 2025 | Jul 29, 2026 | Jul 29, 2027 |
+| 1.34 (current) | Oct 2, 2025 | Dec 2, 2026 | Dec 2, 2027 |
 | 1.35 (latest) | Jan 27, 2026 | Mar 27, 2027 | Mar 27, 2028 |
 
 ## Kubernetes Changelog Summary

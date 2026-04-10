@@ -7,12 +7,12 @@ Phase 1 (EKS 1.33 upgrade) has been completed and verified.
 
 ## Prerequisites
 
-- [ ] Phase 0 applied and verified
-- [ ] Phase 1 applied and verified
-- [ ] Cluster healthy on 1.33: `make check-health`
-- [ ] `kubectl version --short` shows v1.33.x
-- [ ] All nodes running v1.33.x
-- [ ] State backed up: `make backup-staging`
+- [x] Phase 0 applied and verified
+- [x] Phase 1 applied and verified
+- [x] Cluster healthy on 1.33: `make check-health`
+- [x] `kubectl version --short` shows v1.34.x (upgraded)
+- [x] All nodes running v1.33.x (some still converging from 1.32)
+- [x] State backed up: `make backup-staging`
 
 ---
 

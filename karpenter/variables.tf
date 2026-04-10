@@ -24,7 +24,7 @@ variable "default_nodepool_ami_alias" {
 variable "gpu_nodepool_ami" {
   description = "AMI for GPU node pools"
   type        = string
-  default     = "amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403"
+  default     = "amazon-eks-node-al2023-x86_64-nvidia-1.34-v20260403"
 }
 
 variable "default_nodepool_node_limit" {

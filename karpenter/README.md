@@ -119,7 +119,7 @@ This configuration will create and manage the following key resources:
 | <a name="input_default_nodepool_ami_alias"></a> [default\_nodepool\_ami\_alias](#input\_default\_nodepool\_ami\_alias) | AMI alias for default node pools | `string` | `"al2023@v20260403"` | no |
 | <a name="input_default_nodepool_node_limit"></a> [default\_nodepool\_node\_limit](#input\_default\_nodepool\_node\_limit) | Default node limit for node pools | `number` | `10000` | no |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | value | `map` | `{}` | no |
-| <a name="input_gpu_nodepool_ami"></a> [gpu\_nodepool\_ami](#input\_gpu\_nodepool\_ami) | AMI for GPU node pools | `string` | `"amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403"` | no |
+| <a name="input_gpu_nodepool_ami"></a> [gpu\_nodepool\_ami](#input\_gpu\_nodepool\_ami) | AMI for GPU node pools | `string` | `"amazon-eks-node-al2023-x86_64-nvidia-1.34-v20260403"` | no |
 | <a name="input_gpu_nodepool_node_limit"></a> [gpu\_nodepool\_node\_limit](#input\_gpu\_nodepool\_node\_limit) | Default GPU node limit for GPU node pools | `number` | `20` | no |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | value | `any` | n/a | yes |
 
