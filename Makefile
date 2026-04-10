@@ -10,7 +10,7 @@ BOLD   := \033[1m
 NC     := \033[0m
 
 # Cluster defaults
-EKS_VERSION   ?= 1.32
+EKS_VERSION   ?= 1.33
 ARCHITECTURE  ?= x86_64
 AWS_REGION    ?= ap-southeast-3
 

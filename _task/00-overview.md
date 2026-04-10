@@ -4,7 +4,7 @@
 
 | Component | Version |
 |---|---|
-| EKS Control Plane | 1.32 (extended support since Mar 23, 2026) |
+| EKS Control Plane | 1.33 (standard support until Jul 29, 2026) |
 | Terraform AWS Provider | >= 6.0, < 7.0 (resolves to v6.40.0) |
 | terraform-aws-modules/eks/aws | ~> 21.0 |
 | Karpenter Helm Chart | 1.8.2 |
@@ -26,14 +26,13 @@
 | Phase | What | Risk | Est. Effort | Status |
 |---|---|---|---|---|
 | **Phase 0** | AWS Provider v6 + EKS Module v21 upgrade | HIGH - breaking changes across all modules | 2-3 days | **DONE** |
-| **Phase 1** | EKS version 1.32 → 1.33 | MEDIUM - API deprecations, addon versions | 1 day | Pending |
+| **Phase 1** | EKS version 1.32 → 1.33 | MEDIUM - API deprecations, addon versions | 1 day | **DONE** |
 | **Phase 2** | EKS version 1.33 → 1.34 | LOW - fewer changes from 1.33 | 0.5 day | Pending |
 
 ## Urgency
 
-EKS 1.32 entered **extended support on March 23, 2026** — you are currently incurring
-extended support charges ($0.10/cluster/hour). Standard support ends; extended support
-runs until March 23, 2027.
+EKS 1.33 is in **standard support until July 29, 2026**. Phase 2 (→ 1.34) should be
+completed before then to avoid extended support charges.
 
 ## Key Risks
 
@@ -75,12 +74,28 @@ runs until March 23, 2027.
 7. Karpenter Helm chart defaults `automountServiceAccountToken: false` — must set to `true` for Pod Identity
 8. `eks-pod-identity-agent` addon was not pre-installed — required for Pod Identity to function
 
+## Phase 1 Completion Notes
+
+- **Completed**: April 10, 2026
+- EKS control plane upgraded from 1.32 → 1.33 (in-place update)
+- Addon versions updated: kube-proxy v1.33.10, coredns v1.13.2, vpc-cni v1.21.1, ebs-csi v1.57.1
+- Pod Identity Agent unchanged at v1.3.10-eksbuild.2 (still latest compatible)
+- GPU AMI updated to `amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403`
+- AMI alias updated from `al2023@v20250505` to `al2023@v20260403` across all non-GPU nodeclasses
+- Note: GPU AMI SSM path changed from `/amd64/` to `/x86_64/` for 1.33+
+- Plan showed 1 add, 13 change, 1 destroy (time_sleep recreation — expected)
+- No `forces replacement` on any critical resource
+- All addons match recommended versions
+- Karpenter pods healthy, all nodeclasses ready
+- 12 Karpenter nodes on v1.33.8, 10 managed nodes still on v1.32.3 (drift replacement in progress)
+- State backed up after apply
+
 ## Kubernetes Version Timeline (from AWS)
 
 | Version | EKS Release | End Standard Support | End Extended Support |
 |---|---|---|---|
-| 1.32 (current) | Jan 23, 2025 | Mar 23, 2026 | Mar 23, 2027 |
-| 1.33 (Phase 1) | May 29, 2025 | Jul 29, 2026 | Jul 29, 2027 |
+| 1.32 | Jan 23, 2025 | Mar 23, 2026 | Mar 23, 2027 |
+| 1.33 (current) | May 29, 2025 | Jul 29, 2026 | Jul 29, 2027 |
 | 1.34 (Phase 2) | Oct 2, 2025 | Dec 2, 2026 | Dec 2, 2027 |
 | 1.35 (latest) | Jan 27, 2026 | Mar 27, 2027 | Mar 27, 2028 |
 

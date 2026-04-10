@@ -1,5 +1,20 @@
 # Phase 1: EKS Version Upgrade 1.32 → 1.33
 
+## COMPLETED — April 10, 2026
+
+All steps applied and verified. Control plane on 1.33, all addons matching recommended versions.
+
+### What Was Done
+
+- EKS version changed from 1.32 → 1.33 in `staging/main.tf`
+- Addon versions updated: kube-proxy v1.33.10-eksbuild.2, coredns v1.13.2-eksbuild.4, vpc-cni v1.21.1-eksbuild.7, ebs-csi v1.57.1-eksbuild.1
+- GPU AMI updated to `amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403`
+- AMI alias updated from `al2023@v20250505` to `al2023@v20260403`
+- Makefile EKS_VERSION updated to 1.33
+- State backed up after apply
+
+---
+
 ## Objective
 
 Upgrade the EKS control plane from Kubernetes 1.32 to 1.33. This phase assumes

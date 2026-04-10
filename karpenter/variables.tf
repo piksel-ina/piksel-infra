@@ -18,13 +18,13 @@ variable "default_tags" {
 variable "default_nodepool_ami_alias" {
   description = "AMI alias for default node pools"
   type        = string
-  default     = "al2023@v20250505"
+  default     = "al2023@v20260403"
 }
 
 variable "gpu_nodepool_ami" {
   description = "AMI for GPU node pools"
   type        = string
-  default     = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+  default     = "amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403"
 }
 
 variable "default_nodepool_node_limit" {

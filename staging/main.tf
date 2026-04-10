@@ -47,11 +47,11 @@ module "eks-cluster" {
   vpc_id               = module.networks.vpc_id
   vpc_cidr_block       = module.networks.vpc_cidr_block
   private_subnets_ids  = module.networks.private_subnets
-  eks-version          = "1.32"
-  coredns-version      = "v1.11.4-eksbuild.2"
-  vpc-cni-version      = "v1.19.2-eksbuild.1"
-  kube-proxy-version   = "v1.32.0-eksbuild.2"
-  ebs-csi-version      = "v1.46.0-eksbuild.1"
+  eks-version          = "1.33"
+  coredns-version      = "v1.13.2-eksbuild.4"
+  vpc-cni-version      = "v1.21.1-eksbuild.7"
+  kube-proxy-version   = "v1.33.10-eksbuild.2"
+  ebs-csi-version      = "v1.57.1-eksbuild.1"
   pod-identity-version = "v1.3.10-eksbuild.2"
   sso-admin-role-arn   = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
   efs_backup_enabled   = false
@@ -78,10 +78,10 @@ module "karpenter" {
   cluster_name                = local.cluster_name
   oidc_provider_arn           = module.eks-cluster.cluster_oidc_provider_arn
   cluster_endpoint            = module.eks-cluster.cluster_endpoint
-  default_nodepool_ami_alias  = "al2023@v20250505"
+  default_nodepool_ami_alias  = "al2023@v20260403"
   default_nodepool_node_limit = 10000
   data_production_cpu_limit   = 450
-  gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.32-v20250505"
+  gpu_nodepool_ami            = "amazon-eks-node-al2023-x86_64-nvidia-1.33-v20260403"
   gpu_nodepool_node_limit     = 20
   default_tags                = var.default_tags
 }
