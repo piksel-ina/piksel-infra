@@ -10,14 +10,14 @@ data "aws_eks_cluster_auth" "this" {
 # --- Create Cluster ---
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.33"
+  version = "~> 21.0"
 
-  cluster_name                   = local.cluster
-  cluster_version                = var.eks-version
-  cluster_endpoint_public_access = true
+  name                   = local.cluster
+  kubernetes_version     = var.eks-version
+  endpoint_public_access = true
 
   # EKS Addons
-  cluster_addons = {
+  addons = {
     coredns = {
       addon_version = var.coredns-version
       configuration_values = jsonencode({
@@ -46,38 +46,28 @@ module "eks" {
       service_account_role_arn = module.vpc_cni_irsa_role.iam_role_arn
     }
     aws-ebs-csi-driver = {
-      addon_version            = var.ebs-csi-version
-      resolve_conflicts        = "OVERWRITE"
-      service_account_role_arn = module.ebs_csi_irsa_role.iam_role_arn
+      addon_version               = var.ebs-csi-version
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
+      service_account_role_arn    = module.ebs_csi_irsa_role.iam_role_arn
+    }
+    eks-pod-identity-agent = {
+      addon_version               = var.pod-identity-version
+      resolve_conflicts_on_create = "OVERWRITE"
+      resolve_conflicts_on_update = "OVERWRITE"
     }
   }
 
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnets_ids
 
-  cluster_enabled_log_types = ["api", "authenticator", "controllerManager", "scheduler"]
+  enabled_log_types = ["api", "authenticator", "controllerManager", "scheduler"]
 
   # --- EKS Managed Node Groups ---
-  eks_managed_node_group_defaults = {
-    iam_role_attach_cni_policy = true
-    ami_type                   = "AL2023_x86_64_STANDARD"
-    disk_size                  = 20
-    disk_type                  = "gp3"
-
-    iam_role_additional_policies = {
-      AssumeECRRole                      = aws_iam_policy.assume_ecr_role.arn
-      AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-    }
-
-    tags = merge(local.tags, {
-      NodeGroup = "System"
-    })
-  }
-
   eks_managed_node_groups = {
     # 1 On-Demand for system reliability
-    system = {
-      name = "system-v3-1"
+    systems = {
+      name = "system-v1"
 
       min_size     = 1
       max_size     = 2
@@ -85,23 +75,35 @@ module "eks" {
 
       capacity_type  = "ON_DEMAND"
       instance_types = ["t3.large"]
+      ami_type       = "AL2023_x86_64_STANDARD"
+      disk_size      = 20
+
+      iam_role_attach_cni_policy = true
+      iam_role_additional_policies = {
+        AssumeECRRole                      = aws_iam_policy.assume_ecr_role.arn
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      }
 
       labels = {
         "karpenter.sh/controller" = "true"
       }
 
-      taints = [
-        {
+      taints = {
+        CriticalAddonsOnly = {
           key    = "CriticalAddonsOnly"
           value  = "true"
           effect = "NO_SCHEDULE"
         }
-      ]
+      }
+
+      tags = merge(local.tags, {
+        NodeGroup = "System"
+      })
     }
 
     # Spot node group for cost savings
-    system-spot = {
-      name = "system-spot-v3"
+    system-spots = {
+      name = "system-spot-v1"
 
       min_size     = 1
       max_size     = 4
@@ -109,18 +111,30 @@ module "eks" {
 
       capacity_type  = "SPOT"
       instance_types = ["t3.medium", "t3.large", "c5.large", "c5d.large", "m5.large", "m5d.large"]
+      ami_type       = "AL2023_x86_64_STANDARD"
+      disk_size      = 20
+
+      iam_role_attach_cni_policy = true
+      iam_role_additional_policies = {
+        AssumeECRRole                      = aws_iam_policy.assume_ecr_role.arn
+        AmazonEC2ContainerRegistryReadOnly = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      }
 
       labels = {
         "karpenter.sh/controller" = "true"
       }
 
-      taints = [
-        {
+      taints = {
+        CriticalAddonsOnly = {
           key    = "CriticalAddonsOnly"
           value  = "true"
           effect = "NO_SCHEDULE"
         }
-      ]
+      }
+
+      tags = merge(local.tags, {
+        NodeGroup = "System"
+      })
     }
   }
 

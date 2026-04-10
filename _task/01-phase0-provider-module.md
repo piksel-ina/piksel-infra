@@ -1,5 +1,24 @@
 # Phase 0: AWS Provider v6 + EKS Module v21 Upgrade
 
+## COMPLETED — April 10, 2026
+
+All steps applied and verified. Terraform plan shows `No changes`.
+
+### What Was Done
+
+- AWS Provider upgraded to `>= 6.0, < 7.0` (resolves to v6.40.0)
+- EKS Module upgraded to `~> 21.0` — all `cluster_*` prefixes stripped, variable renames applied
+- Karpenter Module upgraded to `~> 21.0` — migrated from IRSA to Pod Identity
+- `eks-pod-identity-agent` addon added to Terraform (`v1.3.10-eksbuild.2`)
+- Node group defaults inlined (v21 removed `eks_managed_node_group_defaults`)
+- IMDS hop limit explicitly set to 2
+- `enable_inline_policy = true` on Karpenter controller (6,144 char policy limit)
+- State imported for pre-existing `eks-pod-identity-agent` addon
+- `AmazonEKSVPCResourceController` policy attachment removed by v21 (merged into ClusterPolicy)
+- State backed up after apply
+
+---
+
 ## Objective
 
 Upgrade the Terraform AWS provider from v5.95 to v6.x and the EKS Terraform module

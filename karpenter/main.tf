@@ -17,12 +17,11 @@ locals {
 # --- Karpenter (magic autoscaler) ---
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 20.33"
+  version = "~> 21.0"
 
-  enable_irsa            = true
-  cluster_name           = local.cluster
-  irsa_oidc_provider_arn = local.oidc_provider
-
+  cluster_name         = local.cluster
+  namespace            = "karpenter"
+  enable_inline_policy = true
 
   # Node IAM role policies (for EC2 instances)
   node_iam_role_additional_policies = {
@@ -50,11 +49,13 @@ module "karpenter" {
         "ec2:DescribeSpotPriceHistory",
         "ec2:DescribeSubnets"
       ]
-      condition = {
-        StringEquals = {
-          "aws:RequestedRegion" = "ap-southeast-3"
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:RequestedRegion"
+          values   = ["ap-southeast-3"]
         }
-      }
+      ]
     },
     {
       sid       = "CustomAllowSSMReadActions"
@@ -75,11 +76,13 @@ module "karpenter" {
         "elasticfilesystem:ClientRootAccess",
         "elasticfilesystem:ClientWrite"
       ]
-      condition = {
-        StringEquals = {
-          "aws:RequestedRegion" = "ap-southeast-3"
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "aws:RequestedRegion"
+          values   = ["ap-southeast-3"]
         }
-      }
+      ]
     }
   ]
 
@@ -128,7 +131,6 @@ resource "helm_release" "karpenter" {
   chart            = "karpenter"
   description      = "Karpenter autoscaler for EKS cluster"
 
-  # Ensure Helm waits for all resources including CRDs
   wait            = true
   wait_for_jobs   = true
   timeout         = 300
@@ -140,9 +142,6 @@ resource "helm_release" "karpenter" {
       clusterName: ${local.cluster}
       clusterEndpoint: ${local.cluster_endpoint}
       interruptionQueue: ${module.karpenter.queue_name}
-    serviceAccount:
-      annotations:
-        eks.amazonaws.com/role-arn: ${module.karpenter.iam_role_arn}
     controller:
       resources:
         requests:
@@ -151,6 +150,8 @@ resource "helm_release" "karpenter" {
         limits:
           cpu: 1
           memory: 2Gi
+    serviceAccount:
+      automountServiceAccountToken: true
     nodeSelector:
       karpenter.sh/controller: "true"
     tolerations:

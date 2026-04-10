@@ -57,6 +57,11 @@ variable "ebs-csi-version" {
   description = "The version of EBS CSI driver"
 }
 
+variable "pod-identity-version" {
+  type        = string
+  description = "The version of EKS Pod Identity Agent addon"
+}
+
 
 variable "account_id" {
   description = "AWS account ID"

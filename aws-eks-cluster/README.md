@@ -82,7 +82,7 @@ No requirements.
 |------|--------|---------|
 | <a name="module_ebs_csi_irsa_role"></a> [ebs\_csi\_irsa\_role](#module\_ebs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 | <a name="module_efs_csi_irsa_role"></a> [efs\_csi\_irsa\_role](#module\_efs\_csi\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
-| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 20.33 |
+| <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 21.0 |
 | <a name="module_vpc_cni_irsa_role"></a> [vpc\_cni\_irsa\_role](#module\_vpc\_cni\_irsa\_role) | terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks | 5.55.0 |
 
 ## Resources
@@ -109,6 +109,7 @@ No requirements.
 | <a name="input_efs_backup_enabled"></a> [efs\_backup\_enabled](#input\_efs\_backup\_enabled) | Enable EFS backup policy | `bool` | `false` | no |
 | <a name="input_eks-version"></a> [eks-version](#input\_eks-version) | The version of Kubernetes for this environment | `string` | n/a | yes |
 | <a name="input_kube-proxy-version"></a> [kube-proxy-version](#input\_kube-proxy-version) | The version of kube-proxy for this environment | `string` | n/a | yes |
+| <a name="input_pod-identity-version"></a> [pod-identity-version](#input\_pod-identity-version) | The version of EKS Pod Identity Agent addon | `string` | n/a | yes |
 | <a name="input_private_subnets_ids"></a> [private\_subnets\_ids](#input\_private\_subnets\_ids) | List of private subnets ID | `list(string)` | n/a | yes |
 | <a name="input_sso-admin-role-arn"></a> [sso-admin-role-arn](#input\_sso-admin-role-arn) | The ARN of SSO Admin group | `string` | n/a | yes |
 | <a name="input_vpc-cni-version"></a> [vpc-cni-version](#input\_vpc-cni-version) | The version of VPC CNI for this environment | `string` | n/a | yes |

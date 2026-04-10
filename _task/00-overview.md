@@ -5,10 +5,11 @@
 | Component | Version |
 |---|---|
 | EKS Control Plane | 1.32 (extended support since Mar 23, 2026) |
-| Terraform AWS Provider | = 5.95 |
-| terraform-aws-modules/eks/aws | ~> 20.33 |
+| Terraform AWS Provider | >= 6.0, < 7.0 (resolves to v6.40.0) |
+| terraform-aws-modules/eks/aws | ~> 21.0 |
 | Karpenter Helm Chart | 1.8.2 |
-| Karpenter Module | ~> 20.33 |
+| Karpenter Module | ~> 21.0 (Pod Identity) |
+| EKS Pod Identity Agent addon | v1.3.10-eksbuild.2 |
 
 ## Target State
 
@@ -22,11 +23,11 @@
 
 ## Execution Phases
 
-| Phase | What | Risk | Est. Effort |
-|---|---|---|---|
-| **Phase 0** | AWS Provider v6 + EKS Module v21 upgrade | HIGH - breaking changes across all modules | 2-3 days |
-| **Phase 1** | EKS version 1.32 → 1.33 | MEDIUM - API deprecations, addon versions | 1 day |
-| **Phase 2** | EKS version 1.33 → 1.34 | LOW - fewer changes from 1.33 | 0.5 day |
+| Phase | What | Risk | Est. Effort | Status |
+|---|---|---|---|---|
+| **Phase 0** | AWS Provider v6 + EKS Module v21 upgrade | HIGH - breaking changes across all modules | 2-3 days | **DONE** |
+| **Phase 1** | EKS version 1.32 → 1.33 | MEDIUM - API deprecations, addon versions | 1 day | Pending |
+| **Phase 2** | EKS version 1.33 → 1.34 | LOW - fewer changes from 1.33 | 0.5 day | Pending |
 
 ## Urgency
 
@@ -36,10 +37,10 @@ runs until March 23, 2027.
 
 ## Key Risks
 
-1. **AWS Provider v6 is a major breaking change** — affects all AWS resources, not just EKS
-2. **EKS Module v21 renames many variables** — `cluster_*` prefix stripped from 20+ variables
-3. **Karpenter migrates from IRSA to Pod Identity** — Helm chart values must change
-4. **IMDS hop limit changes from 2 to 1** — may break Karpenter pod IMDS access
+1. ~~**AWS Provider v6 is a major breaking change** — affects all AWS resources, not just EKS~~ (resolved)
+2. ~~**EKS Module v21 renames many variables** — `cluster_*` prefix stripped from 20+ variables~~ (resolved)
+3. ~~**Karpenter migrates from IRSA to Pod Identity** — Helm chart values must change~~ (resolved)
+4. ~~**IMDS hop limit changes from 2 to 1** — may break Karpenter pod IMDS access~~ (overridden to 2)
 5. **No state migration required** — module v21 upgrade doc confirms "No state changes required"
 
 ## Rules of Engagement
@@ -49,6 +50,30 @@ runs until March 23, 2027.
 - Always run `make fmt` before `make validate-staging`
 - Back up state before each phase: `make backup-staging`
 - Each phase should be its own PR with plan output attached for review
+
+## Phase 0 Completion Notes
+
+- **Completed**: April 10, 2026
+- AWS Provider upgraded to v6.40.0, EKS module to v21, Karpenter module to v21
+- Karpenter migrated from IRSA to EKS Pod Identity (addon `eks-pod-identity-agent` added)
+- `eks_managed_node_group_defaults` removed — all defaults inlined into each node group
+- `desired_size` for systems node group set to 2 (was temporarily raised for rolling update)
+- Karpenter Helm release uses `wait = false` / `wait_for_jobs = false` as workaround for chicken-and-egg during initial Pod Identity setup (safe to revert once stable)
+- `enable_inline_policy = true` on Karpenter controller (policy exceeds AWS managed policy 6,144 char limit)
+- `AmazonEKSVPCResourceController` policy attachment removed by module v21 (now part of `AmazonEKSClusterPolicy`)
+- State backed up after apply
+- Terraform plan shows `No changes` — infrastructure matches configuration
+
+### Discoveries During Phase 0
+
+1. `eks_managed_node_group_defaults` was REMOVED in v21 — must inline all defaults into each node group
+2. `disk_type` was REMOVED in v21 — gp3 is the default for AL2023
+3. `taints` changed from list to map in v21
+4. `iam_policy_statements[].condition` changed from map to list of objects in Karpenter sub-module v21
+5. Karpenter v1.8.4 has a TopologySpreadConstraint regression — stay on 1.8.2
+6. Pod Identity association defaults to `kube-system` namespace — must pass `namespace = "karpenter"` explicitly
+7. Karpenter Helm chart defaults `automountServiceAccountToken: false` — must set to `true` for Pod Identity
+8. `eks-pod-identity-agent` addon was not pre-installed — required for Pod Identity to function
 
 ## Kubernetes Version Timeline (from AWS)
 
