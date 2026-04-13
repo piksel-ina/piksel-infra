@@ -1,4 +1,11 @@
-# Piksel Infrastructure (`piksel-infra`)
+# Piksel Infrastructure
+
+[![CI](https://github.com/piksel-ina/piksel-infra/actions/workflows/ci.yml/badge.svg)](https://github.com/piksel-ina/piksel-infra/actions/workflows/ci.yml)
+[![Terraform](https://img.shields.io/badge/Terraform-1.14.8-7B42BC?logo=terraform&logoColor=white)](https://www.terraform.io/)
+[![AWS](https://img.shields.io/badge/AWS-Provider%205.95-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
+[![EKS](https://img.shields.io/badge/Kubernetes-EKS%201.34-326CE5?logo=kubernetes&logoColor=white)](https://aws.amazon.com/eks/)
+[![Pre-commit](https://img.shields.io/badge/Pre--commit-Enabled-yellow?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
+[![Checkov](https://img.shields.io/badge/Security-Checkov-blue?logo=checkov&logoColor=white)](https://www.checkov.io/)
 
 This repository contains the Infrastructure as Code (IaC) definitions, managed by [Terraform](https://www.terraform.io/), for the Piksel project's AWS infrastructure. It follows GitOps principles for managing deployments across different environments.
 
