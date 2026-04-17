@@ -24,6 +24,21 @@ module "s3_bucket" {
   lifecycle_expiration_days = 90
 }
 
+module "website" {
+  source = "../aws-s3-static-hosting"
+
+  providers = {
+    aws     = aws.aws
+    aws.dns = aws.cross_account
+  }
+
+  project        = var.project
+  environment    = var.environment
+  domain_name    = "staging.piksel.big.go.id"
+  hosted_zone_id = "Z00431943HAESMJJNQCQR"
+  default_tags   = var.default_tags
+}
+
 module "database" {
   source = "../aws-database"
 

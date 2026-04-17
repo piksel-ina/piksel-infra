@@ -72,6 +72,7 @@ No providers.
 | <a name="module_karpenter"></a> [karpenter](#module\_karpenter) | ../karpenter | n/a |
 | <a name="module_networks"></a> [networks](#module\_networks) | ../networks | n/a |
 | <a name="module_s3_bucket"></a> [s3\_bucket](#module\_s3\_bucket) | ../aws-s3-bucket | n/a |
+| <a name="module_website"></a> [website](#module\_website) | ../aws-s3-static-hosting | n/a |
 
 ## Resources
 
@@ -108,4 +109,5 @@ No resources.
 | <a name="output_s3_public_metadata"></a> [s3\_public\_metadata](#output\_s3\_public\_metadata) | Output of S3 bucket |
 | <a name="output_stac_metadata"></a> [stac\_metadata](#output\_stac\_metadata) | Output of STAC configuration and resources |
 | <a name="output_terria_metadata"></a> [terria\_metadata](#output\_terria\_metadata) | Output of Terria configuration and resources |
+| <a name="output_website_metadata"></a> [website\_metadata](#output\_website\_metadata) | Output of S3 static website hosting configuration and resources |
 <!-- END_TF_DOCS -->

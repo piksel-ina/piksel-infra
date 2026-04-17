@@ -33,3 +33,5 @@ tf_backup/
 
 .secrets/
 *.pem
+checkov_terraform.md
+_task/
