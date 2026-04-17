@@ -39,6 +39,78 @@ module "website" {
   default_tags   = var.default_tags
 }
 
+resource "aws_iam_openid_connect_provider" "github" {
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
+
+  tags = merge(var.default_tags, { ManagedBy = "Terraform" })
+}
+
+resource "aws_iam_role" "github_website_deploy" {
+  name = "piksel-website-deploy-github-actions"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:piksel-ina/main-website:*"
+        }
+      }
+    }]
+  })
+
+  tags = merge(var.default_tags, { ManagedBy = "Terraform" })
+}
+
+resource "aws_iam_policy" "github_website_deploy" {
+  name = "piksel-website-deploy-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [module.website.bucket_arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject"
+        ]
+        Resource = ["${module.website.bucket_arn}/*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation"
+        ]
+        Resource = ["arn:aws:cloudfront::326641642924:distribution/${module.website.cloudfront_distribution_id}"]
+      }
+    ]
+  })
+
+  tags = merge(var.default_tags, { ManagedBy = "Terraform" })
+}
+
+resource "aws_iam_role_policy_attachment" "github_website_deploy" {
+  role       = aws_iam_role.github_website_deploy.name
+  policy_arn = aws_iam_policy.github_website_deploy.arn
+}
+
 module "database" {
   source = "../aws-database"
 

@@ -59,7 +59,9 @@ Edit `backup.sh` if needed:
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 6.40.0 |
 
 ## Modules
 
@@ -76,7 +78,12 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [aws_iam_openid_connect_provider.github](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider) | resource |
+| [aws_iam_policy.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 
 ## Inputs
 
@@ -100,6 +107,7 @@ No resources.
 | <a name="output_database_metadata"></a> [database\_metadata](#output\_database\_metadata) | Output of RDS database configuration and resources |
 | <a name="output_eks_cluster_metadata"></a> [eks\_cluster\_metadata](#output\_eks\_cluster\_metadata) | Output of EKS Cluster |
 | <a name="output_external_dns_metadata"></a> [external\_dns\_metadata](#output\_external\_dns\_metadata) | Output of External DNS configuration and resources |
+| <a name="output_github_website_deploy_role_arn"></a> [github\_website\_deploy\_role\_arn](#output\_github\_website\_deploy\_role\_arn) | ARN of the IAM role for GitHub Actions website deployment (OIDC) |
 | <a name="output_grafana_metadata"></a> [grafana\_metadata](#output\_grafana\_metadata) | Output of Grafana configuration and resources |
 | <a name="output_jupyterhub_metadata"></a> [jupyterhub\_metadata](#output\_jupyterhub\_metadata) | Output of JupyterHub configuration and resources |
 | <a name="output_karpenter_metadata"></a> [karpenter\_metadata](#output\_karpenter\_metadata) | Output of Karpenter configuration and resources |

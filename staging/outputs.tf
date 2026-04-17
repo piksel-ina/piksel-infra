@@ -92,6 +92,11 @@ output "website_metadata" {
   }
 }
 
+output "github_website_deploy_role_arn" {
+  description = "ARN of the IAM role for GitHub Actions website deployment (OIDC)"
+  value       = aws_iam_role.github_website_deploy.arn
+}
+
 # --- Database outputs ---
 output "database_metadata" {
   description = "Output of RDS database configuration and resources"
