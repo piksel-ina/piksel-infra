@@ -1,4 +1,12 @@
 terraform {
+  backend "s3" {
+    bucket       = "piksel-staging-tfstate"
+    key          = "staging/terraform.tfstate"
+    region       = "ap-southeast-3"
+    use_lockfile = true
+    encrypt      = true
+  }
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
