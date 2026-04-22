@@ -121,6 +121,18 @@ output "database_metadata" {
 }
 
 
+# --- Cluster Addons ---
+output "cluster_addons_metadata" {
+  description = "Cluster addon Helm release statuses"
+  value = {
+    cert-manager         = module.cluster-addons.cert_manager_status
+    ingress-nginx        = module.cluster-addons.ingress_nginx_status
+    metrics-server       = module.cluster-addons.metrics_server_status
+    nvidia-device-plugin = module.cluster-addons.nvidia_device_plugin_status
+    efs-csi-driver       = module.cluster-addons.efs_csi_driver_status
+  }
+}
+
 # --- Grafana Metadata ---
 output "grafana_metadata" {
   description = "Output of Grafana configuration and resources"

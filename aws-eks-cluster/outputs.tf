@@ -34,3 +34,13 @@ output "authentication_token" {
   value       = data.aws_eks_cluster_auth.this.token
   sensitive   = true
 }
+
+output "efs_filesystem_id" {
+  description = "EFS filesystem ID for CSI driver and StorageClasses"
+  value       = aws_efs_file_system.data.id
+}
+
+output "efs_csi_irsa_role_arn" {
+  description = "IAM role ARN for EFS CSI driver controller service account"
+  value       = module.efs_csi_irsa_role.iam_role_arn
+}

@@ -68,6 +68,7 @@ Edit `backup.sh` if needed:
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_applications"></a> [applications](#module\_applications) | ../applications | n/a |
+| <a name="module_cluster-addons"></a> [cluster-addons](#module\_cluster-addons) | ../cluster-addons | n/a |
 | <a name="module_database"></a> [database](#module\_database) | ../aws-database | n/a |
 | <a name="module_eks-cluster"></a> [eks-cluster](#module\_eks-cluster) | ../aws-eks-cluster | n/a |
 | <a name="module_external-dns"></a> [external-dns](#module\_external-dns) | ../external-dns | n/a |
@@ -104,6 +105,7 @@ Edit `backup.sh` if needed:
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | The AWS account ID |
 | <a name="output_argo_workflow_metadata"></a> [argo\_workflow\_metadata](#output\_argo\_workflow\_metadata) | Output of Argo Workflow configuration and resources |
+| <a name="output_cluster_addons_metadata"></a> [cluster\_addons\_metadata](#output\_cluster\_addons\_metadata) | Cluster addon Helm release statuses |
 | <a name="output_database_metadata"></a> [database\_metadata](#output\_database\_metadata) | Output of RDS database configuration and resources |
 | <a name="output_eks_cluster_metadata"></a> [eks\_cluster\_metadata](#output\_eks\_cluster\_metadata) | Output of EKS Cluster |
 | <a name="output_external_dns_metadata"></a> [external\_dns\_metadata](#output\_external\_dns\_metadata) | Output of External DNS configuration and resources |

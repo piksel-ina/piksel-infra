@@ -1,0 +1,57 @@
+# --- ClusterIssuers (depend on cert-manager) ---
+
+resource "kubectl_manifest" "letsencrypt_production" {
+  depends_on = [helm_release.cert_manager]
+
+  yaml_body = yamlencode({
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name = "letsencrypt-production"
+    }
+    spec = {
+      acme = {
+        email  = "piksel@big.go.id"
+        server = "https://acme-v02.api.letsencrypt.org/directory"
+        privateKeySecretRef = {
+          name = "letsencrypt-production"
+        }
+        solvers = [{
+          http01 = {
+            ingress = {
+              ingressClassName = "nginx"
+            }
+          }
+        }]
+      }
+    }
+  })
+}
+
+resource "kubectl_manifest" "letsencrypt_staging" {
+  depends_on = [helm_release.cert_manager]
+
+  yaml_body = yamlencode({
+    apiVersion = "cert-manager.io/v1"
+    kind       = "ClusterIssuer"
+    metadata = {
+      name = "letsencrypt-staging"
+    }
+    spec = {
+      acme = {
+        email  = "piksel@big.go.id"
+        server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+        privateKeySecretRef = {
+          name = "letsencrypt-staging"
+        }
+        solvers = [{
+          http01 = {
+            ingress = {
+              ingressClassName = "nginx"
+            }
+          }
+        }]
+      }
+    }
+  })
+}

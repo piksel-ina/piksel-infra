@@ -81,6 +81,8 @@ resource "aws_efs_mount_target" "data" {
   depends_on = [aws_efs_file_system.data, aws_security_group.efs]
 }
 
+# Note: EFS access point removed - using existing fsap-0126d051fe0f291c3 in cluster-addons
+
 # --- Enable EFS Backup ---
 resource "aws_efs_backup_policy" "data" {
   file_system_id = aws_efs_file_system.data.id
