@@ -1,31 +1,31 @@
 output "grafana_namespace" {
-  description = "The Kubernetes namespace where Grafana is deployed."
+  description = "The Kubernetes namespace where monitoring resources are deployed."
   value       = kubernetes_namespace.monitoring.metadata[0].name
 }
 
 output "grafana_iam_role_arn" {
-  description = "The IAM role ARN used by Grafana for IRSA (CloudWatch access)."
-  value       = aws_iam_role.grafana.arn
+  description = "The IAM role ARN used by Grafana for IRSA (CloudWatch access). Empty when Grafana is disabled."
+  value       = var.enable_grafana ? aws_iam_role.grafana[0].arn : ""
 }
 
 output "grafana_cloudwatch_policy_arn" {
-  description = "The IAM policy ARN attached to Grafana for CloudWatch access."
-  value       = aws_iam_policy.grafana_cloudwatch.arn
+  description = "The IAM policy ARN attached to Grafana for CloudWatch access. Empty when Grafana is disabled."
+  value       = var.enable_grafana ? aws_iam_policy.grafana_cloudwatch[0].arn : ""
 }
 
 output "grafana_admin_secret_name" {
-  description = "The name of the Kubernetes secret storing the Grafana admin credentials."
-  value       = kubernetes_secret.grafana_admin_credentials.metadata[0].name
+  description = "The name of the Kubernetes secret storing the Grafana admin credentials. Empty when Grafana is disabled."
+  value       = var.enable_grafana ? kubernetes_secret.grafana_admin_credentials[0].metadata[0].name : ""
 }
 
 output "grafana_values_secret_name" {
-  description = "The name of the Kubernetes secret containing the Grafana Helm values."
-  value       = kubernetes_secret.grafana.metadata[0].name
+  description = "The name of the Kubernetes secret containing the Grafana Helm values. Empty when Grafana is disabled."
+  value       = var.enable_grafana ? kubernetes_secret.grafana[0].metadata[0].name : ""
 }
 
 output "grafana_oauth_client_secret_arn" {
-  description = "The ARN of the AWS Secrets Manager secret for the Grafana OAuth client/secret."
-  value       = data.aws_secretsmanager_secret_version.grafana_client_secret.arn
+  description = "The ARN of the AWS Secrets Manager secret for the Grafana OAuth client/secret. Empty when Grafana is disabled."
+  value       = var.enable_grafana ? data.aws_secretsmanager_secret_version.grafana_client_secret[0].arn : ""
 }
 
 # --- JupyterHub Outputs ---

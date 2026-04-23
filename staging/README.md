@@ -119,7 +119,7 @@ Edit `backup.sh` if needed:
 | <a name="output_eks_cluster_metadata"></a> [eks\_cluster\_metadata](#output\_eks\_cluster\_metadata) | Output of EKS Cluster |
 | <a name="output_external_dns_metadata"></a> [external\_dns\_metadata](#output\_external\_dns\_metadata) | Output of External DNS configuration and resources |
 | <a name="output_github_website_deploy_role_arn"></a> [github\_website\_deploy\_role\_arn](#output\_github\_website\_deploy\_role\_arn) | ARN of the IAM role for GitHub Actions website deployment (OIDC) |
-| <a name="output_grafana_metadata"></a> [grafana\_metadata](#output\_grafana\_metadata) | Output of Grafana configuration and resources |
+| <a name="output_grafana_metadata"></a> [grafana\_metadata](#output\_grafana\_metadata) | Output of Grafana configuration and resources. Values are empty strings when Grafana is disabled. |
 | <a name="output_jupyterhub_metadata"></a> [jupyterhub\_metadata](#output\_jupyterhub\_metadata) | Output of JupyterHub configuration and resources |
 | <a name="output_karpenter_metadata"></a> [karpenter\_metadata](#output\_karpenter\_metadata) | Output of Karpenter configuration and resources |
 | <a name="output_network_metadata"></a> [network\_metadata](#output\_network\_metadata) | Grouped network and connectivity metadata |

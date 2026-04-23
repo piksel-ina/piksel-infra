@@ -100,6 +100,12 @@ variable "waf_log_retention_days" {
   default     = 365
 }
 
+variable "enable_grafana" {
+  description = "Whether to create Grafana-related resources (secrets, IAM, Helm values). The monitoring namespace is always created regardless."
+  type        = bool
+  default     = true
+}
+
 variable "lifecycle_expiration_days" {
   description = "Number of days before S3 objects expire. Override per environment (e.g. staging=60)"
   type        = number

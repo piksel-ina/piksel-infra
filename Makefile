@@ -1,4 +1,4 @@
-.PHONY: help pre-commit fmt checkov
+.PHONY: help pre-commit fmt checkov tunnel-db
 
 # Colors
 RED    := \033[0;31m
@@ -40,16 +40,19 @@ help: ## Show this help message
 	@echo ''
 	@echo 'Usage: make <target>'
 	@echo ''
-	@echo '\033[1mGeneral\033[0m'
+	@echo -e '$(BOLD)General$(NC)'
 	@grep -E '^(pre-commit|fmt|checkov):.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
 	@echo ''
-	@echo '\033[1mStaging\033[0m'
+	@echo -e '$(BOLD)Staging$(NC)'
 	@grep -E '^[a-z]+-staging:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
 	@echo ''
-	@echo '\033[1mCluster Checks\033[0m'
+	@echo -e '$(BOLD)Cluster Checks$(NC)'
 	@grep -E '^(check-|restart-|scan-)[a-z]+:.*## ' $(MAKEFILE_LIST) | grep -vE -- '-(staging|dev):' | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
 	@echo ''
-	@echo '\033[1mDev\033[0m'
+	@echo -e '$(BOLD)Database$(NC)'
+	@grep -E '^tunnel-db:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
+	@echo ''
+	@echo -e '$(BOLD)Dev$(NC)'
 	@grep -E '^[a-z]+-dev:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  \033[36m%-22s\033[0m %s\n",$$1,$$2}'
 	@echo ''
 
@@ -61,6 +64,10 @@ fmt: ## Format Terraform files
 
 checkov: ## Run Checkov security scan
 	@{ checkov --directory . --config-file .checkov.yml --compact 2>&1 1>&3 | grep -v '\[WARNI\].*\(external modules\|Unable to load module\)' 1>&2; } 3>&1
+
+# Local port for DB tunnel
+DB_LOCAL_PORT ?= 15432
+DB_NAMESPACE  := database
 
 # ============================================
 # STAGING
@@ -136,3 +143,16 @@ restart-deployments: ## Restart all deployments
 
 scan-deprecated: ## Scan deprecated APIs
 	@$(SCRIPTS_DIR)/scan-deprecated.sh staging
+
+# ============================================
+# DATABASE TUNNEL
+# ============================================
+
+tunnel-db: ## Port-forward to RDS via socat pod (pg_host=localhost pg_port=15432)
+	@kubectl run db-tunnel --image=alpine/socat --restart=Never --namespace=$(DB_NAMESPACE) -- \
+		tcp-listen:5432,fork,reuseaddr \
+		tcp-connect:$$(kubectl get svc db-endpoint -n $(DB_NAMESPACE) -o jsonpath='{.spec.externalName}'):5432 2>/dev/null || true
+	@kubectl wait --for=condition=Ready pod/db-tunnel -n $(DB_NAMESPACE) --timeout=30s
+	@echo "$(CYAN)Tunnel ready. Connect: pg_host=localhost pg_port=$(DB_LOCAL_PORT)$(NC)"
+	@echo "$(YELLOW)Press Ctrl+C to stop$(NC)"
+	@kubectl port-forward pod/db-tunnel -n $(DB_NAMESPACE) $(DB_LOCAL_PORT):5432

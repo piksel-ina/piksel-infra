@@ -104,6 +104,7 @@ No requirements.
 | <a name="input_db_namespace"></a> [db\_namespace](#input\_db\_namespace) | Kubernetes namespace for the database | `string` | `"database"` | no |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | Default tags to apply to all resources | `map(string)` | `{}` | no |
 | <a name="input_eks_oidc_provider_arn"></a> [eks\_oidc\_provider\_arn](#input\_eks\_oidc\_provider\_arn) | The OIDC issuer ARN for the EKS cluster | `string` | n/a | yes |
+| <a name="input_enable_grafana"></a> [enable\_grafana](#input\_enable\_grafana) | Whether to create Grafana-related resources (secrets, IAM, Helm values). The monitoring namespace is always created regardless. | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | The name of the environment | `string` | n/a | yes |
 | <a name="input_grafana_password"></a> [grafana\_password](#input\_grafana\_password) | Password for the Grafana database user (managed by aws-database module) | `string` | n/a | yes |
 | <a name="input_internal_buckets"></a> [internal\_buckets](#input\_internal\_buckets) | List of internal S3 bucket names | `list(string)` | `[]` | no |
@@ -134,12 +135,12 @@ No requirements.
 | <a name="output_argo_artifact_service_account_name"></a> [argo\_artifact\_service\_account\_name](#output\_argo\_artifact\_service\_account\_name) | Kubernetes secret containing Argo artifact user credentials. |
 | <a name="output_argo_k8s_secret_name"></a> [argo\_k8s\_secret\_name](#output\_argo\_k8s\_secret\_name) | The name of the Kubernetes secret containing the Auth0 client secret. |
 | <a name="output_argo_workflow_namespace"></a> [argo\_workflow\_namespace](#output\_argo\_workflow\_namespace) | The namespace for all Argo resources. |
-| <a name="output_grafana_admin_secret_name"></a> [grafana\_admin\_secret\_name](#output\_grafana\_admin\_secret\_name) | The name of the Kubernetes secret storing the Grafana admin credentials. |
-| <a name="output_grafana_cloudwatch_policy_arn"></a> [grafana\_cloudwatch\_policy\_arn](#output\_grafana\_cloudwatch\_policy\_arn) | The IAM policy ARN attached to Grafana for CloudWatch access. |
-| <a name="output_grafana_iam_role_arn"></a> [grafana\_iam\_role\_arn](#output\_grafana\_iam\_role\_arn) | The IAM role ARN used by Grafana for IRSA (CloudWatch access). |
-| <a name="output_grafana_namespace"></a> [grafana\_namespace](#output\_grafana\_namespace) | The Kubernetes namespace where Grafana is deployed. |
-| <a name="output_grafana_oauth_client_secret_arn"></a> [grafana\_oauth\_client\_secret\_arn](#output\_grafana\_oauth\_client\_secret\_arn) | The ARN of the AWS Secrets Manager secret for the Grafana OAuth client/secret. |
-| <a name="output_grafana_values_secret_name"></a> [grafana\_values\_secret\_name](#output\_grafana\_values\_secret\_name) | The name of the Kubernetes secret containing the Grafana Helm values. |
+| <a name="output_grafana_admin_secret_name"></a> [grafana\_admin\_secret\_name](#output\_grafana\_admin\_secret\_name) | The name of the Kubernetes secret storing the Grafana admin credentials. Empty when Grafana is disabled. |
+| <a name="output_grafana_cloudwatch_policy_arn"></a> [grafana\_cloudwatch\_policy\_arn](#output\_grafana\_cloudwatch\_policy\_arn) | The IAM policy ARN attached to Grafana for CloudWatch access. Empty when Grafana is disabled. |
+| <a name="output_grafana_iam_role_arn"></a> [grafana\_iam\_role\_arn](#output\_grafana\_iam\_role\_arn) | The IAM role ARN used by Grafana for IRSA (CloudWatch access). Empty when Grafana is disabled. |
+| <a name="output_grafana_namespace"></a> [grafana\_namespace](#output\_grafana\_namespace) | The Kubernetes namespace where monitoring resources are deployed. |
+| <a name="output_grafana_oauth_client_secret_arn"></a> [grafana\_oauth\_client\_secret\_arn](#output\_grafana\_oauth\_client\_secret\_arn) | The ARN of the AWS Secrets Manager secret for the Grafana OAuth client/secret. Empty when Grafana is disabled. |
+| <a name="output_grafana_values_secret_name"></a> [grafana\_values\_secret\_name](#output\_grafana\_values\_secret\_name) | The name of the Kubernetes secret containing the Grafana Helm values. Empty when Grafana is disabled. |
 | <a name="output_jupyterhub_irsa_arn"></a> [jupyterhub\_irsa\_arn](#output\_jupyterhub\_irsa\_arn) | IAM Role ARN for JupyterHub user-read service account (IRSA) |
 | <a name="output_jupyterhub_namespace"></a> [jupyterhub\_namespace](#output\_jupyterhub\_namespace) | The namespace where JupyterHub is deployed |
 | <a name="output_jupyterhub_service_account_name"></a> [jupyterhub\_service\_account\_name](#output\_jupyterhub\_service\_account\_name) | Kubernetes service account name for S3 read access |

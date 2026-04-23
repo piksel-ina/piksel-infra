@@ -226,6 +226,7 @@ module "applications" {
   ]
   waf_log_retention_days    = 30
   lifecycle_expiration_days = 60
+  enable_grafana            = false
 
   argo_password       = module.database.user_passwords.argo
   grafana_password    = module.database.user_passwords.grafana

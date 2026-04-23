@@ -135,7 +135,7 @@ output "cluster_addons_metadata" {
 
 # --- Grafana Metadata ---
 output "grafana_metadata" {
-  description = "Output of Grafana configuration and resources"
+  description = "Output of Grafana configuration and resources. Values are empty strings when Grafana is disabled."
   value = {
     namespace               = module.applications.grafana_namespace
     admin_secret_name       = module.applications.grafana_admin_secret_name
