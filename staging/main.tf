@@ -184,6 +184,20 @@ module "cluster-addons" {
   default_tags          = var.default_tags
 }
 
+module "arc-runners" {
+  source = "../arc-runners"
+
+  cluster_name        = local.cluster_name
+  aws_region          = var.aws_region
+  account_id          = module.networks.account_id
+  tf_state_bucket_arn = "arn:aws:s3:::piksel-staging-tfstate"
+  default_tags        = var.default_tags
+
+  github_app_id              = var.arc_github_app_id
+  github_app_installation_id = var.arc_github_app_installation_id
+  github_app_private_key     = var.arc_github_app_private_key
+}
+
 module "applications" {
   source = "../applications"
 

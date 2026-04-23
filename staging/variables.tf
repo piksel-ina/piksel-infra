@@ -53,3 +53,22 @@ variable "flow_log_retention_days" {
   type        = number
   default     = 90
 }
+
+# --- ARC Runner Variables ---
+variable "arc_github_app_id" {
+  description = "GitHub App Client ID for ARC authentication"
+  type        = string
+  sensitive   = true
+}
+
+variable "arc_github_app_installation_id" {
+  description = "GitHub App Installation ID for ARC"
+  type        = string
+  sensitive   = true
+}
+
+variable "arc_github_app_private_key" {
+  description = "GitHub App Private Key for ARC (PEM contents)"
+  type        = string
+  sensitive   = true
+}

@@ -234,3 +234,16 @@ output "terria_metadata" {
     configmap_name       = module.applications.terria_configmap_name
   }
 }
+
+# --- ARC Runner Outputs ---
+output "arc_metadata" {
+  description = "Output of ARC runner configuration and resources"
+  value = {
+    namespace              = module.arc-runners.namespace
+    runner_name            = module.arc-runners.runner_name
+    runner_role_arn        = module.arc-runners.runner_role_arn
+    runner_service_account = module.arc-runners.runner_service_account
+    controller_status      = module.arc-runners.controller_release_status
+    runner_set_status      = module.arc-runners.runner_set_release_status
+  }
+}
