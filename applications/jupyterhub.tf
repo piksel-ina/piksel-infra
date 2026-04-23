@@ -22,24 +22,6 @@ resource "kubernetes_namespace" "hub" {
 }
 
 
-# --- Generate random password and store it securely in AWS ---
-resource "random_password" "jupyterhub_random_string" {
-  length           = 32
-  special          = false
-  override_special = "@#$&*+-="
-}
-
-resource "aws_secretsmanager_secret" "jupyterhub_password" {
-  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
-  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
-  name = "jupyterhub-password"
-}
-
-resource "aws_secretsmanager_secret_version" "jupyterhub_password" {
-  secret_id     = aws_secretsmanager_secret.jupyterhub_password.id
-  secret_string = random_password.jupyterhub_random_string.result
-}
-
 # --- Grab DB Secret into this namespace
 resource "kubernetes_secret" "hub_db_secret" {
   metadata {
@@ -48,9 +30,9 @@ resource "kubernetes_secret" "hub_db_secret" {
   }
   data = {
     username         = "jupyterhub"
-    password         = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
-    odcread-password = aws_secretsmanager_secret_version.odc_read_password.secret_string
-    odc-password     = aws_secretsmanager_secret_version.odc_write_password.secret_string
+    password         = var.jupyterhub_password
+    odcread-password = var.odc_read_password
+    odc-password     = var.odc_write_password
   }
   type = "Opaque"
 }
@@ -100,7 +82,7 @@ resource "kubernetes_secret" "jupyterhub" {
       # Jupyterhub hub database
       jhub_db_name     = "jupyterhub"
       jhub_db_username = "jupyterhub"
-      jhub_db_password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+      jhub_db_password = var.jupyterhub_password
       jhub_db_hostname = var.k8s_db_service
 
       # Secrets
@@ -108,7 +90,7 @@ resource "kubernetes_secret" "jupyterhub" {
       jhub_proxy_secret_token      = random_id.jhub_proxy_secret_token.hex
       jhub_dask_gateway_api_token  = random_password.dask_gateway_api_token.result
 
-      odcread_password = aws_secretsmanager_secret_version.odc_read_password.secret_string
+      odcread_password = var.odc_read_password
     })
   }
 

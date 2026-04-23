@@ -55,6 +55,8 @@ Edit `backup.sh` if needed:
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | ~> 2.0 |
 | <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | 1.19.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | ~> 2.0 |
+| <a name="requirement_postgresql"></a> [postgresql](#requirement\_postgresql) | 1.26.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | >= 3.0 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | 0.13.1 |
 
 ## Providers
@@ -100,6 +102,8 @@ Edit `backup.sh` if needed:
 | <a name="input_environment"></a> [environment](#input\_environment) | The environment of the deployment | `string` | `"Staging"` | no |
 | <a name="input_flow_log_retention_days"></a> [flow\_log\_retention\_days](#input\_flow\_log\_retention\_days) | Retention period for VPC Flow Logs in CloudWatch (in days) | `number` | `90` | no |
 | <a name="input_one_nat_gateway_per_az"></a> [one\_nat\_gateway\_per\_az](#input\_one\_nat\_gateway\_per\_az) | Enable one NAT Gateway per Availability Zone (higher availability, higher cost) | `bool` | `false` | no |
+| <a name="input_pg_host"></a> [pg\_host](#input\_pg\_host) | Override PostgreSQL host for the terraform provider. Use 'localhost' when tunnelling via port-forward | `string` | `""` | no |
+| <a name="input_pg_port"></a> [pg\_port](#input\_pg\_port) | Override PostgreSQL port for the terraform provider. Use the local port when tunnelling via port-forward | `number` | `5432` | no |
 | <a name="input_project"></a> [project](#input\_project) | The name of the project | `string` | `"Piksel"` | no |
 | <a name="input_single_nat_gateway"></a> [single\_nat\_gateway](#input\_single\_nat\_gateway) | Enable a single NAT Gateway for all private subnets (cheaper, less availability) | `bool` | `true` | no |
 

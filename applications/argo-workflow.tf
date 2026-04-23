@@ -18,27 +18,6 @@ resource "kubernetes_namespace" "argo_workflow" {
   }
 }
 
-# --- Generate random password and store it securely in AWS, for database connection ---
-resource "random_password" "argo_random_string" {
-  length           = 32
-  special          = true
-  override_special = "@#$&*+-="
-}
-
-resource "aws_secretsmanager_secret" "argo_password" {
-  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
-  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
-  name        = "argo-workflows-password"
-  description = "Password for Argo Workflow server"
-
-  tags = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "argo_password" {
-  secret_id     = aws_secretsmanager_secret.argo_password.id
-  secret_string = random_password.argo_random_string.result
-}
-
 # --- Fetch auth0 client secret from AWS Secrets Manager, was created outside terraform ---
 data "aws_secretsmanager_secret_version" "argo_client_secret" {
   secret_id = local.oauth_secret_argo
@@ -182,7 +161,7 @@ resource "kubernetes_secret" "argo_secret" {
   }
   data = {
     username = "argo"
-    password = aws_secretsmanager_secret_version.argo_password.secret_string
+    password = var.argo_password
   }
   type = "Opaque"
 }
@@ -195,7 +174,7 @@ resource "kubernetes_secret" "jupyterhub_secret" {
   }
   data = {
     username = "jupyterhub"
-    password = aws_secretsmanager_secret_version.jupyterhub_password.secret_string
+    password = var.jupyterhub_password
   }
   type = "Opaque"
 }
@@ -208,7 +187,7 @@ resource "kubernetes_secret" "grafana_secret" {
   }
   data = {
     username = "grafana"
-    password = aws_secretsmanager_secret_version.grafana_password.secret_string
+    password = var.grafana_password
   }
   type = "Opaque"
 }
@@ -221,7 +200,7 @@ resource "kubernetes_secret" "stacread_secret" {
   }
   data = {
     username = "stacread"
-    password = aws_secretsmanager_secret_version.stacread_password.secret_string
+    password = var.stac_read_password
   }
   type = "Opaque"
 }
@@ -234,7 +213,7 @@ resource "kubernetes_secret" "stac_secret" {
   }
   data = {
     username = "stac"
-    password = aws_secretsmanager_secret_version.stac_write_password.secret_string
+    password = var.stac_write_password
   }
   type = "Opaque"
 }
@@ -247,7 +226,7 @@ resource "kubernetes_secret" "odcread_secret" {
   }
   data = {
     username = "odcread"
-    password = aws_secretsmanager_secret_version.odc_read_password.secret_string
+    password = var.odc_read_password
   }
   type = "Opaque"
 }
@@ -260,7 +239,7 @@ resource "kubernetes_secret" "odc_secret" {
   }
   data = {
     username = "odc"
-    password = aws_secretsmanager_secret_version.odc_write_password.secret_string
+    password = var.odc_write_password
   }
   type = "Opaque"
 }

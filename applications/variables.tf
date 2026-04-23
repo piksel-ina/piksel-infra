@@ -105,3 +105,45 @@ variable "lifecycle_expiration_days" {
   type        = number
   default     = 365
 }
+
+variable "argo_password" {
+  description = "Password for the Argo database user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "grafana_password" {
+  description = "Password for the Grafana database user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "jupyterhub_password" {
+  description = "Password for the JupyterHub database user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "odc_write_password" {
+  description = "Password for the ODC write user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "odc_read_password" {
+  description = "Password for the ODC read user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "stac_write_password" {
+  description = "Password for the STAC write user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}
+
+variable "stac_read_password" {
+  description = "Password for the STAC read user (managed by aws-database module)"
+  type        = string
+  sensitive   = true
+}

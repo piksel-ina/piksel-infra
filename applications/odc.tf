@@ -22,50 +22,6 @@ resource "kubernetes_namespace" "odc" {
   }
 }
 
-# --- Create password for the ODC database connection ---
-# --- Write password ---
-resource "random_password" "odc_write" {
-  length           = 32
-  special          = true
-  override_special = "@#$&*+-="
-}
-
-resource "aws_secretsmanager_secret" "odc_write_password" {
-  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
-  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
-  name        = "odc-password"
-  description = "Password for ODC database connection - Write"
-
-  tags = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "odc_write_password" {
-  secret_id     = aws_secretsmanager_secret.odc_write_password.id
-  secret_string = random_password.odc_write.result
-}
-
-
-# --- Read password ---
-resource "random_password" "odc_read" {
-  length           = 32
-  special          = true
-  override_special = "@#$&*+-="
-}
-
-resource "aws_secretsmanager_secret" "odc_read_password" {
-  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
-  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
-  name        = "odc-read-password"
-  description = "Password for ODC database connection - Read"
-
-  tags = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "odc_read_password" {
-  secret_id     = aws_secretsmanager_secret.odc_read_password.id
-  secret_string = random_password.odc_read.result
-}
-
 # --- Pass ODC read secret to the odc namespace ---
 resource "kubernetes_secret" "odcread_namespace_secret" {
   metadata {
@@ -74,7 +30,7 @@ resource "kubernetes_secret" "odcread_namespace_secret" {
   }
   data = {
     username = "odcread"
-    password = aws_secretsmanager_secret_version.odc_read_password.secret_string
+    password = var.odc_read_password
   }
   type = "Opaque"
 }
@@ -86,7 +42,7 @@ resource "kubernetes_secret" "odc_namespace_secret" {
   }
   data = {
     username = "odc"
-    password = aws_secretsmanager_secret_version.odc_write_password.secret_string
+    password = var.odc_write_password
   }
   type = "Opaque"
 }

@@ -125,6 +125,8 @@ module "database" {
   db_allocated_storage    = 50
   backup_retention_period = 14
   db_multi_az             = false
+  pg_host                 = var.pg_host
+  pg_port                 = var.pg_port
 }
 
 module "eks-cluster" {
@@ -224,4 +226,12 @@ module "applications" {
   ]
   waf_log_retention_days    = 30
   lifecycle_expiration_days = 60
+
+  argo_password       = module.database.user_passwords.argo
+  grafana_password    = module.database.user_passwords.grafana
+  jupyterhub_password = module.database.user_passwords.jupyterhub
+  odc_write_password  = module.database.user_passwords.odc
+  odc_read_password   = module.database.user_passwords.odcread
+  stac_write_password = module.database.user_passwords.stac
+  stac_read_password  = module.database.user_passwords.stacread
 }

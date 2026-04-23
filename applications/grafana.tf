@@ -24,28 +24,6 @@ resource "kubernetes_namespace" "monitoring" {
   }
 }
 
-# --- Generate secure password for Grafana database connection ---
-resource "random_password" "grafana_random_string" {
-  length           = 32
-  special          = true
-  override_special = "@#$&*+-="
-}
-
-# --- Store database password in AWS Secrets Manager ---
-resource "aws_secretsmanager_secret" "grafana_password" {
-  #checkov:skip=CKV_AWS_149:AWS-managed encryption sufficient. Custom KMS CMK to be implemented when further compliance requires it.
-  #checkov:skip=CKV2_AWS_57:Terraform-managed password. Rotation via time_rotating to be implemented when CI/CD pipeline is in place.
-  name        = "grafana-db-password"
-  description = "Password for Grafana database connection"
-
-  tags = local.tags
-}
-
-resource "aws_secretsmanager_secret_version" "grafana_password" {
-  secret_id     = aws_secretsmanager_secret.grafana_password.id
-  secret_string = random_password.grafana_random_string.result
-}
-
 # --- This secret was issued through AWS CLI ---
 data "aws_secretsmanager_secret_version" "grafana_client_secret" {
   secret_id = local.oauth_secret_grafana

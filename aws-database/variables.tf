@@ -91,3 +91,15 @@ variable "vpc_cidr_block" {
   description = "CIDR block of the deployment vpc"
   type        = string
 }
+
+variable "pg_host" {
+  description = "Override PostgreSQL host for the terraform provider. Use 'localhost' when tunnelling via port-forward"
+  type        = string
+  default     = ""
+}
+
+variable "pg_port" {
+  description = "Override PostgreSQL port for the terraform provider. Use the local port when tunnelling via port-forward"
+  type        = number
+  default     = 5432
+}

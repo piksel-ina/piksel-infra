@@ -61,3 +61,17 @@ output "security_group_description_database" {
   description = "The description of the security group"
   value       = module.security_group.security_group_description
 }
+
+output "user_passwords" {
+  description = "Map of application database user passwords"
+  value = {
+    argo       = random_password.argo.result
+    grafana    = random_password.grafana.result
+    jupyterhub = random_password.jupyterhub.result
+    odc        = random_password.odc_write.result
+    odcread    = random_password.odc_read.result
+    stac       = random_password.stac_write.result
+    stacread   = random_password.stac_read.result
+  }
+  sensitive = true
+}
