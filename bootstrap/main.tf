@@ -6,6 +6,8 @@ locals {
 resource "aws_s3_bucket" "this" {
   #checkov:skip=CKV_AWS_144:No cross-region replication needed for state bucket.
   #checkov:skip=CKV_AWS_145:SSE-S3 encryption sufficient. CMK to be considered for future compliance.
+  #checkov:skip=CKV_AWS_18:Access logging not required for internal state bucket.
+  #checkov:skip=CKV2_AWS_62:Event notifications not required for state bucket.
   bucket        = local.bucket_name
   force_destroy = false
 
