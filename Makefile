@@ -60,7 +60,7 @@ fmt: ## Format Terraform files
 	terraform fmt -recursive
 
 checkov: ## Run Checkov security scan
-	checkov --directory . --config-file .checkov.yml --compact
+	@{ checkov --directory . --config-file .checkov.yml --compact 2>&1 1>&3 | grep -v '\[WARNI\].*\(external modules\|Unable to load module\)' 1>&2; } 3>&1
 
 # ============================================
 # STAGING
