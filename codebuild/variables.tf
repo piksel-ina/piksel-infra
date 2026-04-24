@@ -29,6 +29,11 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
+variable "vpc_cidr_block" {
+  description = "VPC CIDR block for scoping security group egress rules"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "EKS cluster name for IAM policy scoping"
   type        = string

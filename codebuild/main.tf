@@ -1,13 +1,22 @@
 resource "aws_security_group" "codebuild" {
   name_prefix = "${var.project}-tf-codebuild-"
-  description = "Security group for Terraform CodeBuild project"
+  description = "CodeBuild VPC access for Terraform CI/CD - egress to AWS APIs and RDS"
   vpc_id      = var.vpc_id
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTPS to AWS APIs (S3, CodeBuild, STS, EKS, Secrets Manager)"
+  }
+
+  egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "PostgreSQL to RDS within VPC"
   }
 
   tags = merge(var.default_tags, {
@@ -171,6 +180,13 @@ resource "aws_codebuild_project" "plan" {
     buildspec = file("${path.module}/buildspec.yml")
   }
 
+  logs_config {
+    cloudwatch_logs {
+      group_name = "/aws/codebuild/${var.project}-tf-plan"
+      status     = "ENABLED"
+    }
+  }
+
   vpc_config {
     security_group_ids = [aws_security_group.codebuild.id]
     subnets            = var.private_subnet_ids
@@ -222,6 +238,13 @@ resource "aws_codebuild_project" "apply" {
   source {
     type      = "NO_SOURCE"
     buildspec = file("${path.module}/buildspec.yml")
+  }
+
+  logs_config {
+    cloudwatch_logs {
+      group_name = "/aws/codebuild/${var.project}-tf-apply"
+      status     = "ENABLED"
+    }
   }
 
   vpc_config {

@@ -148,7 +148,10 @@ resource "aws_iam_policy" "github_tf_deploy" {
           "codebuild:StartBuild",
           "codebuild:BatchGetBuilds"
         ]
-        Resource = ["*"]
+        Resource = [
+          module.codebuild.plan_project_arn,
+          module.codebuild.apply_project_arn
+        ]
       },
       {
         Effect = "Allow"
@@ -255,6 +258,7 @@ module "codebuild" {
   aws_region          = var.aws_region
   account_id          = module.networks.account_id
   vpc_id              = module.networks.vpc_id
+  vpc_cidr_block      = module.networks.vpc_cidr_block
   private_subnet_ids  = module.networks.private_subnets
   cluster_name        = local.cluster_name
   tf_state_bucket_arn = "arn:aws:s3:::piksel-staging-tfstate"
