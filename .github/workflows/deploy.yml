@@ -12,64 +12,136 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 env:
-  TF_VERSION: "1.14.8"
   AWS_REGION: "ap-southeast-3"
+  PLAN_OUTPUT_BUCKET: "piksel-staging-tfstate"
+  PLAN_PROJECT: "Piksel-tf-plan"
+  APPLY_PROJECT: "Piksel-tf-apply"
 
 jobs:
   plan:
     name: Terraform Plan (Staging)
-    runs-on: piksel-staging-runners
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Write secrets.auto.tfvars
-        run: echo '${{ secrets.STAGING_TFVARS }}' > staging/secrets.auto.tfvars
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::326641642924:role/piksel-tf-deploy-github-actions
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform -chdir=staging init
-
-      - name: Terraform Plan
-        id: plan
+      - name: Trigger CodeBuild plan
+        id: codebuild
         run: |
-          terraform -chdir=staging plan \
-            -var="pg_host=" \
-            -var="pg_port=5432" \
-            -no-color 2>&1 | tee plan_output.txt
+          BUILD_ID=$(aws codebuild start-build \
+            --project-name "$PLAN_PROJECT" \
+            --environment-variables-override \
+              name=TF_ACTION,value=plan \
+              name=PR_NUMBER,value=${{ github.event.pull_request.number }} \
+              name=PR_BRANCH,value=${{ github.head_ref }} \
+              name=BRANCH,value= \
+              name=STAGING_TFVARS,value='${{ secrets.STAGING_TFVARS }}' \
+              name=PLAN_OUTPUT_BUCKET,value=$PLAN_OUTPUT_BUCKET \
+            --query 'build.id' \
+            --output text)
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Comment PR with plan
-        if: always() && steps.plan.outcome != ''
+          echo "Waiting for CodeBuild $BUILD_ID..."
+          while true; do
+            STATUS=$(aws codebuild batch-get-builds --ids "$BUILD_ID" \
+              --query 'builds[0].buildStatus' --output text)
+            echo "Status: $STATUS"
+            if [ "$STATUS" != "IN_PROGRESS" ]; then break; fi
+            sleep 15
+          done
+
+          if [ "$STATUS" != "SUCCEEDED" ]; then
+            echo "::error::CodeBuild failed with status $STATUS"
+            exit 1
+          fi
+
+          BUILD_NUMBER=$(aws codebuild batch-get-builds --ids "$BUILD_ID" \
+            --query 'builds[0].buildNumber' --output text)
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch and post plan output
+        if: always() && steps.codebuild.outcome == 'success'
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const plan = fs.readFileSync('plan_output.txt', 'utf8');
-            const body = `## Terraform Plan (Staging)\n\n\`\`\`\n${plan.substring(0, 60000)}\n\`\`\``;
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: body
-            });
+            const { execSync } = require('child_process');
+            const buildId = `${{ steps.codebuild.outputs.build_id }}`;
+
+            try {
+              const listOutput = execSync(
+                `aws s3 ls s3://${process.env.PLAN_OUTPUT_BUCKET}/plans/ --recursive | grep "${buildId.replace(/:/g, '\\\\:')}" | tail -1 | awk '{print $4}'`,
+                { encoding: 'utf8' }
+              );
+              const key = listOutput.trim();
+              if (!key) {
+                console.log('No plan output found in S3');
+                return;
+              }
+
+              const plan = execSync(
+                `aws s3 cp s3://${process.env.PLAN_OUTPUT_BUCKET}/${key} -`,
+                { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 }
+              );
+
+              const body = `## Terraform Plan (Staging) via CodeBuild\n\n\`\`\`\n${plan.substring(0, 60000)}\n\`\`\``;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            } catch (e) {
+              console.log('Failed to fetch plan output:', e.message);
+            }
 
   apply:
     name: Terraform Apply (Staging)
-    runs-on: piksel-staging-runners
+    runs-on: ubuntu-latest
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v4
 
-      - name: Write secrets.auto.tfvars
-        run: echo '${{ secrets.STAGING_TFVARS }}' > staging/secrets.auto.tfvars
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::326641642924:role/piksel-tf-deploy-github-actions
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform -chdir=staging init
-
-      - name: Terraform Apply
+      - name: Trigger CodeBuild apply
+        id: codebuild
         run: |
-          terraform -chdir=staging apply \
-            -var="pg_host=" \
-            -var="pg_port=5432" \
-            -auto-approve
+          BUILD_ID=$(aws codebuild start-build \
+            --project-name "$APPLY_PROJECT" \
+            --environment-variables-override \
+              name=TF_ACTION,value=apply \
+              name=PR_NUMBER,value= \
+              name=PR_BRANCH,value= \
+              name=BRANCH,value=${{ github.ref_name }} \
+              name=STAGING_TFVARS,value='${{ secrets.STAGING_TFVARS }}' \
+              name=PLAN_OUTPUT_BUCKET,value=$PLAN_OUTPUT_BUCKET \
+            --query 'build.id' \
+            --output text)
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+
+          echo "Waiting for CodeBuild $BUILD_ID..."
+          while true; do
+            STATUS=$(aws codebuild batch-get-builds --ids "$BUILD_ID" \
+              --query 'builds[0].buildStatus' --output text)
+            echo "Status: $STATUS"
+            if [ "$STATUS" != "IN_PROGRESS" ]; then break; fi
+            sleep 15
+          done
+
+          if [ "$STATUS" != "SUCCEEDED" ]; then
+            echo "::error::CodeBuild failed with status $STATUS"
+            exit 1
+          fi
