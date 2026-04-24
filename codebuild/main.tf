@@ -90,6 +90,7 @@ resource "aws_iam_policy" "codebuild" {
         Effect = "Allow"
         Action = [
           "ec2:CreateNetworkInterface",
+          "ec2:CreateNetworkInterfacePermission",
           "ec2:DeleteNetworkInterface",
           "ec2:DescribeNetworkInterfaces",
           "ec2:DescribeSecurityGroups",
@@ -98,6 +99,13 @@ resource "aws_iam_policy" "codebuild" {
           "ec2:DescribeVpcs"
         ]
         Resource = ["*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:CreateTags"
+        ]
+        Resource = ["arn:aws:ec2:${var.aws_region}:${var.account_id}:network-interface/*"]
       },
       {
         Effect = "Allow"
