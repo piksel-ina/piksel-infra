@@ -36,7 +36,10 @@ jobs:
 
       - name: Trigger CodeBuild plan
         id: codebuild
+        env:
+          TF_VARS_CONTENT: ${{ secrets.STAGING_TFVARS }}
         run: |
+          TFVARS_B64=$(echo "$TF_VARS_CONTENT" | base64 -w 0)
           BUILD_ID=$(aws codebuild start-build \
             --project-name "$PLAN_PROJECT" \
             --environment-variables-override \
@@ -44,7 +47,7 @@ jobs:
               name=PR_NUMBER,value=${{ github.event.pull_request.number }} \
               name=PR_BRANCH,value=${{ github.head_ref }} \
               name=BRANCH,value= \
-              name=STAGING_TFVARS,value='${{ secrets.STAGING_TFVARS }}' \
+              "name=STAGING_TFVARS_B64,value=${TFVARS_B64}" \
               name=PLAN_OUTPUT_BUCKET,value=$PLAN_OUTPUT_BUCKET \
             --query 'build.id' \
             --output text)
@@ -118,7 +121,10 @@ jobs:
 
       - name: Trigger CodeBuild apply
         id: codebuild
+        env:
+          TF_VARS_CONTENT: ${{ secrets.STAGING_TFVARS }}
         run: |
+          TFVARS_B64=$(echo "$TF_VARS_CONTENT" | base64 -w 0)
           BUILD_ID=$(aws codebuild start-build \
             --project-name "$APPLY_PROJECT" \
             --environment-variables-override \
@@ -126,7 +132,7 @@ jobs:
               name=PR_NUMBER,value= \
               name=PR_BRANCH,value= \
               name=BRANCH,value=${{ github.ref_name }} \
-              name=STAGING_TFVARS,value='${{ secrets.STAGING_TFVARS }}' \
+              "name=STAGING_TFVARS_B64,value=${TFVARS_B64}" \
               name=PLAN_OUTPUT_BUCKET,value=$PLAN_OUTPUT_BUCKET \
             --query 'build.id' \
             --output text)

@@ -22,7 +22,7 @@ phases:
           git checkout "$BRANCH"
         fi
       - echo "Writing secrets.auto.tfvars"
-      - printf '%s' "$STAGING_TFVARS" > staging/secrets.auto.tfvars
+      - echo "$STAGING_TFVARS_B64" | base64 -d > staging/secrets.auto.tfvars
 
   build:
     commands:
