@@ -23,6 +23,11 @@ output "controller_release_status" {
   value       = helm_release.arc_controller.status
 }
 
+output "cache_pvc_name" {
+  description = "Name of the EFS-backed PVC used for runner caching"
+  value       = kubectl_manifest.pvc_efs_arc_cache.name
+}
+
 output "runner_set_release_status" {
   description = "Status of the ARC runner scale set Helm release"
   value       = helm_release.arc_runner_set.status
