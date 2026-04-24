@@ -111,6 +111,67 @@ resource "aws_iam_role_policy_attachment" "github_website_deploy" {
   policy_arn = aws_iam_policy.github_website_deploy.arn
 }
 
+resource "aws_iam_role" "github_tf_deploy" {
+  name = "piksel-tf-deploy-github-actions"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Federated = aws_iam_openid_connect_provider.github.arn
+      }
+      Action = "sts:AssumeRoleWithWebIdentity"
+      Condition = {
+        StringEquals = {
+          "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+        }
+        StringLike = {
+          "token.actions.githubusercontent.com:sub" = "repo:piksel-ina/terraform-iac:*"
+        }
+      }
+    }]
+  })
+
+  tags = merge(var.default_tags, { ManagedBy = "Terraform" })
+}
+
+resource "aws_iam_policy" "github_tf_deploy" {
+  name = "piksel-tf-deploy-github-actions-policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "codebuild:StartBuild",
+          "codebuild:BatchGetBuilds"
+        ]
+        Resource = ["*"]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::piksel-staging-tfstate",
+          "arn:aws:s3:::piksel-staging-tfstate/*"
+        ]
+      }
+    ]
+  })
+
+  tags = merge(var.default_tags, { ManagedBy = "Terraform" })
+}
+
+resource "aws_iam_role_policy_attachment" "github_tf_deploy" {
+  role       = aws_iam_role.github_tf_deploy.name
+  policy_arn = aws_iam_policy.github_tf_deploy.arn
+}
+
 module "database" {
   source = "../aws-database"
 
@@ -186,18 +247,19 @@ module "cluster-addons" {
   default_tags          = var.default_tags
 }
 
-module "arc-runners" {
-  source = "../arc-runners"
+module "codebuild" {
+  source = "../codebuild"
 
-  cluster_name        = local.cluster_name
+  project             = var.project
+  environment         = var.environment
   aws_region          = var.aws_region
   account_id          = module.networks.account_id
+  vpc_id              = module.networks.vpc_id
+  private_subnet_ids  = module.networks.private_subnets
+  cluster_name        = local.cluster_name
   tf_state_bucket_arn = "arn:aws:s3:::piksel-staging-tfstate"
+  plan_output_bucket  = "piksel-staging-tfstate"
   default_tags        = var.default_tags
-
-  github_app_id              = var.arc_github_app_id
-  github_app_installation_id = var.arc_github_app_installation_id
-  github_app_private_key     = var.arc_github_app_private_key
 }
 
 module "applications" {

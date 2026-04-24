@@ -1,0 +1,45 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Terraform ${TF_VERSION}"
+      - curl -fsSL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip" -o terraform.zip
+      - unzip terraform.zip -d /usr/local/bin
+      - rm terraform.zip
+      - terraform version
+
+  pre_build:
+    commands:
+      - echo "Cloning repository"
+      - git clone "https://github.com/piksel-ina/terraform-iac.git" /tmp/repo
+      - cd /tmp/repo
+      - |
+        if [ -n "$PR_BRANCH" ]; then
+          git fetch origin "pull/${PR_NUMBER}/head"
+          git checkout FETCH_HEAD
+        elif [ -n "$BRANCH" ]; then
+          git checkout "$BRANCH"
+        fi
+      - echo "Writing secrets.auto.tfvars"
+      - printf '%s' "$STAGING_TFVARS" > staging/secrets.auto.tfvars
+
+  build:
+    commands:
+      - cd /tmp/repo
+      - terraform -chdir=staging init
+      - |
+        if [ "$TF_ACTION" = "plan" ]; then
+          terraform -chdir=staging plan -no-color 2>&1 | tee /tmp/plan_output.txt
+        elif [ "$TF_ACTION" = "apply" ]; then
+          terraform -chdir=staging apply -auto-approve -no-color 2>&1 | tee /tmp/apply_output.txt
+        fi
+
+  post_build:
+    commands:
+      - |
+        if [ "$TF_ACTION" = "plan" ]; then
+          aws s3 cp /tmp/plan_output.txt "s3://${PLAN_OUTPUT_BUCKET}/plans/${CODEBUILD_BUILD_ID}.txt"
+        elif [ "$TF_ACTION" = "apply" ]; then
+          aws s3 cp /tmp/apply_output.txt "s3://${PLAN_OUTPUT_BUCKET}/plans/${CODEBUILD_BUILD_ID}-apply.txt"
+        fi

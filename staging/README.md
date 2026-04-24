@@ -70,8 +70,8 @@ Edit `backup.sh` if needed:
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_applications"></a> [applications](#module\_applications) | ../applications | n/a |
-| <a name="module_arc-runners"></a> [arc-runners](#module\_arc-runners) | ../arc-runners | n/a |
 | <a name="module_cluster-addons"></a> [cluster-addons](#module\_cluster-addons) | ../cluster-addons | n/a |
+| <a name="module_codebuild"></a> [codebuild](#module\_codebuild) | ../codebuild | n/a |
 | <a name="module_database"></a> [database](#module\_database) | ../aws-database | n/a |
 | <a name="module_eks-cluster"></a> [eks-cluster](#module\_eks-cluster) | ../aws-eks-cluster | n/a |
 | <a name="module_external-dns"></a> [external-dns](#module\_external-dns) | ../external-dns | n/a |
@@ -85,17 +85,17 @@ Edit `backup.sh` if needed:
 | Name | Type |
 |------|------|
 | [aws_iam_openid_connect_provider.github](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider) | resource |
+| [aws_iam_policy.github_tf_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.github_tf_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.github_tf_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.github_website_deploy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_arc_github_app_id"></a> [arc\_github\_app\_id](#input\_arc\_github\_app\_id) | GitHub App Client ID for ARC authentication | `string` | n/a | yes |
-| <a name="input_arc_github_app_installation_id"></a> [arc\_github\_app\_installation\_id](#input\_arc\_github\_app\_installation\_id) | GitHub App Installation ID for ARC | `string` | n/a | yes |
-| <a name="input_arc_github_app_private_key"></a> [arc\_github\_app\_private\_key](#input\_arc\_github\_app\_private\_key) | GitHub App Private Key for ARC (PEM contents) | `string` | n/a | yes |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | Region to deploy resources in | `string` | `"ap-southeast-3"` | no |
 | <a name="input_default_tags"></a> [default\_tags](#input\_default\_tags) | A map of default tags to apply to all AWS resources | `map(string)` | <pre>{<br/>  "Environment": "Staging",<br/>  "ManagedBy": "Terraform",<br/>  "Owner": "Piksel-Devops-Team",<br/>  "Project": "Piksel"<br/>}</pre> | no |
 | <a name="input_enable_flow_log"></a> [enable\_flow\_log](#input\_enable\_flow\_log) | Enable VPC Flow Logs for monitoring network traffic | `bool` | `false` | no |
@@ -112,12 +112,13 @@ Edit `backup.sh` if needed:
 | Name | Description |
 |------|-------------|
 | <a name="output_account_id"></a> [account\_id](#output\_account\_id) | The AWS account ID |
-| <a name="output_arc_metadata"></a> [arc\_metadata](#output\_arc\_metadata) | Output of ARC runner configuration and resources |
 | <a name="output_argo_workflow_metadata"></a> [argo\_workflow\_metadata](#output\_argo\_workflow\_metadata) | Output of Argo Workflow configuration and resources |
 | <a name="output_cluster_addons_metadata"></a> [cluster\_addons\_metadata](#output\_cluster\_addons\_metadata) | Cluster addon Helm release statuses |
+| <a name="output_codebuild_metadata"></a> [codebuild\_metadata](#output\_codebuild\_metadata) | CodeBuild project details for Terraform CI/CD |
 | <a name="output_database_metadata"></a> [database\_metadata](#output\_database\_metadata) | Output of RDS database configuration and resources |
 | <a name="output_eks_cluster_metadata"></a> [eks\_cluster\_metadata](#output\_eks\_cluster\_metadata) | Output of EKS Cluster |
 | <a name="output_external_dns_metadata"></a> [external\_dns\_metadata](#output\_external\_dns\_metadata) | Output of External DNS configuration and resources |
+| <a name="output_github_tf_deploy_role_arn"></a> [github\_tf\_deploy\_role\_arn](#output\_github\_tf\_deploy\_role\_arn) | ARN of the IAM role for GitHub Actions Terraform deployment (OIDC) |
 | <a name="output_github_website_deploy_role_arn"></a> [github\_website\_deploy\_role\_arn](#output\_github\_website\_deploy\_role\_arn) | ARN of the IAM role for GitHub Actions website deployment (OIDC) |
 | <a name="output_grafana_metadata"></a> [grafana\_metadata](#output\_grafana\_metadata) | Output of Grafana configuration and resources. Values are empty strings when Grafana is disabled. |
 | <a name="output_jupyterhub_metadata"></a> [jupyterhub\_metadata](#output\_jupyterhub\_metadata) | Output of JupyterHub configuration and resources |

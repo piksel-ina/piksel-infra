@@ -227,15 +227,16 @@ output "terria_metadata" {
   }
 }
 
-# --- ARC Runner Outputs ---
-output "arc_metadata" {
-  description = "Output of ARC runner configuration and resources"
+output "github_tf_deploy_role_arn" {
+  description = "ARN of the IAM role for GitHub Actions Terraform deployment (OIDC)"
+  value       = aws_iam_role.github_tf_deploy.arn
+}
+
+output "codebuild_metadata" {
+  description = "CodeBuild project details for Terraform CI/CD"
   value = {
-    namespace              = module.arc-runners.namespace
-    runner_name            = module.arc-runners.runner_name
-    runner_role_arn        = module.arc-runners.runner_role_arn
-    runner_service_account = module.arc-runners.runner_service_account
-    controller_status      = module.arc-runners.controller_release_status
-    runner_set_status      = module.arc-runners.runner_set_release_status
+    plan_project_name  = module.codebuild.plan_project_name
+    apply_project_name = module.codebuild.apply_project_name
+    codebuild_role_arn = module.codebuild.codebuild_role_arn
   }
 }
