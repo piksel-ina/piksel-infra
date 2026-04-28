@@ -21,13 +21,18 @@ phases:
         elif [ -n "$BRANCH" ]; then
           git checkout "$BRANCH"
         fi
-      - echo "Writing secrets.auto.tfvars"
-      - echo "$STAGING_TFVARS_B64" | base64 -d > staging/secrets.auto.tfvars
 
   build:
     commands:
       - cd /tmp/repo
-      - terraform -chdir=staging init
+      - |
+        for i in 1 2 3; do
+          echo "terraform init attempt $i"
+          if terraform -chdir=staging init; then break; fi
+          if [ "$i" -eq 3 ]; then exit 1; fi
+          echo "init failed, retrying in 10s..."
+          sleep 10
+        done
       - set -o pipefail
       - |
         if [ "$TF_ACTION" = "plan" ]; then
@@ -39,8 +44,8 @@ phases:
   post_build:
     commands:
       - |
-        if [ "$TF_ACTION" = "plan" ]; then
+        if [ "$TF_ACTION" = "plan" ] && [ -f /tmp/plan_output.txt ]; then
           aws s3 cp /tmp/plan_output.txt "s3://${PLAN_OUTPUT_BUCKET}/plans/${CODEBUILD_BUILD_ID}.txt"
-        elif [ "$TF_ACTION" = "apply" ]; then
+        elif [ "$TF_ACTION" = "apply" ] && [ -f /tmp/apply_output.txt ]; then
           aws s3 cp /tmp/apply_output.txt "s3://${PLAN_OUTPUT_BUCKET}/plans/${CODEBUILD_BUILD_ID}-apply.txt"
         fi

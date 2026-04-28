@@ -139,11 +139,24 @@ module "eks" {
   }
 
   # Enable cluster access
-  enable_cluster_creator_admin_permissions = true
+  enable_cluster_creator_admin_permissions = false
   access_entries = {
     admin-access = {
       kubernetes_groups = []
       principal_arn     = var.sso-admin-role-arn
+
+      policy_associations = {
+        single = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+    codebuild-access = {
+      kubernetes_groups = []
+      principal_arn     = var.codebuild_role_arn
 
       policy_associations = {
         single = {

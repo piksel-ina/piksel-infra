@@ -208,6 +208,7 @@ module "eks-cluster" {
   ebs-csi-version      = "v1.57.1-eksbuild.1"
   pod-identity-version = "v1.3.10-eksbuild.2"
   sso-admin-role-arn   = "arn:aws:iam::326641642924:role/aws-reserved/sso.amazonaws.com/ap-southeast-3/AWSReservedSSO_AdministratorAccess_0e029b26d9443921"
+  codebuild_role_arn   = module.codebuild.codebuild_role_arn
   efs_backup_enabled   = false
   default_tags         = var.default_tags
 }

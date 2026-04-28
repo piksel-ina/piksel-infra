@@ -74,6 +74,12 @@ variable "efs_backup_enabled" {
   default     = false
 }
 
+variable "codebuild_role_arn" {
+  description = "ARN of the CodeBuild IAM role for EKS cluster access"
+  type        = string
+  default     = ""
+}
+
 variable "cross_account_ecr_role_arn" {
   description = "Cross Account ECR Role ARN"
   type        = string
