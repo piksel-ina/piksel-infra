@@ -28,6 +28,7 @@ phases:
     commands:
       - cd /tmp/repo
       - terraform -chdir=staging init
+      - set -o pipefail
       - |
         if [ "$TF_ACTION" = "plan" ]; then
           terraform -chdir=staging plan -no-color 2>&1 | tee /tmp/plan_output.txt

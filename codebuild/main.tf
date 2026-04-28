@@ -45,97 +45,34 @@ resource "aws_iam_role" "codebuild" {
   })
 }
 
-resource "aws_iam_policy" "codebuild" {
-  name = "${var.project}-tf-codebuild-policy"
+resource "aws_iam_policy" "codebuild_iam" {
+  name        = "${var.project}-tf-codebuild-iam-policy"
+  description = "IAM permissions for Terraform CodeBuild role"
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ]
-        Resource = [
-          var.tf_state_bucket_arn,
-          "${var.tf_state_bucket_arn}/*"
-        ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret"
-        ]
-        Resource = ["arn:aws:secretsmanager:${var.aws_region}:${var.account_id}:secret:*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:PutImage",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload"
-        ]
+        Effect   = "Allow"
+        Action   = ["iam:*"]
         Resource = ["*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "eks:DescribeCluster",
-          "eks:ListAddons",
-          "eks:DescribeAddon"
-        ]
-        Resource = ["arn:aws:eks:${var.aws_region}:${var.account_id}:cluster/${var.cluster_name}"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:CreateNetworkInterface",
-          "ec2:CreateNetworkInterfacePermission",
-          "ec2:DeleteNetworkInterface",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeDhcpOptions",
-          "ec2:DescribeVpcs"
-        ]
-        Resource = ["*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:CreateTags"
-        ]
-        Resource = ["arn:aws:ec2:${var.aws_region}:${var.account_id}:network-interface/*"]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = ["arn:aws:logs:${var.aws_region}:${var.account_id}:log-group:/aws/codebuild/*"]
       }
     ]
   })
 
   tags = merge(var.default_tags, {
-    Name = "${var.project}-tf-codebuild-policy"
+    Name = "${var.project}-tf-codebuild-iam-policy"
   })
 }
 
-resource "aws_iam_role_policy_attachment" "codebuild" {
+resource "aws_iam_role_policy_attachment" "codebuild_poweruser" {
   role       = aws_iam_role.codebuild.name
-  policy_arn = aws_iam_policy.codebuild.arn
+  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_iam" {
+  role       = aws_iam_role.codebuild.name
+  policy_arn = aws_iam_policy.codebuild_iam.arn
 }
 
 resource "aws_codebuild_project" "plan" {
