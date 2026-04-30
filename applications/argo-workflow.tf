@@ -147,7 +147,7 @@ resource "kubernetes_secret" "argo_db_secret" {
     db_name    = local.project
     db_address = var.db_address
     username   = local.db_username
-    password   = base64encode(data.aws_secretsmanager_secret_version.db_secret.secret_string)
+    password   = data.aws_secretsmanager_secret_version.db_secret.secret_string
   }
 }
 

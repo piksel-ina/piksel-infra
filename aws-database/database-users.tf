@@ -195,6 +195,15 @@ locals {
   additional_databases = ["argo", "jupyterhub", "grafana", "stac", "odc"]
 }
 
+# --- Extensions ---
+
+resource "postgresql_extension" "postgis" {
+  name     = "postgis"
+  database = "odc"
+
+  depends_on = [postgresql_database.app_databases]
+}
+
 # --- Databases ---
 
 resource "postgresql_database" "app_databases" {
