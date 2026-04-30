@@ -36,13 +36,16 @@ jobs:
 
       - name: Trigger CodeBuild plan
         id: codebuild
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BRANCH: ${{ github.head_ref }}
         run: |
           BUILD_ID=$(aws codebuild start-build \
             --project-name "$PLAN_PROJECT" \
             --environment-variables-override \
               name=TF_ACTION,value=plan \
-              name=PR_NUMBER,value=${{ github.event.pull_request.number }} \
-              name=PR_BRANCH,value=${{ github.head_ref }} \
+              name=PR_NUMBER,value="$PR_NUMBER" \
+              name=PR_BRANCH,value="$PR_BRANCH" \
               name=BRANCH,value= \
               name=PLAN_OUTPUT_BUCKET,value=$PLAN_OUTPUT_BUCKET \
             --query 'build.id' \

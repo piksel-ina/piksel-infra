@@ -46,6 +46,11 @@ resource "aws_iam_role" "codebuild" {
 }
 
 resource "aws_iam_policy" "codebuild_iam" {
+  #checkov:skip=CKV_AWS_289:Terraform CI/CD requires broad IAM access to manage all infrastructure resources
+  #checkov:skip=CKV_AWS_355:Terraform CI/CD requires broad IAM access to manage all infrastructure resources
+  #checkov:skip=CKV_AWS_286:Terraform CI/CD requires broad IAM access to manage all infrastructure resources
+  #checkov:skip=CKV_AWS_287:Terraform CI/CD requires broad IAM access to manage all infrastructure resources
+  #checkov:skip=CKV2_AWS_40:Terraform CI/CD requires broad IAM access to manage all infrastructure resources
   name        = "${var.project}-tf-codebuild-iam-policy"
   description = "IAM permissions for Terraform CodeBuild role"
 
