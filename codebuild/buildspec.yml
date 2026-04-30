@@ -33,12 +33,13 @@ phases:
           echo "init failed, retrying in 10s..."
           sleep 10
         done
-      - set -o pipefail
       - |
         if [ "$TF_ACTION" = "plan" ]; then
           terraform -chdir=staging plan -no-color 2>&1 | tee /tmp/plan_output.txt
+          exit "${PIPESTATUS[0]}"
         elif [ "$TF_ACTION" = "apply" ]; then
           terraform -chdir=staging apply -auto-approve -no-color 2>&1 | tee /tmp/apply_output.txt
+          exit "${PIPESTATUS[0]}"
         fi
 
   post_build:

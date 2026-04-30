@@ -267,6 +267,16 @@ module "codebuild" {
   default_tags        = var.default_tags
 }
 
+resource "aws_security_group_rule" "codebuild_to_eks_api" {
+  description              = "Allow CodeBuild to reach EKS control plane API"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = module.codebuild.codebuild_security_group_id
+  security_group_id        = module.eks-cluster.cluster_security_group_id
+}
+
 module "applications" {
   source = "../applications"
 

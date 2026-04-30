@@ -44,3 +44,8 @@ output "efs_csi_irsa_role_arn" {
   description = "IAM role ARN for EFS CSI driver controller service account"
   value       = module.efs_csi_irsa_role.iam_role_arn
 }
+
+output "cluster_security_group_id" {
+  description = "Security group ID attached to the EKS cluster control plane ENIs"
+  value       = module.eks.cluster_security_group_id
+}

@@ -22,3 +22,8 @@ output "codebuild_role_arn" {
   description = "IAM role ARN used by CodeBuild"
   value       = aws_iam_role.codebuild.arn
 }
+
+output "codebuild_security_group_id" {
+  description = "Security group ID attached to the CodeBuild projects"
+  value       = aws_security_group.codebuild.id
+}
